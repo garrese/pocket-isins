@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/markets_provider.dart';
+import 'screens/ticker_detail_screen.dart';
 
 class MarketsScreen extends ConsumerWidget {
   const MarketsScreen({super.key});
@@ -40,7 +41,8 @@ class MarketsScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
                       isin.name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                   ...isin.tickers.map((ticker) {
@@ -50,53 +52,74 @@ class MarketsScreen extends ConsumerWidget {
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           title: Text(ticker.symbol),
-                          subtitle: const Text('Data not available. Invalid ticker or not found on Yahoo.', style: TextStyle(color: Colors.redAccent)),
-                          trailing: const Icon(Icons.error_outline, color: Colors.red),
+                          subtitle: const Text(
+                              'Data not available. Invalid ticker or not found on Yahoo.',
+                              style: TextStyle(color: Colors.redAccent)),
+                          trailing: const Icon(Icons.error_outline,
+                              color: Colors.red),
                         ),
                       );
                     }
 
-                    final variation = cache.regularMarketPrice - cache.chartPreviousClose;
-                    final variationPercent = (variation / cache.chartPreviousClose) * 100;
+                    final variation =
+                        cache.regularMarketPrice - cache.chartPreviousClose;
+                    final variationPercent =
+                        (variation / cache.chartPreviousClose) * 100;
                     final isPositive = variation >= 0;
                     final color = isPositive ? Colors.green : Colors.red;
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            // Ticker Info
-                            Expanded(
-                              flex: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    ticker.symbol,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                  ),
-                                  Text(
-                                    '${cache.regularMarketPrice.toStringAsFixed(2)} ${ticker.currency}',
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  Text(
-                                    '${isPositive ? '+' : ''}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
-                                    style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  TickerDetailScreen(symbol: ticker.symbol),
                             ),
-                            // Sparkline Chart (Level 2)
-                            Expanded(
-                              flex: 2,
-                              child: SizedBox(
-                                height: 50,
-                                child: _buildSparkline(cache.intradayPrices, color),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              // Ticker Info
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      ticker.symbol,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      '${cache.regularMarketPrice.toStringAsFixed(2)} ${ticker.currency}',
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                    Text(
+                                      '${isPositive ? '+' : ''}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: color,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                              // Sparkline Chart (Level 2)
+                              Expanded(
+                                flex: 2,
+                                child: SizedBox(
+                                  height: 50,
+                                  child: _buildSparkline(
+                                      cache.intradayPrices, color),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
