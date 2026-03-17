@@ -65,7 +65,7 @@ class InsightsScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Error: \$searchError',
+                'Error: $searchError',
                 style: const TextStyle(color: Colors.red),
               ),
             ),
