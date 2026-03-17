@@ -26,6 +26,11 @@ const IsinSchema = CollectionSchema(
       id: 1,
       name: r'name',
       type: IsarType.string,
+    ),
+    r'shortName': PropertySchema(
+      id: 2,
+      name: r'shortName',
+      type: IsarType.string,
     )
   },
   estimateSize: _isinEstimateSize,
@@ -71,6 +76,12 @@ int _isinEstimateSize(
   var bytesCount = offsets.last;
   bytesCount += 3 + object.isinCode.length * 3;
   bytesCount += 3 + object.name.length * 3;
+  {
+    final value = object.shortName;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -82,6 +93,7 @@ void _isinSerialize(
 ) {
   writer.writeString(offsets[0], object.isinCode);
   writer.writeString(offsets[1], object.name);
+  writer.writeString(offsets[2], object.shortName);
 }
 
 Isin _isinDeserialize(
@@ -94,6 +106,7 @@ Isin _isinDeserialize(
   object.id = id;
   object.isinCode = reader.readString(offsets[0]);
   object.name = reader.readString(offsets[1]);
+  object.shortName = reader.readStringOrNull(offsets[2]);
   return object;
 }
 
@@ -108,6 +121,8 @@ P _isinDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
+    case 2:
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -608,6 +623,152 @@ extension IsinQueryFilter on QueryBuilder<Isin, Isin, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'shortName',
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'shortName',
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'shortName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'shortName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'shortName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'shortName',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'shortName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'shortName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'shortName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'shortName',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'shortName',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterFilterCondition> shortNameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'shortName',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension IsinQueryObject on QueryBuilder<Isin, Isin, QFilterCondition> {}
@@ -694,6 +855,18 @@ extension IsinQuerySortBy on QueryBuilder<Isin, Isin, QSortBy> {
       return query.addSortBy(r'name', Sort.desc);
     });
   }
+
+  QueryBuilder<Isin, Isin, QAfterSortBy> sortByShortName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shortName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterSortBy> sortByShortNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shortName', Sort.desc);
+    });
+  }
 }
 
 extension IsinQuerySortThenBy on QueryBuilder<Isin, Isin, QSortThenBy> {
@@ -732,6 +905,18 @@ extension IsinQuerySortThenBy on QueryBuilder<Isin, Isin, QSortThenBy> {
       return query.addSortBy(r'name', Sort.desc);
     });
   }
+
+  QueryBuilder<Isin, Isin, QAfterSortBy> thenByShortName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shortName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QAfterSortBy> thenByShortNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shortName', Sort.desc);
+    });
+  }
 }
 
 extension IsinQueryWhereDistinct on QueryBuilder<Isin, Isin, QDistinct> {
@@ -746,6 +931,13 @@ extension IsinQueryWhereDistinct on QueryBuilder<Isin, Isin, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Isin, Isin, QDistinct> distinctByShortName(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'shortName', caseSensitive: caseSensitive);
     });
   }
 }
@@ -766,6 +958,12 @@ extension IsinQueryProperty on QueryBuilder<Isin, Isin, QQueryProperty> {
   QueryBuilder<Isin, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<Isin, String?, QQueryOperations> shortNameProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'shortName');
     });
   }
 }

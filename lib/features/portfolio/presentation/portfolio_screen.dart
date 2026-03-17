@@ -43,7 +43,7 @@ class PortfolioScreen extends ConsumerWidget {
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   title: Text(
-                    isin.name,
+                    isin.displayName,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
