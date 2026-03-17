@@ -4,6 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/database/isar_service.dart';
 import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/ticker.dart';
+import '../../../core/database/models/position.dart';
+import '../domain/portfolio_form_data.dart';
 
 part 'portfolio_provider.g.dart';
 
@@ -16,43 +18,90 @@ class Portfolio extends _$Portfolio {
 
   Future<List<Isin>> _fetchIsins() async {
     final isar = ref.read(isarServiceProvider).db;
-    // We load all Isins. Also we need to make sure the tickers are loaded.
-    // In Isar, IsarLinks are loaded lazily, so we might need to load them if accessed,
-    // but put/putAll with save() populates them.
     final isins = await isar.isins.where().findAll();
     for (var isin in isins) {
       await isin.tickers.load();
+      for (var ticker in isin.tickers) {
+        await ticker.positions.load();
+      }
     }
     return isins;
   }
 
-  Future<void> addIsin(String isinCode, String name, double position, double purchasePrice, String currency, List<String> newTickers) async {
+  Future<void> saveIsin({
+    int? id,
+    required String isinCode,
+    required String name,
+    required List<TickerFormData> tickersData,
+  }) async {
     final isar = ref.read(isarServiceProvider).db;
 
-    final newIsin = Isin()
-      ..isinCode = isinCode
-      ..name = name
-      ..position = position
-      ..purchasePrice = purchasePrice
-      ..currency = currency;
-
     await isar.writeTxn(() async {
-      await isar.isins.put(newIsin);
+      final isin = id != null ? await isar.isins.get(id) : Isin();
+      if (isin == null) return;
 
-      if (newTickers.isNotEmpty) {
-        final tickersObj = newTickers.map((t) => Ticker()
-          ..symbol = t
-          ..exchange = 'UNKNOWN'
-          ..currency = currency
-          ..isin.value = newIsin).toList();
+      isin.isinCode = isinCode;
+      isin.name = name;
+      await isar.isins.put(isin);
+
+      if (id != null) {
+        await isin.tickers.load();
         
-        await isar.tickers.putAll(tickersObj);
-        newIsin.tickers.addAll(tickersObj);
-        await newIsin.tickers.save();
+        // Identify and remove tickers that are no longer present
+        final retainedSymbols = tickersData.map((e) => e.symbol).toSet();
+        final toRemove = isin.tickers.where((t) => !retainedSymbols.contains(t.symbol)).toList();
+        for (var t in toRemove) {
+          await t.positions.load();
+          for (var p in t.positions) {
+            await isar.positions.delete(p.id);
+          }
+          await isar.tickers.delete(t.id);
+          isin.tickers.remove(t);
+        }
       }
+
+      // Upsert current tickers and positions
+      for (final tData in tickersData) {
+        Ticker? ticker;
+        if (id != null) {
+          ticker = isin.tickers.cast<Ticker?>().firstWhere((t) => t?.symbol == tData.symbol, orElse: () => null);
+        }
+        
+        if (ticker == null) {
+          ticker = Ticker()
+            ..symbol = tData.symbol
+            ..isin.value = isin;
+          isin.tickers.add(ticker);
+        }
+        
+        ticker.exchange = tData.exchange;
+        ticker.currency = tData.currency;
+        await isar.tickers.put(ticker);
+
+        await ticker.positions.load();
+        
+        // For simplicity in the dynamic form without position IDs, we replace all nested positions on save
+        for (var oldPos in ticker.positions) {
+           await isar.positions.delete(oldPos.id);
+        }
+        ticker.positions.clear();
+
+        // Add positions
+        for (final pData in tData.positions) {
+          final pos = Position()
+            ..capitalInvested = pData.capitalInvested
+            ..purchasePrice = pData.purchasePrice
+            ..ticker.value = ticker;
+          await isar.positions.put(pos);
+          ticker.positions.add(pos);
+        }
+        
+        await ticker.positions.save();
+      }
+      
+      await isin.tickers.save();
     });
 
-    // Refresh state
     state = const AsyncValue.loading();
     state = AsyncValue.data(await _fetchIsins());
   }
@@ -61,64 +110,20 @@ class Portfolio extends _$Portfolio {
     final isar = ref.read(isarServiceProvider).db;
 
     await isar.writeTxn(() async {
-      // Deleting an Isin also requires deleting or unlinking its Tickers
       final isin = await isar.isins.get(id);
       if (isin != null) {
         await isin.tickers.load();
-        // Delete all associated tickers
         for (var ticker in isin.tickers) {
+          await ticker.positions.load();
+          for (var pos in ticker.positions) {
+            await isar.positions.delete(pos.id);
+          }
           await isar.tickers.delete(ticker.id);
         }
         await isar.isins.delete(id);
       }
     });
 
-    // Refresh state
-    state = const AsyncValue.loading();
-    state = AsyncValue.data(await _fetchIsins());
-  }
-
-  Future<void> editIsin(int id, String name, double position, double purchasePrice, String currency, List<String> currentTickers) async {
-    final isar = ref.read(isarServiceProvider).db;
-
-    await isar.writeTxn(() async {
-      final isin = await isar.isins.get(id);
-      if (isin != null) {
-        isin.name = name;
-        isin.position = position;
-        isin.purchasePrice = purchasePrice;
-        isin.currency = currency;
-        await isar.isins.put(isin);
-
-        await isin.tickers.load();
-        
-        // Remove tickers that are no longer in the list
-        final toRemove = isin.tickers.where((t) => !currentTickers.contains(t.symbol)).toList();
-        for (var t in toRemove) {
-          await isar.tickers.delete(t.id);
-          isin.tickers.remove(t);
-        }
-
-        // Add new tickers that are not in the database yet
-        final existingSymbols = isin.tickers.map((t) => t.symbol).toSet();
-        final toAddSymbols = currentTickers.where((sym) => !existingSymbols.contains(sym)).toList();
-        
-        if (toAddSymbols.isNotEmpty) {
-          final newObjs = toAddSymbols.map((sym) => Ticker()
-            ..symbol = sym
-            ..exchange = 'UNKNOWN'
-            ..currency = currency
-            ..isin.value = isin).toList();
-
-          await isar.tickers.putAll(newObjs);
-          isin.tickers.addAll(newObjs);
-        }
-
-        await isin.tickers.save();
-      }
-    });
-
-    // Refresh state
     state = const AsyncValue.loading();
     state = AsyncValue.data(await _fetchIsins());
   }

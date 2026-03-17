@@ -6,7 +6,7 @@ part of 'markets_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$marketsHash() => r'0f03b28704e3f924751dfcb2310eb62f0d081554';
+String _$marketsHash() => r'00af66e2c6d33c537152759096e858466a795adf';
 
 /// See also [Markets].
 @ProviderFor(Markets)
