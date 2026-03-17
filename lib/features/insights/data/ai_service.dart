@@ -44,6 +44,8 @@ Example format:
 
     if (settings.apiProvider == 'google_ai_studio') {
       return _fetchNewsGoogleAIStudio(settings, prompt);
+    } else if (settings.apiProvider == 'openrouter_web') {
+      return _fetchNewsOpenAICompatible(settings, prompt, openRouterWeb: true);
     } else {
       return _fetchNewsOpenAICompatible(settings, prompt);
     }
@@ -115,7 +117,7 @@ Example format:
   }
 
   Future<List<NewsCardModel>> _fetchNewsOpenAICompatible(
-      AiSettings settings, String prompt) async {
+      AiSettings settings, String prompt, {bool openRouterWeb = false}) async {
     if (settings.apiKey.isEmpty && settings.baseUrl.contains('openai.com')) {
       throw Exception('API Key is missing for OpenAI.');
     }
@@ -141,6 +143,10 @@ Example format:
           'content': 'Find the latest important stock market news.'
         }
       ],
+      if (openRouterWeb)
+        'plugins': [
+          {'id': 'web'}
+        ],
       // We enable generic tools/search if the model supports it natively via prompt,
       // or we just rely on models like gpt-4o which might search if asked.
       // Some APIs use specific parameters to force search, but since this is a "Universal Connector"
