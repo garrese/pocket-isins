@@ -33,8 +33,10 @@ class MarketDataService {
         'range': range,
       });
       if (response.statusCode == 200) return response.data;
-    } catch (e) {
-      print('MarketDataService Error fetching $symbol: $e');
+    } catch (e, stack) {
+      // ignore: avoid_print
+      print('MarketDataService Error fetching $symbol: $e\n$stack');
+      rethrow; // Rethrow to let the UI know about the error
     }
     return null;
   }
