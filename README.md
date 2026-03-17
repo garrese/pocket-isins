@@ -13,7 +13,7 @@
 * **Paradigma:** 100% Local (Client-Side). No existe un backend propio ni servidor en la nube. Toda la lógica de orquestación reside en la aplicación.
 * **Gestión de Estado:** Riverpod. Encargado de separar la capa de datos de la interfaz visual y manejar la reactividad.
 * **Persistencia de Datos:**
-    * Base de datos local (SQLite o Isar) para almacenar la cartera (ISINs, relaciones con Tickers, transacciones, caché de noticias).
+    * Base de datos local (Isar) para almacenar la cartera (ISINs, relaciones con Tickers, transacciones, caché de noticias, caché de tickers).
     * Capa de almacenamiento seguro (`flutter_secure_storage`) para encriptar en el dispositivo las API Keys del usuario.
 
 ## 3. Integración de Inteligencia Artificial (Enfoque BYOK)
