@@ -15,16 +15,19 @@ class AiSettingsRepository {
 
   AiSettingsRepository(this._storage);
 
+  static const _keyApiProvider = 'ai_api_provider';
   static const _keyBaseUrl = 'ai_base_url';
   static const _keyApiKey = 'ai_api_key';
   static const _keyModelName = 'ai_model_name';
 
   Future<AiSettings> getSettings() async {
+    final apiProvider = await _storage.read(key: _keyApiProvider);
     final baseUrl = await _storage.read(key: _keyBaseUrl);
     final apiKey = await _storage.read(key: _keyApiKey);
     final modelName = await _storage.read(key: _keyModelName);
 
     return AiSettings(
+      apiProvider: apiProvider ?? 'openai',
       baseUrl: baseUrl ?? 'https://api.openai.com/v1',
       apiKey: apiKey ?? '',
       modelName: modelName ?? 'gpt-4o',
@@ -32,6 +35,7 @@ class AiSettingsRepository {
   }
 
   Future<void> saveSettings(AiSettings settings) async {
+    await _storage.write(key: _keyApiProvider, value: settings.apiProvider);
     await _storage.write(key: _keyBaseUrl, value: settings.baseUrl);
     await _storage.write(key: _keyApiKey, value: settings.apiKey);
     await _storage.write(key: _keyModelName, value: settings.modelName);
