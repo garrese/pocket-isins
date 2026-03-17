@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  static ThemeData get darkTheme {
+    return ThemeData.dark().copyWith(
+      primaryColor: Colors.tealAccent,
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.tealAccent,
+        secondary: Colors.amberAccent,
+        surface: Color(0xFF1E1E2C),
+      ),
+      scaffoldBackgroundColor: const Color(0xFF12121D),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF1E1E2C),
+        elevation: 0,
+        centerTitle: true,
+      ),
+      cardTheme: const CardThemeData(
+        color: Color(0xFF1E1E2C),
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+      ),
+    );
+  }
+}
