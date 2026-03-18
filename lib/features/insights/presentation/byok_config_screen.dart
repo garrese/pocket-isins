@@ -20,6 +20,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
   late TextEditingController _baseUrlController;
   late TextEditingController _apiKeyController;
   late TextEditingController _modelNameController;
+  String _selectedProvider = 'openai';
   bool _isSaving = false;
 
   @override
@@ -46,6 +47,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
     });
 
     final newSettings = AiSettings(
+      apiProvider: _selectedProvider,
       baseUrl: _baseUrlController.text.trim(),
       apiKey: _apiKeyController.text.trim(),
       modelName: _modelNameController.text.trim(),
@@ -93,6 +95,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
           if (_baseUrlController.text.isEmpty &&
               _apiKeyController.text.isEmpty &&
               _modelNameController.text.isEmpty) {
+            _selectedProvider = settings.apiProvider;
             _baseUrlController.text = settings.baseUrl;
             _apiKeyController.text = settings.apiKey;
             _modelNameController.text = settings.modelName;
@@ -107,10 +110,35 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                 children: [
                   const Text(
                     'Configure your "Bring Your Own Key" (BYOK) AI provider. '
-                    'This allows you to use OpenAI, OpenRouter, Ollama, or any standard compatible API.',
+                    'Select your API Provider below. Supported: OpenAI-compatible APIs (OpenAI, OpenRouter, Ollama) and Google AI Studio.',
                     style: TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 24),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedProvider,
+                    decoration: const InputDecoration(
+                      labelText: 'API Provider',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'openai',
+                        child: Text('OpenAI / Compatible (OpenRouter, etc.)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'google_ai_studio',
+                        child: Text('Google AI Studio (Gemini)'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedProvider = value;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _baseUrlController,
                     decoration: const InputDecoration(
