@@ -103,8 +103,8 @@ class TickerDetailScreen extends ConsumerWidget {
         }
       }
 
-      if (prices.isEmpty) {
-        return const Center(child: Text('No price data available.'));
+      if (prices.length < 2) {
+        return const Center(child: Text('Not enough price data available.'));
       }
 
       return Column(
