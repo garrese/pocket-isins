@@ -3,7 +3,9 @@ import 'ticker.dart';
 
 part 'position.g.dart';
 
-@collection
+
+@Collection(accessor: "positions")
+@Name("Position")
 class Position {
   Id id = Isar.autoIncrement;
 

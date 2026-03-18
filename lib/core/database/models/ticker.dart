@@ -5,7 +5,9 @@ import 'market_data_cache.dart';
 
 part 'ticker.g.dart';
 
-@collection
+
+@Collection(accessor: "tickers")
+@Name("Ticker")
 class Ticker {
   Id id = Isar.autoIncrement;
 
