@@ -17,30 +17,15 @@ const IsinSchema = CollectionSchema(
   name: r'Isin',
   id: -9173980691444550219,
   properties: {
-    r'currency': PropertySchema(
-      id: 0,
-      name: r'currency',
-      type: IsarType.string,
-    ),
     r'isinCode': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'isinCode',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'name',
       type: IsarType.string,
-    ),
-    r'position': PropertySchema(
-      id: 3,
-      name: r'position',
-      type: IsarType.double,
-    ),
-    r'purchasePrice': PropertySchema(
-      id: 4,
-      name: r'purchasePrice',
-      type: IsarType.double,
     )
   },
   estimateSize: _isinEstimateSize,
@@ -84,7 +69,6 @@ int _isinEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.currency.length * 3;
   bytesCount += 3 + object.isinCode.length * 3;
   bytesCount += 3 + object.name.length * 3;
   return bytesCount;
@@ -96,11 +80,8 @@ void _isinSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.currency);
-  writer.writeString(offsets[1], object.isinCode);
-  writer.writeString(offsets[2], object.name);
-  writer.writeDouble(offsets[3], object.position);
-  writer.writeDouble(offsets[4], object.purchasePrice);
+  writer.writeString(offsets[0], object.isinCode);
+  writer.writeString(offsets[1], object.name);
 }
 
 Isin _isinDeserialize(
@@ -110,12 +91,9 @@ Isin _isinDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Isin();
-  object.currency = reader.readString(offsets[0]);
   object.id = id;
-  object.isinCode = reader.readString(offsets[1]);
-  object.name = reader.readString(offsets[2]);
-  object.position = reader.readDouble(offsets[3]);
-  object.purchasePrice = reader.readDouble(offsets[4]);
+  object.isinCode = reader.readString(offsets[0]);
+  object.name = reader.readString(offsets[1]);
   return object;
 }
 
@@ -130,12 +108,6 @@ P _isinDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
-    case 2:
-      return (reader.readString(offset)) as P;
-    case 3:
-      return (reader.readDouble(offset)) as P;
-    case 4:
-      return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -328,135 +300,6 @@ extension IsinQueryWhere on QueryBuilder<Isin, Isin, QWhereClause> {
 }
 
 extension IsinQueryFilter on QueryBuilder<Isin, Isin, QFilterCondition> {
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'currency',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'currency',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'currency',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'currency',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'currency',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'currency',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyContains(String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'currency',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'currency',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'currency',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> currencyIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'currency',
-        value: '',
-      ));
-    });
-  }
-
   QueryBuilder<Isin, Isin, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -765,130 +608,6 @@ extension IsinQueryFilter on QueryBuilder<Isin, Isin, QFilterCondition> {
       ));
     });
   }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> positionEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'position',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> positionGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'position',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> positionLessThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'position',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> positionBetween(
-    double lower,
-    double upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'position',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> purchasePriceEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'purchasePrice',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> purchasePriceGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'purchasePrice',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> purchasePriceLessThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'purchasePrice',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterFilterCondition> purchasePriceBetween(
-    double lower,
-    double upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'purchasePrice',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
 }
 
 extension IsinQueryObject on QueryBuilder<Isin, Isin, QFilterCondition> {}
@@ -952,18 +671,6 @@ extension IsinQueryLinks on QueryBuilder<Isin, Isin, QFilterCondition> {
 }
 
 extension IsinQuerySortBy on QueryBuilder<Isin, Isin, QSortBy> {
-  QueryBuilder<Isin, Isin, QAfterSortBy> sortByCurrency() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currency', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> sortByCurrencyDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currency', Sort.desc);
-    });
-  }
-
   QueryBuilder<Isin, Isin, QAfterSortBy> sortByIsinCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isinCode', Sort.asc);
@@ -987,45 +694,9 @@ extension IsinQuerySortBy on QueryBuilder<Isin, Isin, QSortBy> {
       return query.addSortBy(r'name', Sort.desc);
     });
   }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> sortByPosition() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'position', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> sortByPositionDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'position', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> sortByPurchasePrice() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'purchasePrice', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> sortByPurchasePriceDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'purchasePrice', Sort.desc);
-    });
-  }
 }
 
 extension IsinQuerySortThenBy on QueryBuilder<Isin, Isin, QSortThenBy> {
-  QueryBuilder<Isin, Isin, QAfterSortBy> thenByCurrency() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currency', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> thenByCurrencyDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currency', Sort.desc);
-    });
-  }
-
   QueryBuilder<Isin, Isin, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -1061,40 +732,9 @@ extension IsinQuerySortThenBy on QueryBuilder<Isin, Isin, QSortThenBy> {
       return query.addSortBy(r'name', Sort.desc);
     });
   }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> thenByPosition() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'position', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> thenByPositionDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'position', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> thenByPurchasePrice() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'purchasePrice', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QAfterSortBy> thenByPurchasePriceDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'purchasePrice', Sort.desc);
-    });
-  }
 }
 
 extension IsinQueryWhereDistinct on QueryBuilder<Isin, Isin, QDistinct> {
-  QueryBuilder<Isin, Isin, QDistinct> distinctByCurrency(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'currency', caseSensitive: caseSensitive);
-    });
-  }
-
   QueryBuilder<Isin, Isin, QDistinct> distinctByIsinCode(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1108,30 +748,12 @@ extension IsinQueryWhereDistinct on QueryBuilder<Isin, Isin, QDistinct> {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
     });
   }
-
-  QueryBuilder<Isin, Isin, QDistinct> distinctByPosition() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'position');
-    });
-  }
-
-  QueryBuilder<Isin, Isin, QDistinct> distinctByPurchasePrice() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'purchasePrice');
-    });
-  }
 }
 
 extension IsinQueryProperty on QueryBuilder<Isin, Isin, QQueryProperty> {
   QueryBuilder<Isin, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
-    });
-  }
-
-  QueryBuilder<Isin, String, QQueryOperations> currencyProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'currency');
     });
   }
 
@@ -1144,18 +766,6 @@ extension IsinQueryProperty on QueryBuilder<Isin, Isin, QQueryProperty> {
   QueryBuilder<Isin, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
-    });
-  }
-
-  QueryBuilder<Isin, double, QQueryOperations> positionProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'position');
-    });
-  }
-
-  QueryBuilder<Isin, double, QQueryOperations> purchasePriceProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'purchasePrice');
     });
   }
 }

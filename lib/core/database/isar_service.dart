@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'models/isin.dart';
 import 'models/ticker.dart';
+import 'models/position.dart';
 import 'models/market_data_cache.dart';
 
 part 'isar_service.g.dart';
@@ -15,7 +16,7 @@ class IsarService {
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
     db = await Isar.open(
-      [IsinSchema, TickerSchema, MarketDataCacheSchema],
+      [IsinSchema, TickerSchema, PositionSchema, MarketDataCacheSchema],
       directory: dir.path,
     );
     await _seedInitialData();
@@ -30,53 +31,65 @@ class IsarService {
       await db.writeTxn(() async {
         // Seed Apple
         final apple = Isin()
-        ..isinCode = 'US0378331005'
-        ..name = 'Apple Inc.'
-        ..position = 10
-        ..purchasePrice = 150.0 // example purchase price
-        ..currency = 'USD';
+          ..isinCode = 'US0378331005'
+          ..name = 'Apple Inc.';
 
-      final aaplTicker = Ticker()
-        ..symbol = 'AAPL'
-        ..exchange = 'NASDAQ'
-        ..currency = 'USD'
-        ..isin.value = apple;
+        final aaplTicker = Ticker()
+          ..symbol = 'AAPL'
+          ..exchange = 'NASDAQ'
+          ..currency = 'USD'
+          ..isin.value = apple;
 
-      final aplsTicker = Ticker()
-        ..symbol = '0R2V.L'
-        ..exchange = 'LSE'
-        ..currency = 'GBP'
-        ..isin.value = apple;
+        final aplsTicker = Ticker()
+          ..symbol = '0R2V.L'
+          ..exchange = 'LSE'
+          ..currency = 'GBP'
+          ..isin.value = apple;
 
-      await db.isins.put(apple);
-      await db.tickers.putAll([aaplTicker, aplsTicker]);
-      apple.tickers.addAll([aaplTicker, aplsTicker]);
-      await apple.tickers.save();
+        final applePos = Position()
+          ..capitalInvested = 1500.0
+          ..purchasePrice = 150.0
+          ..ticker.value = aaplTicker;
 
-      // Seed Alphabet
-      final alphabet = Isin()
-        ..isinCode = 'US02079K3059'
-        ..name = 'Alphabet Inc. (Class A)'
-        ..position = 5
-        ..purchasePrice = 120.0
-        ..currency = 'USD';
+        await db.isins.put(apple);
+        await db.tickers.putAll([aaplTicker, aplsTicker]);
+        apple.tickers.addAll([aaplTicker, aplsTicker]);
+        await apple.tickers.save();
 
-      final googTicker = Ticker()
-        ..symbol = 'GOOGL'
-        ..exchange = 'NASDAQ'
-        ..currency = 'USD'
-        ..isin.value = alphabet;
+        await db.positions.put(applePos);
+        aaplTicker.positions.add(applePos);
+        await aaplTicker.positions.save();
 
-      final googLseTicker = Ticker()
-        ..symbol = '0RIH.L'
-        ..exchange = 'LSE'
-        ..currency = 'GBP'
-        ..isin.value = alphabet;
+        // Seed Alphabet
+        final alphabet = Isin()
+          ..isinCode = 'US02079K3059'
+          ..name = 'Alphabet Inc. (Class A)';
 
-      await db.isins.put(alphabet);
-      await db.tickers.putAll([googTicker, googLseTicker]);
-      alphabet.tickers.addAll([googTicker, googLseTicker]);
-      await alphabet.tickers.save();
+        final googTicker = Ticker()
+          ..symbol = 'GOOGL'
+          ..exchange = 'NASDAQ'
+          ..currency = 'USD'
+          ..isin.value = alphabet;
+
+        final googLseTicker = Ticker()
+          ..symbol = '0RIH.L'
+          ..exchange = 'LSE'
+          ..currency = 'GBP'
+          ..isin.value = alphabet;
+
+        final googPos = Position()
+          ..capitalInvested = 600.0
+          ..purchasePrice = 120.0
+          ..ticker.value = googTicker;
+
+        await db.isins.put(alphabet);
+        await db.tickers.putAll([googTicker, googLseTicker]);
+        alphabet.tickers.addAll([googTicker, googLseTicker]);
+        await alphabet.tickers.save();
+
+        await db.positions.put(googPos);
+        googTicker.positions.add(googPos);
+        await googTicker.positions.save();
       });
     } catch (e) {
       print('Seeding failed, cleaning up: \$e');

@@ -61,6 +61,12 @@ const TickerSchema = CollectionSchema(
       single: true,
       linkName: r'tickers',
     ),
+    r'positions': LinkSchema(
+      id: 5562009030290465229,
+      name: r'positions',
+      target: r'Position',
+      single: false,
+    ),
     r'marketDataCache': LinkSchema(
       id: -3037857321410809956,
       name: r'marketDataCache',
@@ -135,12 +141,14 @@ Id _tickerGetId(Ticker object) {
 }
 
 List<IsarLinkBase<dynamic>> _tickerGetLinks(Ticker object) {
-  return [object.isin, object.marketDataCache];
+  return [object.isin, object.positions, object.marketDataCache];
 }
 
 void _tickerAttach(IsarCollection<dynamic> col, Id id, Ticker object) {
   object.id = id;
   object.isin.attach(col, col.isar.collection<Isin>(), r'isin', id);
+  object.positions
+      .attach(col, col.isar.collection<Position>(), r'positions', id);
   object.marketDataCache.attach(
       col, col.isar.collection<MarketDataCache>(), r'marketDataCache', id);
 }
@@ -775,6 +783,63 @@ extension TickerQueryLinks on QueryBuilder<Ticker, Ticker, QFilterCondition> {
   QueryBuilder<Ticker, Ticker, QAfterFilterCondition> isinIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'isin', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Ticker, Ticker, QAfterFilterCondition> positions(
+      FilterQuery<Position> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'positions');
+    });
+  }
+
+  QueryBuilder<Ticker, Ticker, QAfterFilterCondition> positionsLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'positions', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<Ticker, Ticker, QAfterFilterCondition> positionsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'positions', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Ticker, Ticker, QAfterFilterCondition> positionsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'positions', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<Ticker, Ticker, QAfterFilterCondition> positionsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'positions', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<Ticker, Ticker, QAfterFilterCondition>
+      positionsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'positions', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<Ticker, Ticker, QAfterFilterCondition> positionsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'positions', lower, includeLower, upper, includeUpper);
     });
   }
 
