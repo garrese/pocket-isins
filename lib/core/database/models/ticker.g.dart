@@ -15,7 +15,7 @@ extension GetTickerCollection on Isar {
 
 const TickerSchema = CollectionSchema(
   name: r'Ticker',
-  id: -6339289241962154981,
+  id: 1779033375502683,
   properties: {
     r'currency': PropertySchema(
       id: 0,
@@ -40,7 +40,7 @@ const TickerSchema = CollectionSchema(
   idName: r'id',
   indexes: {
     r'symbol': IndexSchema(
-      id: -7050953154795990356,
+      id: 1683861666205597,
       name: r'symbol',
       unique: true,
       replace: false,
@@ -55,20 +55,20 @@ const TickerSchema = CollectionSchema(
   },
   links: {
     r'isin': LinkSchema(
-      id: 3905232142123839539,
+      id: 5114864820990436,
       name: r'isin',
       target: r'Isin',
       single: true,
       linkName: r'tickers',
     ),
     r'positions': LinkSchema(
-      id: 5562009030290465229,
+      id: 4567090115273782,
       name: r'positions',
       target: r'Position',
       single: false,
     ),
     r'marketDataCache': LinkSchema(
-      id: -3037857321410809956,
+      id: 6576026691645002,
       name: r'marketDataCache',
       target: r'MarketDataCache',
       single: true,
