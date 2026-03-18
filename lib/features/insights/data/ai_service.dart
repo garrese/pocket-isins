@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../domain/ai_settings.dart';
 import '../domain/news_card_model.dart';
 import 'ai_settings_repository.dart';
 
@@ -24,19 +25,6 @@ class AiService {
   Future<List<NewsCardModel>> fetchMarketNews() async {
     final settings = await _settingsRepo.getSettings();
 
-    if (settings.apiKey.isEmpty && settings.baseUrl.contains('openai.com')) {
-      throw Exception('API Key is missing for OpenAI.');
-    }
-
-    final headers = {
-      'Content-Type': 'application/json',
-      if (settings.apiKey.isNotEmpty)
-        'Authorization': 'Bearer ${settings.apiKey}',
-      // OpenRouter specific headers recommended but not strictly required
-      'HTTP-Referer': 'https://pocket-isins.app',
-      'X-Title': 'Pocket ISINs',
-    };
-
     const prompt = '''
 You are a financial AI assistant. Your task is to search the internet for the most relevant and recent news about global stock markets, economy, or major financial events.
 
@@ -53,6 +41,93 @@ Example format:
   }
 ]
 ''';
+
+    if (settings.apiProvider == 'google_ai_studio') {
+      return _fetchNewsGoogleAIStudio(settings, prompt);
+    } else {
+      return _fetchNewsOpenAICompatible(settings, prompt);
+    }
+  }
+
+  Future<List<NewsCardModel>> _fetchNewsGoogleAIStudio(
+      AiSettings settings, String prompt) async {
+    if (settings.apiKey.isEmpty) {
+      throw Exception('API Key is missing for Google AI Studio.');
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    var baseUrl = settings.baseUrl;
+    if (baseUrl.endsWith('/')) {
+      baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+    }
+    // Expected default base url: https://generativelanguage.googleapis.com/v1beta
+    final endpoint = '$baseUrl/models/${settings.modelName}:generateContent?key=${settings.apiKey}';
+
+    final data = {
+      'contents': [
+        {
+          'role': 'user',
+          'parts': [
+            {
+              'text':
+                  '$prompt\n\nFind the latest important stock market news.'
+            }
+          ]
+        }
+      ],
+      'tools': [
+        {'googleSearch': {}}
+      ]
+    };
+
+    try {
+      final response = await _dio.post(
+        endpoint,
+        options: Options(headers: headers),
+        data: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        final content = response.data['candidates'][0]['content']['parts'][0]['text'] as String;
+
+        // Clean the string in case the model ignored instructions and wrapped in markdown
+        final cleanedContent = content
+            .replaceAll(RegExp(r'```json\n?'), '')
+            .replaceAll(RegExp(r'```\n?'), '')
+            .trim();
+
+        final List<dynamic> jsonList = jsonDecode(cleanedContent);
+
+        return jsonList.map((item) => NewsCardModel.fromJson(item)).toList();
+      } else {
+        throw Exception(
+            'Failed to fetch news: ${response.statusCode} - ${response.data}');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+          'Network or API Error: ${e.message}\n${e.response?.data}');
+    } catch (error) {
+      throw Exception('Parsing Error: $error');
+    }
+  }
+
+  Future<List<NewsCardModel>> _fetchNewsOpenAICompatible(
+      AiSettings settings, String prompt) async {
+    if (settings.apiKey.isEmpty && settings.baseUrl.contains('openai.com')) {
+      throw Exception('API Key is missing for OpenAI.');
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+      if (settings.apiKey.isNotEmpty)
+        'Authorization': 'Bearer ${settings.apiKey}',
+      // OpenRouter specific headers recommended but not strictly required
+      'HTTP-Referer': 'https://pocket-isins.app',
+      'X-Title': 'Pocket ISINs',
+    };
 
     final data = {
       'model': settings.modelName,
