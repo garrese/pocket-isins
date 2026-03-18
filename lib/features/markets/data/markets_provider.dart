@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -45,39 +46,44 @@ class Markets extends _$Markets {
         }
 
         if (needsUpdate) {
-          // Fetch from Yahoo (5m intraday)
-          final rawData = await marketService.fetchIntradayData(ticker.symbol);
-          
-          if (rawData != null && rawData['chart']?['result'] != null) {
-            final result = rawData['chart']['result'][0];
-            final meta = result['meta'];
-            final indicators = result['indicators']?['quote']?[0];
+          try {
+            // Fetch from Yahoo (5m intraday)
+            final rawData = await marketService.fetchIntradayData(ticker.symbol);
             
-            if (meta != null && indicators != null) {
-              final regularMarketPrice = (meta['regularMarketPrice'] as num).toDouble();
-              final chartPreviousClose = (meta['chartPreviousClose'] as num?)?.toDouble() ?? regularMarketPrice;
+            if (rawData != null && rawData['chart']?['result'] != null) {
+              final result = rawData['chart']['result'][0];
+              final meta = result['meta'];
+              final indicators = result['indicators']?['quote']?[0];
               
-              final List<double> intradayPrices = [];
-              final closeArray = indicators['close'] as List<dynamic>? ?? [];
-              for (final val in closeArray) {
-                if (val != null) intradayPrices.add((val as num).toDouble());
-              }
+              if (meta != null && indicators != null) {
+                final regularMarketPrice = (meta['regularMarketPrice'] as num).toDouble();
+                final chartPreviousClose = (meta['chartPreviousClose'] as num?)?.toDouble() ?? regularMarketPrice;
 
-              // Save to Isar
-              await isar.writeTxn(() async {
-                MarketDataCache cache = ticker.marketDataCache.value ?? MarketDataCache();
-                cache.symbol = ticker.symbol;
-                cache.lastUpdated = now;
-                cache.regularMarketPrice = regularMarketPrice;
-                cache.chartPreviousClose = chartPreviousClose;
-                cache.intradayPrices = intradayPrices;
-                await isar.marketDataCaches.put(cache);
-                if (ticker.marketDataCache.value == null) {
-                  ticker.marketDataCache.value = cache;
-                  await ticker.marketDataCache.save();
+                final List<double> intradayPrices = [];
+                final closeArray = indicators['close'] as List<dynamic>? ?? [];
+                for (final val in closeArray) {
+                  if (val != null) intradayPrices.add((val as num).toDouble());
                 }
-              });
+
+                // Save to Isar
+                await isar.writeTxn(() async {
+                  MarketDataCache cache = ticker.marketDataCache.value ?? MarketDataCache();
+                  cache.symbol = ticker.symbol;
+                  cache.lastUpdated = now;
+                  cache.regularMarketPrice = regularMarketPrice;
+                  cache.chartPreviousClose = chartPreviousClose;
+                  cache.intradayPrices = intradayPrices;
+                  await isar.marketDataCaches.put(cache);
+                  if (ticker.marketDataCache.value == null) {
+                    ticker.marketDataCache.value = cache;
+                    await ticker.marketDataCache.save();
+                  }
+                });
+              }
             }
+          } catch (e, stack) {
+            debugPrint('MarketsProvider Error parsing data for ${ticker.symbol}: $e\n$stack');
+            rethrow;
           }
         }
       }
