@@ -1,6 +1,3 @@
-Aquí tienes la traducción del informe, manteniendo la terminología técnica estándar de desarrollo de software:
-
-```markdown
 # Architecture Report: BYOK Integration vs. Web Search Conflict in Pocket ISINs
 
 ## 1. Nature of the Problem
@@ -42,4 +39,3 @@ Modifies the project scope, limiting compatible services.
 
 * **Mechanics:** The application will only accept credentials from providers whose models integrate web search by default in the endpoint itself without requiring payload alterations (e.g., Perplexity with the `sonar` family, or specific OpenRouter variants configured externally).
 * **Impact:** This is the solution with the lowest initial development effort, preserving the single HTTP client. However, it breaks the requirement of being a purely agnostic app by preventing the use of standard LLMs or local infrastructures.
-```
