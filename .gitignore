@@ -101,3 +101,5 @@ coverage/
 # Isar Databases (Local App Data)
 *.isar
 *.isar.lock
+venv/
+myenv/

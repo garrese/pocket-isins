@@ -31,7 +31,7 @@ class AiService {
     final headers = {
       'Content-Type': 'application/json',
       if (settings.apiKey.isNotEmpty)
-        'Authorization': 'Bearer \${settings.apiKey}',
+        'Authorization': 'Bearer ${settings.apiKey}',
       // OpenRouter specific headers recommended but not strictly required
       'HTTP-Referer': 'https://pocket-isins.app',
       'X-Title': 'Pocket ISINs',
@@ -105,13 +105,13 @@ Example format:
         return jsonList.map((item) => NewsCardModel.fromJson(item)).toList();
       } else {
         throw Exception(
-            'Failed to fetch news: \${response.statusCode} - \${response.data}');
+            'Failed to fetch news: ${response.statusCode} - ${response.data}');
       }
     } on DioException catch (e) {
       throw Exception(
-          'Network or API Error: \${e.message}\\n\${e.response?.data}');
+          'Network or API Error: ${e.message}\n${e.response?.data}');
     } catch (error) {
-      throw Exception('Parsing Error: \$error');
+      throw Exception('Parsing Error: $error');
     }
   }
 }
