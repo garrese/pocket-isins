@@ -21,6 +21,11 @@ class MarketDataService {
     return _fetch(symbol, '5m', '1d');
   }
 
+  /// Fetches Level 3 Historical data with configurable interval and range.
+  Future<Map<String, dynamic>?> fetchHistoricalData(String symbol, String interval, String range) async {
+    return _fetch(symbol, interval, range);
+  }
+
   Future<Map<String, dynamic>?> _fetch(String symbol, String interval, String range) async {
     try {
       final response = await _dio.get(symbol, queryParameters: {
