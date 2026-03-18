@@ -21,15 +21,18 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
 
   late TextEditingController _codeController;
   late TextEditingController _nameController;
+  late TextEditingController _shortNameController;
 
   final List<TickerFormData> _tickers = [];
   int? _searchingIndex;
+  bool _isAutoFillingName = false;
 
   @override
   void initState() {
     super.initState();
     _codeController = TextEditingController(text: widget.isinToEdit?.isinCode ?? '');
     _nameController = TextEditingController(text: widget.isinToEdit?.name ?? '');
+    _shortNameController = TextEditingController(text: widget.isinToEdit?.shortName ?? '');
 
     if (widget.isinToEdit != null) {
       for (final ticker in widget.isinToEdit!.tickers) {
@@ -59,7 +62,79 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
   void dispose() {
     _codeController.dispose();
     _nameController.dispose();
+    _shortNameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _autoFillName() async {
+    final isin = _codeController.text.trim();
+    if (isin.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor se necesita un ISIN primero.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isAutoFillingName = true;
+    });
+
+    try {
+      final dio = Dio();
+      dio.options.headers['User-Agent'] = 'yaak';
+      dio.options.headers['Accept'] = '*/*';
+
+      final response = await dio.get(
+        'https://query2.finance.yahoo.com/v1/finance/search',
+        queryParameters: {'newsCount': 0, 'q': isin},
+      );
+      final quotes = response.data['quotes'] as List<dynamic>? ?? [];
+
+      if (quotes.isNotEmpty) {
+        final firstQuote = quotes[0];
+        final longname = firstQuote['longname'];
+        final shortname = firstQuote['shortname'];
+
+        final nameToUse = longname ?? shortname;
+
+        if (nameToUse != null) {
+          setState(() {
+            _nameController.text = nameToUse;
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Name auto-filled successfully.')),
+            );
+          }
+        } else {
+           if (mounted) {
+             ScaffoldMessenger.of(context).showSnackBar(
+               const SnackBar(content: Text('Could not find a name for this ISIN.')),
+             );
+           }
+        }
+      } else {
+         if (mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(
+             const SnackBar(content: Text('No results found for this ISIN.')),
+           );
+         }
+      }
+    } catch (e, stack) {
+      debugPrint('Error auto-filling name: $e');
+      debugPrint('Stacktrace: $stack');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error auto-filling name.')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAutoFillingName = false;
+        });
+      }
+    }
   }
 
   Future<void> _searchSymbol(int tIndex) async {
@@ -91,15 +166,24 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
         );
         final firstQuotes = response.data['quotes'] as List<dynamic>? ?? [];
 
-        if (firstQuotes.isNotEmpty && firstQuotes[0]['shortname'] != null) {
-           final shortname = firstQuotes[0]['shortname'];
-           final secondResponse = await dio.get(
-             'https://query2.finance.yahoo.com/v1/finance/search',
-             queryParameters: {'newsCount': 0, 'q': shortname},
-           );
-           quotes = secondResponse.data['quotes'] as List<dynamic>? ?? [];
+        if (firstQuotes.isNotEmpty) {
+           final firstQuote = firstQuotes[0];
+           final longname = firstQuote['longname'];
+           final shortname = firstQuote['shortname'];
+
+           final nameToSearch = longname ?? shortname;
+
+           if (nameToSearch != null && nameToSearch.toString().isNotEmpty) {
+             final secondResponse = await dio.get(
+               'https://query2.finance.yahoo.com/v1/finance/search',
+               queryParameters: {'newsCount': 0, 'q': nameToSearch},
+             );
+             quotes = secondResponse.data['quotes'] as List<dynamic>? ?? [];
+           } else {
+             // fallback to direct ISIN search if no name available
+             quotes = firstQuotes;
+           }
         } else {
-           // fallback to direct ISIN search if shortname missing
            quotes = firstQuotes;
         }
       } else if (name.isNotEmpty) {
@@ -145,6 +229,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
         id: widget.isinToEdit?.id,
         isinCode: _codeController.text.trim(),
         name: _nameController.text.trim(),
+        shortName: _shortNameController.text.trim().isEmpty ? null : _shortNameController.text.trim(),
         tickersData: validTickers,
       );
       Navigator.pop(context);
@@ -195,17 +280,36 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Company Name', border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: _isAutoFillingName
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.auto_awesome),
+                  onPressed: _isAutoFillingName ? null : _autoFillName,
+                  tooltip: 'Auto-fill from Yahoo',
+                ),
+              ),
               validator: (v) => v!.trim().isEmpty ? 'Required' : null,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _shortNameController,
+              decoration: const InputDecoration(
+                labelText: 'Short Name (Optional)',
+                border: OutlineInputBorder(),
+                helperText: 'Used across the app instead of full name if provided.',
+              ),
             ),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Yahoo Symbols', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Market Data', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 TextButton.icon(
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Yahoo Symbol'),
+                  label: const Text('Add Market'),
                   onPressed: () {
                     setState(() {
                       _tickers.add(TickerFormData());
@@ -243,7 +347,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Symbol Data', style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text('Market', style: TextStyle(fontWeight: FontWeight.w600)),
                 _searchingIndex == tIndex
                     ? const Padding(
                         padding: EdgeInsets.only(right: 8.0),
@@ -251,7 +355,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                       )
                     : TextButton.icon(
                         icon: const Icon(Icons.search, size: 16),
-                        label: const Text('Search Symbol'),
+                        label: const Text('Search Market'),
                         onPressed: _searchingIndex != null ? null : () => _searchSymbol(tIndex),
                       ),
               ],
@@ -269,11 +373,35 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: TextFormField(
-                    initialValue: ticker.currency,
-                    decoration: const InputDecoration(labelText: 'Currency (USD)'),
-                    onChanged: (v) => ticker.currency = v,
-                    validator: (v) => v!.trim().isEmpty ? 'Required' : null,
+                  child: DropdownButtonFormField<String>(
+                    value: ticker.currency.isEmpty ? null : ticker.currency,
+                    decoration: const InputDecoration(labelText: 'Currency'),
+                    items: const [
+                      DropdownMenuItem(value: 'USD', child: Text('USD')),
+                      DropdownMenuItem(value: 'EUR', child: Text('EUR')),
+                      DropdownMenuItem(value: 'GBP', child: Text('GBP')),
+                      DropdownMenuItem(value: 'CHF', child: Text('CHF')),
+                      DropdownMenuItem(value: 'JPY', child: Text('JPY')),
+                      DropdownMenuItem(value: 'CAD', child: Text('CAD')),
+                      DropdownMenuItem(value: 'AUD', child: Text('AUD')),
+                      DropdownMenuItem(value: 'HKD', child: Text('HKD')),
+                      DropdownMenuItem(value: 'SEK', child: Text('SEK')),
+                      DropdownMenuItem(value: 'NOK', child: Text('NOK')),
+                      DropdownMenuItem(value: 'DKK', child: Text('DKK')),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() {
+                          ticker.currency = v;
+                        });
+                      }
+                    },
+                    validator: (v) {
+                      if (ticker.positions.isNotEmpty && (v == null || v.isEmpty)) {
+                        return 'Required with positions';
+                      }
+                      return null;
+                    },
                   ),
                 ),
                 IconButton(
@@ -349,16 +477,63 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
           itemCount: quotes.length,
           itemBuilder: (context, index) {
             final q = quotes[index];
-            final shortname = q['shortname'] ?? 'Unknown';
+            final shortname = q['longname'] ?? q['shortname'] ?? 'Unknown';
             final exchange = q['exchange'] ?? 'Unknown';
+            final exchDisp = q['exchDisp'] ?? exchange;
             final symbol = q['symbol'] ?? 'Unknown';
-            final title = '$shortname ($exchange) - $symbol';
+            final title = '$shortname ($exchDisp) - $symbol';
 
             return ListTile(
               title: Text(title),
               onTap: () {
                 setState(() {
                   _tickers[tIndex].symbol = symbol;
+
+                  // Auto-map currency based on exchDisp
+                  final currencyMap = {
+                    'XETRA': 'EUR',
+                    'Milan': 'EUR',
+                    'Stockholm': 'SEK',
+                    'London': 'GBP',
+                    'Stuttgart': 'EUR',
+                    'Swiss': 'CHF',
+                    'Paris': 'EUR',
+                    'NYSE': 'USD',
+                    'NASDAQ': 'USD',
+                    'Toronto': 'CAD',
+                    'Amsterdam': 'EUR',
+                    'Frankfurt': 'EUR',
+                    'Madrid': 'EUR',
+                    'Oslo': 'NOK',
+                    'Copenhagen': 'DKK',
+                    'Helsinki': 'EUR',
+                    'Tokyo': 'JPY',
+                    'Hong Kong': 'HKD',
+                    'Sydney': 'AUD',
+                  };
+
+                  // Reset currency first
+                  _tickers[tIndex].currency = '';
+
+                  // Try to find a match
+                  final matchingCurrency = currencyMap[exchDisp.toString()];
+                  if (matchingCurrency != null) {
+                    _tickers[tIndex].currency = matchingCurrency;
+                  } else {
+                     // Check common symbol suffixes if exchDisp wasn't mapped
+                     if (symbol.endsWith('.L')) { _tickers[tIndex].currency = 'GBP'; }
+                     else if (symbol.endsWith('.MI')) { _tickers[tIndex].currency = 'EUR'; }
+                     else if (symbol.endsWith('.DE') || symbol.endsWith('.F') || symbol.endsWith('.SG') || symbol.endsWith('.MU') || symbol.endsWith('.HM')) { _tickers[tIndex].currency = 'EUR'; }
+                     else if (symbol.endsWith('.PA')) { _tickers[tIndex].currency = 'EUR'; }
+                     else if (symbol.endsWith('.AS')) { _tickers[tIndex].currency = 'EUR'; }
+                     else if (symbol.endsWith('.MA')) { _tickers[tIndex].currency = 'EUR'; }
+                     else if (symbol.endsWith('.SW')) { _tickers[tIndex].currency = 'CHF'; }
+                     else if (symbol.endsWith('.TO')) { _tickers[tIndex].currency = 'CAD'; }
+                     else if (symbol.endsWith('.AX')) { _tickers[tIndex].currency = 'AUD'; }
+                     else if (symbol.endsWith('.T')) { _tickers[tIndex].currency = 'JPY'; }
+                     else if (symbol.endsWith('.HK')) { _tickers[tIndex].currency = 'HKD'; }
+                  }
+
                 });
                 Navigator.pop(context);
               },

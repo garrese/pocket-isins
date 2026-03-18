@@ -14,7 +14,7 @@ class TickerFormData {
   TickerFormData({
     this.symbol = '',
     this.exchange = 'UNKNOWN',
-    this.currency = 'USD',
+    this.currency = '',
     List<PositionFormData>? positions,
   }) : positions = positions ?? [];
 }
