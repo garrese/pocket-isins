@@ -123,37 +123,30 @@ class PortfolioScreen extends ConsumerWidget {
               }
               String tickersList = isin.tickers.map((t) => t.symbol).join(', '); // Although we change UI to Yahoo Symbol, we keep variable names internal as isin.tickers.map((t) => t.symbol)
 
+              bool hasPositions = numShares > 0 || totalCapital > 0;
+
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => IsinFormScreen(isinToEdit: isin)),
+                    );
+                  },
                   title: Text(
                     isin.displayName,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text(
-                    '${isin.isinCode} • ${numShares.toStringAsFixed(2)} Shares • Capital: $totalCapital $primaryCurrency\nYahoo Symbols: $tickersList',
-                  ),
-                  isThreeLine: true,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blueAccent),
-                        onPressed: () {
-                           Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => IsinFormScreen(isinToEdit: isin)),
-                           );
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.redAccent),
-                        onPressed: () {
-                          ref.read(portfolioProvider.notifier).removeIsin(isin.id);
-                        },
-                      ),
+                      Text(tickersList),
+                      if (hasPositions)
+                        Text('$totalCapital $primaryCurrency • $numShares Shares'),
                     ],
                   ),
+                  isThreeLine: hasPositions,
                 ),
               );
             },
