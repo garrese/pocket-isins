@@ -18,6 +18,7 @@ To maintain consistency throughout development, **you are obligated** to consult
 3.  **Modular Code (Feature-First):** Strictly structure `lib/` using "feature-first". If you create something new, place it in its feature (`/lib/features/{feature}/...`) or in the core if it's transversal (`/lib/core/...`).
 4.  **Do Not Assume, Verify:** If the current project structure and your short-term memory do not match this `AGENTS.md` or `/ai_context`, **always** trust the static documentation or ask the human.
 5.  **English Only Project:** Even though user communication might be in Spanish, EVERY piece of code, documentation, comment, variable name, and context file (`AGENTS.md` included) MUST be written in **English**.
+6.  **Autonomous Git Commits:** You must manage git commits yourself for the different changes you implement. After completing a logical unit of work, feature, or bug fix, automatically create a concise, descriptive git commit summarizing your changes in English.
 
 ---
 *End of Project-Specific System Prompt*
