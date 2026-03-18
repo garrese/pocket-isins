@@ -24,6 +24,9 @@ class MarketDataCache {
   // Level 2 Data (Intraday Chart points - usually around 80 data points for a single day at 5m interval)
   List<double> intradayPrices = [];
 
+  // Level 2 Data (Timestamps for Intraday Chart points)
+  List<int> intradayTimestamps = [];
+
   // Backlink to the parent Ticker
   @Backlink(to: 'marketDataCache')
   final ticker = IsarLink<Ticker>();

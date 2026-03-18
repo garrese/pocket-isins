@@ -27,18 +27,23 @@ const MarketDataCacheSchema = CollectionSchema(
       name: r'intradayPrices',
       type: IsarType.doubleList,
     ),
-    r'lastUpdated': PropertySchema(
+    r'intradayTimestamps': PropertySchema(
       id: 2,
+      name: r'intradayTimestamps',
+      type: IsarType.longList,
+    ),
+    r'lastUpdated': PropertySchema(
+      id: 3,
       name: r'lastUpdated',
       type: IsarType.dateTime,
     ),
     r'regularMarketPrice': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'regularMarketPrice',
       type: IsarType.double,
     ),
     r'symbol': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'symbol',
       type: IsarType.string,
     )
@@ -86,6 +91,7 @@ int _marketDataCacheEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.intradayPrices.length * 8;
+  bytesCount += 3 + object.intradayTimestamps.length * 8;
   bytesCount += 3 + object.symbol.length * 3;
   return bytesCount;
 }
@@ -98,9 +104,10 @@ void _marketDataCacheSerialize(
 ) {
   writer.writeDouble(offsets[0], object.chartPreviousClose);
   writer.writeDoubleList(offsets[1], object.intradayPrices);
-  writer.writeDateTime(offsets[2], object.lastUpdated);
-  writer.writeDouble(offsets[3], object.regularMarketPrice);
-  writer.writeString(offsets[4], object.symbol);
+  writer.writeLongList(offsets[2], object.intradayTimestamps);
+  writer.writeDateTime(offsets[3], object.lastUpdated);
+  writer.writeDouble(offsets[4], object.regularMarketPrice);
+  writer.writeString(offsets[5], object.symbol);
 }
 
 MarketDataCache _marketDataCacheDeserialize(
@@ -113,9 +120,10 @@ MarketDataCache _marketDataCacheDeserialize(
   object.chartPreviousClose = reader.readDouble(offsets[0]);
   object.id = id;
   object.intradayPrices = reader.readDoubleList(offsets[1]) ?? [];
-  object.lastUpdated = reader.readDateTime(offsets[2]);
-  object.regularMarketPrice = reader.readDouble(offsets[3]);
-  object.symbol = reader.readString(offsets[4]);
+  object.intradayTimestamps = reader.readLongList(offsets[2]) ?? [];
+  object.lastUpdated = reader.readDateTime(offsets[3]);
+  object.regularMarketPrice = reader.readDouble(offsets[4]);
+  object.symbol = reader.readString(offsets[5]);
   return object;
 }
 
@@ -131,10 +139,12 @@ P _marketDataCacheDeserializeProp<P>(
     case 1:
       return (reader.readDoubleList(offset) ?? []) as P;
     case 2:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readLongList(offset) ?? []) as P;
     case 3:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 4:
+      return (reader.readDouble(offset)) as P;
+    case 5:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -615,6 +625,151 @@ extension MarketDataCacheQueryFilter
   }
 
   QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsElementEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'intradayTimestamps',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsElementGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'intradayTimestamps',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsElementLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'intradayTimestamps',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsElementBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'intradayTimestamps',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'intradayTimestamps',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'intradayTimestamps',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'intradayTimestamps',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'intradayTimestamps',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'intradayTimestamps',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
+      intradayTimestampsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'intradayTimestamps',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QAfterFilterCondition>
       lastUpdatedEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1038,6 +1193,13 @@ extension MarketDataCacheQueryWhereDistinct
   }
 
   QueryBuilder<MarketDataCache, MarketDataCache, QDistinct>
+      distinctByIntradayTimestamps() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'intradayTimestamps');
+    });
+  }
+
+  QueryBuilder<MarketDataCache, MarketDataCache, QDistinct>
       distinctByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastUpdated');
@@ -1078,6 +1240,13 @@ extension MarketDataCacheQueryProperty
       intradayPricesProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'intradayPrices');
+    });
+  }
+
+  QueryBuilder<MarketDataCache, List<int>, QQueryOperations>
+      intradayTimestampsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'intradayTimestamps');
     });
   }
 
