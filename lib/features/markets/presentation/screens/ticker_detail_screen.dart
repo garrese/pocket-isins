@@ -46,9 +46,7 @@ class TickerDetailScreen extends ConsumerWidget {
           children: [
             _buildTimeRangeSelector(context, ref, detailState),
             const SizedBox(height: 16),
-            Expanded(
-              child: _buildChartArea(context, detailState),
-            ),
+            Expanded(child: _buildChartArea(context, detailState)),
           ],
         ),
       ),
@@ -56,7 +54,10 @@ class TickerDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildTimeRangeSelector(
-      BuildContext context, WidgetRef ref, TickerDetailState state) {
+    BuildContext context,
+    WidgetRef ref,
+    TickerDetailState state,
+  ) {
     return Wrap(
       spacing: 8.0,
       runSpacing: 8.0,
@@ -69,7 +70,9 @@ class TickerDetailScreen extends ConsumerWidget {
           showCheckmark: false,
           onSelected: (selected) {
             if (selected) {
-              ref.read(tickerDetailProvider(symbol).notifier).changeTimeRange(range);
+              ref
+                  .read(tickerDetailProvider(symbol).notifier)
+                  .changeTimeRange(range);
             }
           },
         );
@@ -99,14 +102,17 @@ class TickerDetailScreen extends ConsumerWidget {
       final result = state.data!['chart']['result'][0];
       final meta = result['meta'];
       final indicators = result['indicators']?['quote']?[0];
-      final List<dynamic> timestampsDynamic = result['timestamp'] as List<dynamic>? ?? [];
+      final List<dynamic> timestampsDynamic =
+          result['timestamp'] as List<dynamic>? ?? [];
 
       if (meta == null || indicators == null) {
         return const Center(child: Text('Invalid data format.'));
       }
 
       final regularMarketPrice = (meta['regularMarketPrice'] as num).toDouble();
-      final chartPreviousClose = (meta['chartPreviousClose'] as num?)?.toDouble() ?? regularMarketPrice;
+      final chartPreviousClose =
+          (meta['chartPreviousClose'] as num?)?.toDouble() ??
+          regularMarketPrice;
       final variation = regularMarketPrice - chartPreviousClose;
       final variationPercent = (variation / chartPreviousClose) * 100;
       final isPositive = variation >= 0;
@@ -147,13 +153,15 @@ class TickerDetailScreen extends ConsumerWidget {
             timestamp = (timestampsDynamic[i] as num).toInt();
           }
 
-          chartPoints.add(ChartPoint(
-            close: closePrice,
-            high: high,
-            low: low,
-            volume: volume,
-            timestamp: timestamp,
-          ));
+          chartPoints.add(
+            ChartPoint(
+              close: closePrice,
+              high: high,
+              low: low,
+              volume: volume,
+              timestamp: timestamp,
+            ),
+          );
         }
       }
 
@@ -170,7 +178,11 @@ class TickerDetailScreen extends ConsumerWidget {
           ),
           Text(
             '${isPositive ? "+" : ""}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
-            style: TextStyle(fontSize: 16, color: color, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 16,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -191,7 +203,11 @@ class TickerDetailScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildLineChart(List<ChartPoint> chartPoints, TimeRange timeRange, Color color) {
+  Widget _buildLineChart(
+    List<ChartPoint> chartPoints,
+    TimeRange timeRange,
+    Color color,
+  ) {
     final prices = chartPoints.map((e) => e.close).toList();
     final minPrice = prices.reduce((a, b) => a < b ? a : b);
     final maxPrice = prices.reduce((a, b) => a > b ? a : b);
@@ -211,18 +227,27 @@ class TickerDetailScreen extends ConsumerWidget {
     String lastTime = '';
 
     if (chartPoints.isNotEmpty) {
-      int firstTs = chartPoints.map((e) => e.timestamp).firstWhere((ts) => ts > 0, orElse: () => 0);
-      int lastTs = chartPoints.map((e) => e.timestamp).lastWhere((ts) => ts > 0, orElse: () => 0);
+      int firstTs = chartPoints
+          .map((e) => e.timestamp)
+          .firstWhere((ts) => ts > 0, orElse: () => 0);
+      int lastTs = chartPoints
+          .map((e) => e.timestamp)
+          .lastWhere((ts) => ts > 0, orElse: () => 0);
 
-      String formatString = (timeRange == TimeRange.day || timeRange == TimeRange.week)
+      String formatString =
+          (timeRange == TimeRange.day || timeRange == TimeRange.week)
           ? 'HH:mm'
           : 'dd/MM/yy';
 
       if (firstTs > 0) {
-        firstTime = DateFormat(formatString).format(DateTime.fromMillisecondsSinceEpoch(firstTs * 1000));
+        firstTime = DateFormat(
+          formatString,
+        ).format(DateTime.fromMillisecondsSinceEpoch(firstTs * 1000));
       }
       if (lastTs > 0) {
-        lastTime = DateFormat(formatString).format(DateTime.fromMillisecondsSinceEpoch(lastTs * 1000));
+        lastTime = DateFormat(
+          formatString,
+        ).format(DateTime.fromMillisecondsSinceEpoch(lastTs * 1000));
       }
     }
 
@@ -246,9 +271,15 @@ class TickerDetailScreen extends ConsumerWidget {
             ),
             titlesData: FlTitlesData(
               show: true,
-              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              bottomTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
@@ -281,13 +312,21 @@ class TickerDetailScreen extends ConsumerWidget {
                     final timestamp = touchedSpot.x.toInt();
 
                     try {
-                      final point = chartPoints.firstWhere((p) => p.timestamp == timestamp);
+                      final point = chartPoints.firstWhere(
+                        (p) => p.timestamp == timestamp,
+                      );
                       String timeStr = '';
                       if (point.timestamp > 0) {
-                        final formatString = (timeRange == TimeRange.day || timeRange == TimeRange.week)
+                        final formatString =
+                            (timeRange == TimeRange.day ||
+                                timeRange == TimeRange.week)
                             ? 'HH:mm'
                             : 'dd/MM/yy';
-                        timeStr = DateFormat(formatString).format(DateTime.fromMillisecondsSinceEpoch(point.timestamp * 1000));
+                        timeStr = DateFormat(formatString).format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                            point.timestamp * 1000,
+                          ),
+                        );
                       }
 
                       return LineTooltipItem(
@@ -302,7 +341,10 @@ class TickerDetailScreen extends ConsumerWidget {
                     } catch (e) {
                       return LineTooltipItem(
                         touchedSpot.y.toStringAsFixed(2),
-                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       );
                     }
                   }).toList();
@@ -313,7 +355,7 @@ class TickerDetailScreen extends ConsumerWidget {
             lineBarsData: [
               LineChartBarData(
                 spots: spots,
-                isCurved: true,
+                isCurved: false,
                 color: color,
                 barWidth: 2,
                 isStrokeCapRound: true,
@@ -357,14 +399,34 @@ class TickerDetailScreen extends ConsumerWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        _buildMetaRow('Prev Close', meta['chartPreviousClose'], 'Volume', _formatVolume(meta['regularMarketVolume'])),
-        _buildMetaRow('Day Low', meta['regularMarketDayLow'], 'Day High', meta['regularMarketDayHigh']),
-        _buildMetaRow('52w Low', meta['fiftyTwoWeekLow'], '52w High', meta['fiftyTwoWeekHigh']),
+        _buildMetaRow(
+          'Prev Close',
+          meta['chartPreviousClose'],
+          'Volume',
+          _formatVolume(meta['regularMarketVolume']),
+        ),
+        _buildMetaRow(
+          'Day Low',
+          meta['regularMarketDayLow'],
+          'Day High',
+          meta['regularMarketDayHigh'],
+        ),
+        _buildMetaRow(
+          '52w Low',
+          meta['fiftyTwoWeekLow'],
+          '52w High',
+          meta['fiftyTwoWeekHigh'],
+        ),
       ],
     );
   }
 
-  Widget _buildMetaRow(String label1, dynamic val1, String label2, dynamic val2) {
+  Widget _buildMetaRow(
+    String label1,
+    dynamic val1,
+    String label2,
+    dynamic val2,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
