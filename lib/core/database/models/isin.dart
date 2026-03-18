@@ -3,7 +3,9 @@ import 'ticker.dart';
 
 part 'isin.g.dart';
 
-@collection
+
+@Collection(accessor: "isins")
+@Name("Isin")
 class Isin {
   Id id = Isar.autoIncrement;
 
