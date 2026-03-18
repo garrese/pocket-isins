@@ -1,8 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../data/portfolio_provider.dart';
 import 'isin_form_screen.dart';
+
 
 class PortfolioScreen extends ConsumerWidget {
   const PortfolioScreen({super.key});
@@ -12,6 +17,62 @@ class PortfolioScreen extends ConsumerWidget {
     final portfolioAsync = ref.watch(portfolioProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Portfolio'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.file_download),
+            tooltip: 'Import Portfolio',
+            onPressed: () async {
+              try {
+                final result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['json'],
+                );
+                if (result != null && result.files.single.path != null) {
+                  final file = File(result.files.single.path!);
+                  final jsonString = await file.readAsString();
+                  await ref.read(portfolioProvider.notifier).importPortfolio(jsonString);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Portfolio imported successfully')),
+                    );
+                  }
+                }
+              } catch (e, st) {
+                debugPrint('Error importing portfolio: $e\n$st');
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error importing portfolio: $e')),
+                  );
+                }
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.upload),
+            tooltip: 'Export Portfolio',
+            onPressed: () async {
+              try {
+                final jsonString = await ref.read(portfolioProvider.notifier).exportPortfolio();
+                final directory = await getTemporaryDirectory();
+                final file = File('${directory.path}/portfolio_export.json');
+                await file.writeAsString(jsonString);
+
+                final xFile = XFile(file.path);
+                await Share.shareXFiles([xFile], text: 'My Portfolio Export');
+              } catch (e, st) {
+                debugPrint('Error exporting portfolio: $e\n$st');
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error exporting portfolio: $e')),
+                  );
+                }
+              }
+            },
+          ),
+        ],
+      ),
       body: portfolioAsync.when(
         data: (isins) {
           if (isins.isEmpty) {
