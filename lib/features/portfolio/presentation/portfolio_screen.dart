@@ -37,7 +37,7 @@ class PortfolioScreen extends ConsumerWidget {
                     }
                  }
               }
-              String tickersList = isin.tickers.map((t) => t.symbol).join(', ');
+              String tickersList = isin.tickers.map((t) => t.symbol).join(', '); // Although we change UI to Yahoo Symbol, we keep variable names internal as isin.tickers.map((t) => t.symbol)
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -47,7 +47,7 @@ class PortfolioScreen extends ConsumerWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    '${isin.isinCode} • ${numShares.toStringAsFixed(2)} Shares • Capital: $totalCapital $primaryCurrency\nTickers: $tickersList',
+                    '${isin.isinCode} • ${numShares.toStringAsFixed(2)} Shares • Capital: $totalCapital $primaryCurrency\nYahoo Symbols: $tickersList',
                   ),
                   isThreeLine: true,
                   trailing: Row(

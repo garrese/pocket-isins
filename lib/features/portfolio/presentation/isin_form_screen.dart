@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 
 import '../../../core/database/models/isin.dart';
 import '../domain/portfolio_form_data.dart';
@@ -20,7 +22,8 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
   late TextEditingController _codeController;
   late TextEditingController _nameController;
 
-  List<TickerFormData> _tickers = [];
+  final List<TickerFormData> _tickers = [];
+  int? _searchingIndex;
 
   @override
   void initState() {
@@ -59,6 +62,79 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
     super.dispose();
   }
 
+  Future<void> _searchSymbol(int tIndex) async {
+    final isin = _codeController.text.trim();
+    final name = _nameController.text.trim();
+
+    if (isin.isEmpty && name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an ISIN or Company Name first.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _searchingIndex = tIndex;
+    });
+
+    try {
+      final dio = Dio();
+      dio.options.headers['User-Agent'] = 'yaak';
+      dio.options.headers['Accept'] = '*/*';
+
+      List<dynamic> quotes = [];
+
+      if (isin.isNotEmpty) {
+        final response = await dio.get(
+          'https://query2.finance.yahoo.com/v1/finance/search',
+          queryParameters: {'newsCount': 0, 'q': isin},
+        );
+        final firstQuotes = response.data['quotes'] as List<dynamic>? ?? [];
+
+        if (firstQuotes.isNotEmpty && firstQuotes[0]['shortname'] != null) {
+           final shortname = firstQuotes[0]['shortname'];
+           final secondResponse = await dio.get(
+             'https://query2.finance.yahoo.com/v1/finance/search',
+             queryParameters: {'newsCount': 0, 'q': shortname},
+           );
+           quotes = secondResponse.data['quotes'] as List<dynamic>? ?? [];
+        } else {
+           // fallback to direct ISIN search if shortname missing
+           quotes = firstQuotes;
+        }
+      } else if (name.isNotEmpty) {
+        final response = await dio.get(
+          'https://query2.finance.yahoo.com/v1/finance/search',
+          queryParameters: {'newsCount': 0, 'q': name},
+        );
+        quotes = response.data['quotes'] as List<dynamic>? ?? [];
+      }
+
+      if (quotes.isEmpty && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not find a symbol. Please enter the Yahoo Symbol manually.')),
+        );
+      } else if (mounted) {
+         _showSymbolSelectionDialog(tIndex, quotes);
+      }
+
+    } catch (e, stack) {
+      debugPrint('Error searching symbol: $e');
+      debugPrint('Stacktrace: $stack');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error searching symbol. Please enter the Yahoo Symbol manually.')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _searchingIndex = null;
+        });
+      }
+    }
+  }
+
   void _save() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -92,12 +168,30 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            TextFormField(
-              controller: _codeController,
-              decoration: const InputDecoration(labelText: 'ISIN Code (e.g., US0378331005)', border: OutlineInputBorder()),
-              enabled: widget.isinToEdit == null,
-              validator: (v) => v!.trim().isEmpty ? 'Required' : null,
-            ),
+            widget.isinToEdit == null
+                ? TextFormField(
+                    controller: _codeController,
+                    decoration: const InputDecoration(labelText: 'ISIN Code (e.g., US0378331005)', border: OutlineInputBorder()),
+                    validator: (v) => v!.trim().isEmpty ? 'Required' : null,
+                  )
+                : InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: _codeController.text));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('ISIN copied to clipboard!')),
+                      );
+                    },
+                    child: IgnorePointer(
+                      child: TextFormField(
+                        controller: _codeController,
+                        decoration: const InputDecoration(
+                          labelText: 'ISIN Code (e.g., US0378331005)',
+                          border: OutlineInputBorder(),
+                        ),
+                        enabled: false,
+                      ),
+                    ),
+                  ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
@@ -108,10 +202,10 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Tickers', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Yahoo Symbols', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 TextButton.icon(
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Ticker'),
+                  label: const Text('Add Yahoo Symbol'),
                   onPressed: () {
                     setState(() {
                       _tickers.add(TickerFormData());
@@ -147,11 +241,28 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Symbol Data', style: TextStyle(fontWeight: FontWeight.w600)),
+                _searchingIndex == tIndex
+                    ? const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                      )
+                    : TextButton.icon(
+                        icon: const Icon(Icons.search, size: 16),
+                        label: const Text('Search Symbol'),
+                        onPressed: _searchingIndex != null ? null : () => _searchSymbol(tIndex),
+                      ),
+              ],
+            ),
+            Row(
               children: [
                 Expanded(
                   child: TextFormField(
+                    key: ValueKey('symbol_${tIndex}_${ticker.symbol}'),
                     initialValue: ticker.symbol,
-                    decoration: const InputDecoration(labelText: 'Ticker Symbol (e.g., AAPL)'),
+                    decoration: const InputDecoration(labelText: 'Yahoo Symbol (e.g., AAPL)'),
                     onChanged: (v) => ticker.symbol = v,
                     validator: (v) => v!.trim().isEmpty ? 'Required' : null,
                   ),
@@ -227,6 +338,34 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showSymbolSelectionDialog(int tIndex, List<dynamic> quotes) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ListView.builder(
+          itemCount: quotes.length,
+          itemBuilder: (context, index) {
+            final q = quotes[index];
+            final shortname = q['shortname'] ?? 'Unknown';
+            final exchange = q['exchange'] ?? 'Unknown';
+            final symbol = q['symbol'] ?? 'Unknown';
+            final title = '$shortname ($exchange) - $symbol';
+
+            return ListTile(
+              title: Text(title),
+              onTap: () {
+                setState(() {
+                  _tickers[tIndex].symbol = symbol;
+                });
+                Navigator.pop(context);
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
