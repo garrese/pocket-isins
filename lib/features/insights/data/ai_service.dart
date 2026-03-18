@@ -28,9 +28,7 @@ class AiService {
     const prompt = '''
 You are a financial AI assistant. Your task is to search the internet for the most relevant and recent news about global stock markets, economy, or major financial events.
 
-Return exactly 5 news items.
-You must return the result STRICTLY as a JSON array of objects, with no markdown formatting, no code blocks, and no other text.
-
+You must return the result STRICTLY as a JSON array of objects, with no markdown formatting, no code blocks, and no other text. 
 Example format:
 [
   {
@@ -38,8 +36,10 @@ Example format:
     "summary": "A brief 2-3 sentence summary of the news.",
     "url": "https://www.example-financial-news.com/article123",
     "source": "Bloomberg"
+    "relevance-rating": 7
   }
 ]
+Relevance-rating should be between 1 and 10.
 ''';
 
     if (settings.apiProvider == 'google_ai_studio') {
@@ -66,17 +66,15 @@ Example format:
       baseUrl = baseUrl.substring(0, baseUrl.length - 1);
     }
     // Expected default base url: https://generativelanguage.googleapis.com/v1beta
-    final endpoint = '$baseUrl/models/${settings.modelName}:generateContent?key=${settings.apiKey}';
+    final endpoint =
+        '$baseUrl/models/${settings.modelName}:generateContent?key=${settings.apiKey}';
 
     final data = {
       'contents': [
         {
           'role': 'user',
           'parts': [
-            {
-              'text':
-                  '$prompt\n\nFind the latest important stock market news.'
-            }
+            {'text': '$prompt\n\nFind the latest important stock market news.'}
           ]
         }
       ],
@@ -93,7 +91,8 @@ Example format:
       );
 
       if (response.statusCode == 200) {
-        final content = response.data['candidates'][0]['content']['parts'][0]['text'] as String;
+        final content = response.data['candidates'][0]['content']['parts'][0]
+            ['text'] as String;
 
         // Clean the string in case the model ignored instructions and wrapped in markdown
         final cleanedContent = content
@@ -117,7 +116,8 @@ Example format:
   }
 
   Future<List<NewsCardModel>> _fetchNewsOpenAICompatible(
-      AiSettings settings, String prompt, {bool openRouterWeb = false}) async {
+      AiSettings settings, String prompt,
+      {bool openRouterWeb = false}) async {
     if (settings.apiKey.isEmpty && settings.baseUrl.contains('openai.com')) {
       throw Exception('API Key is missing for OpenAI.');
     }
