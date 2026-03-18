@@ -109,21 +109,25 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    'Configure your "Bring Your Own Key" (BYOK) AI provider. '
-                    'Select your API Provider below. Supported: OpenAI-compatible APIs (OpenAI, OpenRouter, Ollama) and Google AI Studio.',
+                    'Configure your "Bring Your Own Key" (BYOK) AI provider.\n'
+                    'Select the API Syntax below. If your provider uses standard OpenAI format (like Ollama, Groq, or basic OpenRouter), select "OpenAI Compatible". Only select a different syntax if it requires a proprietary format.',
                     style: TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 24),
                   DropdownButtonFormField<String>(
                     initialValue: _selectedProvider,
                     decoration: const InputDecoration(
-                      labelText: 'API Provider',
+                      labelText: 'API Syntax',
                       border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(
                         value: 'openai',
-                        child: Text('OpenAI / Compatible (OpenRouter, etc.)'),
+                        child: Text('OpenAI Compatible (OpenAI, OpenRouter, Ollama)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'openrouter_web',
+                        child: Text('OpenRouter with Web Search'),
                       ),
                       DropdownMenuItem(
                         value: 'google_ai_studio',
