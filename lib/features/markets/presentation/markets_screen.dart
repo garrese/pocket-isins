@@ -141,7 +141,7 @@ class MarketsScreen extends ConsumerWidget {
   }
 
   Widget _buildSparkline(List<double> prices, Color color) {
-    if (prices.isEmpty) return const SizedBox.shrink();
+    if (prices.length < 2) return const SizedBox.shrink();
 
     final minPrice = prices.reduce((a, b) => a < b ? a : b);
     final maxPrice = prices.reduce((a, b) => a > b ? a : b);
