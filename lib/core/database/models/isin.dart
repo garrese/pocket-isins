@@ -12,5 +12,10 @@ class Isin {
 
   late String name;
 
+  String? shortName;
+
+  @ignore
+  String get displayName => (shortName != null && shortName!.trim().isNotEmpty) ? shortName! : name;
+
   final tickers = IsarLinks<Ticker>();
 }

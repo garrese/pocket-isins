@@ -32,6 +32,7 @@ class Portfolio extends _$Portfolio {
     int? id,
     required String isinCode,
     required String name,
+    String? shortName,
     required List<TickerFormData> tickersData,
   }) async {
     final isar = ref.read(isarServiceProvider).db;
@@ -42,6 +43,7 @@ class Portfolio extends _$Portfolio {
 
       isin.isinCode = isinCode;
       isin.name = name;
+      isin.shortName = shortName;
       await isar.isins.put(isin);
 
       if (id != null) {
