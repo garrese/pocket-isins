@@ -69,6 +69,16 @@ The endpoint returns a robust JSON object, but we are primarily interested in th
 
 The application uses a universal HTTP connector compatible with the standard OpenAI API (`/v1/chat/completions`) to integrate LLMs, allowing users to configure OpenAI, OpenRouter, Ollama, or any compatible proxy.
 
+### Syntax Selectors Strategy
+Instead of generic company selectors, the BYOK settings allow the user to select the **Syntax** to be used for the HTTP request.
+- If a new provider or model uses the exact same syntax as OpenAI, **no new selector is needed**. The user just selects the "OpenAI Compatible" syntax.
+- If a provider (like Google AI Studio) or a specific feature (like OpenRouter's Web Search) requires a proprietary payload structure or endpoint, a **new Syntax Selector** is implemented.
+
+Currently Supported Syntaxes:
+1. **OpenAI Compatible**: Standard `/v1/chat/completions`. Used by OpenAI, Ollama, standard OpenRouter models, Groq, etc.
+2. **Google AI Studio**: Proprietary Google Gemini syntax (`generateContent`).
+3. **OpenRouter Web Search**: OpenAI compatible, but requires injecting `"plugins": [{"id": "web"}]` into the payload for models that support it (like `minmax/minmax-m2.7` or `openai/gpt-4o`).
+
 ### Setup and Authentication
 - **Endpoint**: Configurable Base URL (defaults to `https://api.openai.com/v1/chat/completions`)
 - **Headers**:
