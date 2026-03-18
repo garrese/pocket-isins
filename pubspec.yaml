@@ -43,6 +43,7 @@ dependencies:
   dio: ^5.9.2
   fl_chart: any
   path_provider: ^2.1.5
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
