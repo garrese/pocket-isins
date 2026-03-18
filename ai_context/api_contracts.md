@@ -65,8 +65,45 @@ The endpoint returns a robust JSON object, but we are primarily interested in th
 
 *(Check the `ai_context/yahoo_samples/` folder for exact JSON examples for these queries.)*
 
-## 2. OpenAI (BYOK AI Insights)
-*(To be defined when we reach the AI integration phase)*
+## 2. BYOK AI Insights (Universal Connector)
 
-## 3. OpenRouter (BYOK AI Insights)
-*(To be defined when we reach the AI integration phase)*
+The application uses a universal HTTP connector compatible with the standard OpenAI API (`/v1/chat/completions`) to integrate LLMs, allowing users to configure OpenAI, OpenRouter, Ollama, or any compatible proxy.
+
+### Setup and Authentication
+- **Endpoint**: Configurable Base URL (defaults to `https://api.openai.com/v1/chat/completions`)
+- **Headers**:
+  - `Content-Type`: `application/json`
+  - `Authorization`: `Bearer {API_KEY}` (if provided)
+  - `HTTP-Referer`: `https://pocket-isins.app` (for OpenRouter ranking)
+  - `X-Title`: `Pocket ISINs` (for OpenRouter display)
+
+### News Insights Request Structure
+The app requests news through standard system/user prompting, instructing the model to fetch and return formatted financial news.
+```json
+{
+  "model": "{CONFIGURED_MODEL}",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a financial AI assistant. Your task is to search the internet for the most relevant and recent news about global stock markets, economy, or major financial events.\\n\\nReturn exactly 5 news items.\\nYou must return the result STRICTLY as a JSON array of objects, with no markdown formatting, no code blocks, and no other text."
+    },
+    {
+      "role": "user",
+      "content": "Find the latest important stock market news."
+    }
+  ]
+}
+```
+
+### Expected Response JSON Structure
+The LLM is prompted to strictly return a string representing a JSON array with the following schema:
+```json
+[
+  {
+    "title": "News Headline",
+    "summary": "Brief 2-3 sentence overview.",
+    "url": "https://source.com/article",
+    "source": "News Outlet Name"
+  }
+]
+```

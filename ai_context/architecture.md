@@ -27,8 +27,8 @@ The application's development context is divided into the following levels, ensu
     * Secure storage layer (`flutter_secure_storage`) to encrypt the user's API Keys on the device.
 
 ## 4. Artificial Intelligence Integration (BYOK Approach)
-* **"Bring Your Own Key" Model:** The app is provider-agnostic. The user configures their own credentials in the local app settings.
-* **Universal Connector:** A single HTTP client based on the OpenAI API standard (`/v1/chat/completions`). Compatible with OpenAI, OpenRouter, local models (Ollama), and Google Gemini (via OpenAI endpoint).
+* **"Bring Your Own Key" Model:** The app is provider-agnostic. The user configures their own credentials (Base URL, API Key, Model Name) in the local app settings (`flutter_secure_storage`).
+* **Universal Connector:** A single HTTP client based on the OpenAI API standard (`/v1/chat/completions`) inside `AiService`. It strictly defines JSON output schemas via system prompts to ensure data can be mapped to Dart models, leveraging the model's native capability to search the web if instructed (e.g. OpenAI's `gpt-4o` or Perplexity models via OpenRouter).
 
 ## 5. Financial Data Extraction Strategy
 * **Bulk HTTP requests:** Network optimization fetching multiple symbols per call when communicating with Yahoo Finance API.

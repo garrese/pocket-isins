@@ -4,6 +4,7 @@ import 'core/theme/app_theme.dart';
 import 'core/database/isar_service.dart';
 import 'features/portfolio/presentation/portfolio_screen.dart';
 import 'features/markets/presentation/markets_screen.dart';
+import 'features/insights/presentation/insights_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,7 +50,7 @@ class MainScreen extends ConsumerWidget {
     final screens = [
       const PortfolioScreen(),
       const MarketsScreen(),
-      const Center(child: Text('AI Insights', style: TextStyle(fontSize: 20))),
+      const InsightsScreen(),
     ];
 
     return Scaffold(
