@@ -204,7 +204,11 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: \$error')),
+        error: (error, stack) {
+          debugPrint('ByokConfigScreen Error: $error');
+          debugPrint('Stacktrace: $stack');
+          return Center(child: Text('Error: $error'));
+        },
       ),
     );
   }

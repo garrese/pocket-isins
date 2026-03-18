@@ -131,7 +131,11 @@ class MarketsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: \$err')),
+        error: (err, stack) {
+          debugPrint('MarketsScreen Error: $err');
+          debugPrint('Stacktrace: $stack');
+          return Center(child: Text('Error: $err'));
+        },
       ),
     );
   }
