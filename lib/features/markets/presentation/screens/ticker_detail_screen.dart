@@ -2,12 +2,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:intl/intl.dart';
 import '../../data/ticker_detail_provider.dart';
 
 class TickerDetailScreen extends ConsumerWidget {
   final String symbol;
+  final String? displayName;
 
-  const TickerDetailScreen({super.key, required this.symbol});
+  const TickerDetailScreen({super.key, required this.symbol, this.displayName});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,7 +17,7 @@ class TickerDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(symbol),
+        title: Text(displayName != null ? '$displayName ($symbol)' : symbol),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -79,9 +81,9 @@ class TickerDetailScreen extends ConsumerWidget {
       final result = state.data!['chart']['result'][0];
       final meta = result['meta'];
       final indicators = result['indicators']?['quote']?[0];
-      final List<dynamic>? timestampsDynamic = result['timestamp'];
+      final List<dynamic> timestampsDynamic = result['timestamp'] as List<dynamic>? ?? [];
 
-      if (meta == null || indicators == null || timestampsDynamic == null) {
+      if (meta == null || indicators == null) {
         return const Center(child: Text('Invalid data format.'));
       }
 
@@ -94,12 +96,18 @@ class TickerDetailScreen extends ConsumerWidget {
       final currency = meta['currency'] ?? '';
 
       final List<double> prices = [];
+      final List<int> timestamps = [];
       final closeArray = indicators['close'] as List<dynamic>? ?? [];
 
       for (var i = 0; i < closeArray.length; i++) {
         final val = closeArray[i];
         if (val != null) {
           prices.add((val as num).toDouble());
+          if (i < timestampsDynamic.length) {
+            timestamps.add((timestampsDynamic[i] as num).toInt());
+          } else {
+            timestamps.add(0);
+          }
         }
       }
 
@@ -112,16 +120,18 @@ class TickerDetailScreen extends ConsumerWidget {
         children: [
           Text(
             '${regularMarketPrice.toStringAsFixed(2)} $currency',
-            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           Text(
             '${isPositive ? "+" : ""}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
-            style: TextStyle(fontSize: 18, color: color, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16, color: color, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Expanded(
-            child: _buildLineChart(prices, color),
+            child: _buildLineChart(prices, timestamps, state.selectedRange, color),
           ),
+          const SizedBox(height: 16),
+          _buildMetaData(meta),
           if (state.isLoading) const LinearProgressIndicator(),
         ],
       );
@@ -135,7 +145,7 @@ class TickerDetailScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildLineChart(List<double> prices, Color color) {
+  Widget _buildLineChart(List<double> prices, List<int> timestamps, TimeRange timeRange, Color color) {
     final minPrice = prices.reduce((a, b) => a < b ? a : b);
     final maxPrice = prices.reduce((a, b) => a > b ? a : b);
 
@@ -147,73 +157,187 @@ class TickerDetailScreen extends ConsumerWidget {
       return FlSpot(e.key.toDouble(), e.value);
     }).toList();
 
-    return LineChart(
-      LineChartData(
-        minX: 0,
-        maxX: (spots.length - 1).toDouble(),
-        minY: minY,
-        maxY: maxY,
-        gridData: FlGridData(
-          show: true,
-          drawVerticalLine: false,
-          getDrawingHorizontalLine: (value) {
-            return FlLine(
-              color: Colors.grey.withValues(alpha: 0.2),
-              strokeWidth: 1,
-            );
-          },
-        ),
-        titlesData: FlTitlesData(
-          show: true,
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 40,
-              getTitlesWidget: (value, meta) {
-                return SideTitleWidget(
-                  axisSide: meta.axisSide,
-                  child: Text(
-                    value.toStringAsFixed(1),
-                    style: const TextStyle(fontSize: 10),
-                  ),
+    String firstTime = '';
+    String lastTime = '';
+
+    if (timestamps.isNotEmpty) {
+      int firstTs = timestamps.firstWhere((ts) => ts > 0, orElse: () => 0);
+      int lastTs = timestamps.lastWhere((ts) => ts > 0, orElse: () => 0);
+
+      String formatString = (timeRange == TimeRange.day || timeRange == TimeRange.week)
+          ? 'HH:mm'
+          : 'dd/MM/yy';
+
+      if (firstTs > 0) {
+        firstTime = DateFormat(formatString).format(DateTime.fromMillisecondsSinceEpoch(firstTs * 1000));
+      }
+      if (lastTs > 0) {
+        lastTime = DateFormat(formatString).format(DateTime.fromMillisecondsSinceEpoch(lastTs * 1000));
+      }
+    }
+
+    return Stack(
+      children: [
+        LineChart(
+          LineChartData(
+            minX: 0,
+            maxX: (spots.length - 1).toDouble(),
+            minY: minY,
+            maxY: maxY,
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              getDrawingHorizontalLine: (value) {
+                return FlLine(
+                  color: Colors.grey.withValues(alpha: 0.2),
+                  strokeWidth: 1,
                 );
               },
             ),
-          ),
-        ),
-        borderData: FlBorderData(show: false),
-        lineTouchData: LineTouchData(
-          touchTooltipData: LineTouchTooltipData(
-            getTooltipColor: (spot) => Colors.blueGrey,
-            getTooltipItems: (touchedSpots) {
-              return touchedSpots.map((LineBarSpot touchedSpot) {
-                return LineTooltipItem(
-                  touchedSpot.y.toStringAsFixed(2),
-                  const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                );
-              }).toList();
-            },
-          ),
-          handleBuiltInTouches: true,
-        ),
-        lineBarsData: [
-          LineChartBarData(
-            spots: spots,
-            isCurved: true,
-            color: color,
-            barWidth: 2,
-            isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
-            belowBarData: BarAreaData(
+            titlesData: FlTitlesData(
               show: true,
-              color: color.withValues(alpha: 0.1),
+              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 40,
+                  getTitlesWidget: (value, meta) {
+                    return SideTitleWidget(
+                      axisSide: meta.axisSide,
+                      child: Text(
+                        value.toStringAsFixed(1),
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            borderData: FlBorderData(show: false),
+            lineTouchData: LineTouchData(
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (spot) => Colors.blueGrey,
+                getTooltipItems: (touchedSpots) {
+                  return touchedSpots.map((LineBarSpot touchedSpot) {
+                    return LineTooltipItem(
+                      touchedSpot.y.toStringAsFixed(2),
+                      const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    );
+                  }).toList();
+                },
+              ),
+              handleBuiltInTouches: true,
+            ),
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: color,
+                barWidth: 2,
+                isStrokeCapRound: true,
+                dotData: const FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: color.withValues(alpha: 0.1),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (firstTime.isNotEmpty)
+          Positioned(
+            left: 48, // left padding for the Y-axis labels
+            bottom: 0,
+            child: Text(
+              firstTime,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
           ),
+        if (lastTime.isNotEmpty)
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Text(
+              lastTime,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildMetaData(Map<String, dynamic> meta) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Market Info',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        _buildMetaRow('Prev Close', meta['previousClose'], 'Prev Chart Close', meta['chartPreviousClose']),
+        _buildMetaRow('Day High', meta['regularMarketDayHigh'], 'Day Low', meta['regularMarketDayLow']),
+        _buildMetaRow('52w High', meta['fiftyTwoWeekHigh'], '52w Low', meta['fiftyTwoWeekLow']),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Volume', style: TextStyle(color: Colors.grey)),
+              Text(_formatVolume(meta['regularMarketVolume'])),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetaRow(String label1, dynamic val1, String label2, dynamic val2) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(child: _buildMetaItem(label1, val1)),
+          Expanded(child: _buildMetaItem(label2, val2)),
         ],
       ),
     );
+  }
+
+  Widget _buildMetaItem(String label, dynamic val) {
+    String formattedVal = '-';
+    if (val != null) {
+      if (val is num) {
+        formattedVal = val.toStringAsFixed(2);
+      } else {
+        formattedVal = val.toString();
+      }
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        Text(formattedVal, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        const SizedBox(width: 16),
+      ],
+    );
+  }
+
+  String _formatVolume(dynamic vol) {
+    if (vol == null) return '-';
+    if (vol is num) {
+      if (vol >= 1000000000) {
+        return '${(vol / 1000000000).toStringAsFixed(2)}B';
+      } else if (vol >= 1000000) {
+        return '${(vol / 1000000).toStringAsFixed(2)}M';
+      } else if (vol >= 1000) {
+        return '${(vol / 1000).toStringAsFixed(2)}K';
+      }
+      return vol.toString();
+    }
+    return vol.toString();
   }
 }
