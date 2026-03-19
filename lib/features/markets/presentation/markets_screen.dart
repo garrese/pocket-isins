@@ -55,11 +55,16 @@ class MarketsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4.0,
+                            horizontal: 4.0,
+                          ),
                           child: Text(
                             isin.displayName,
                             style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         ...isin.tickers.map((ticker) {
@@ -70,16 +75,20 @@ class MarketsScreen extends ConsumerWidget {
                               child: ListTile(
                                 title: Text(ticker.symbol),
                                 subtitle: const Text(
-                                    'Data not available. Invalid ticker or not found on Yahoo.',
-                                    style: TextStyle(color: Colors.redAccent)),
-                                trailing: const Icon(Icons.error_outline,
-                                    color: Colors.red),
+                                  'Data not available. Invalid ticker or not found on Yahoo.',
+                                  style: TextStyle(color: Colors.redAccent),
+                                ),
+                                trailing: const Icon(
+                                  Icons.error_outline,
+                                  color: Colors.red,
+                                ),
                               ),
                             );
                           }
 
                           final variation =
-                              cache.regularMarketPrice - cache.chartPreviousClose;
+                              cache.regularMarketPrice -
+                              cache.chartPreviousClose;
                           final variationPercent =
                               (variation / cache.chartPreviousClose) * 100;
                           final isPositive = variation >= 0;
@@ -91,11 +100,10 @@ class MarketsScreen extends ConsumerWidget {
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        TickerDetailScreen(
-                                          symbol: ticker.symbol,
-                                          displayName: isin.displayName,
-                                        ),
+                                    builder: (_) => TickerDetailScreen(
+                                      symbol: ticker.symbol,
+                                      displayName: isin.displayName,
+                                    ),
                                   ),
                                 );
                               },
@@ -107,24 +115,29 @@ class MarketsScreen extends ConsumerWidget {
                                     SizedBox(
                                       width: 110,
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           _buildMarqueeText(
                                             ticker.symbol,
                                             style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
                                           ),
                                           _buildMarqueeText(
                                             '${cache.regularMarketPrice.toStringAsFixed(2)} ${ticker.currency}',
-                                            style: const TextStyle(fontSize: 12),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                            ),
                                           ),
                                           _buildMarqueeText(
                                             '${isPositive ? '+' : ''}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
                                             style: TextStyle(
-                                                fontSize: 12,
-                                                color: color,
-                                                fontWeight: FontWeight.bold),
+                                              fontSize: 12,
+                                              color: color,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -135,7 +148,10 @@ class MarketsScreen extends ConsumerWidget {
                                       child: SizedBox(
                                         height: 50,
                                         child: _buildSparkline(
-                                            cache.intradayPrices, cache.intradayTimestamps, color),
+                                          cache.intradayPrices,
+                                          cache.intradayTimestamps,
+                                          color,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -175,7 +191,10 @@ class MarketsScreen extends ConsumerWidget {
 
       int lastTs = -1;
       if (cache.intradayTimestamps.isNotEmpty) {
-        lastTs = cache.intradayTimestamps.lastWhere((ts) => ts > 0, orElse: () => -1);
+        lastTs = cache.intradayTimestamps.lastWhere(
+          (ts) => ts > 0,
+          orElse: () => -1,
+        );
       }
 
       if (lastTs > mostRecentTimestamp) {
@@ -224,17 +243,17 @@ class MarketsScreen extends ConsumerWidget {
           );
         } else {
           // If it fits, just display the normal Text
-          return Text(
-            text,
-            style: style,
-            overflow: TextOverflow.ellipsis,
-          );
+          return Text(text, style: style, overflow: TextOverflow.ellipsis);
         }
       },
     );
   }
 
-  Widget _buildSparkline(List<double> prices, List<int> timestamps, Color color) {
+  Widget _buildSparkline(
+    List<double> prices,
+    List<int> timestamps,
+    Color color,
+  ) {
     if (prices.length < 2) return const SizedBox.shrink();
 
     final minPrice = prices.reduce((a, b) => a < b ? a : b);
@@ -261,10 +280,14 @@ class MarketsScreen extends ConsumerWidget {
       int lastTs = timestamps.lastWhere((ts) => ts > 0, orElse: () => 0);
 
       if (firstTs > 0) {
-        firstTime = DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(firstTs * 1000));
+        firstTime = DateFormat(
+          'HH:mm',
+        ).format(DateTime.fromMillisecondsSinceEpoch(firstTs * 1000));
       }
       if (lastTs > 0) {
-        lastTime = DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(lastTs * 1000));
+        lastTime = DateFormat(
+          'HH:mm',
+        ).format(DateTime.fromMillisecondsSinceEpoch(lastTs * 1000));
       }
     }
 
@@ -283,7 +306,7 @@ class MarketsScreen extends ConsumerWidget {
             lineBarsData: [
               LineChartBarData(
                 spots: spots,
-                isCurved: true,
+                isCurved: false,
                 color: color,
                 barWidth: 2,
                 isStrokeCapRound: true,
