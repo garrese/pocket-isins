@@ -113,6 +113,9 @@ class TickerDetailScreen extends ConsumerWidget {
       final color = isPositive ? Colors.green : Colors.red;
       final currency = meta['currency'] ?? '';
 
+      // Yahoo Finance API provides parallel arrays for timestamps and Open/High/Low/Close/Volume values.
+      // We iterate over the 'close' array (as it's our primary metric) and build a consolidated list
+      // of ChartPoint objects using the corresponding index across all arrays.
       final List<ChartPoint> chartPoints = [];
       final closeArray = indicators['close'] as List<dynamic>? ?? [];
       final highArray = indicators['high'] as List<dynamic>? ?? [];
@@ -248,10 +251,13 @@ class TickerDetailScreen extends ConsumerWidget {
                   showTitles: true,
                   reservedSize: 40,
                   getTitlesWidget: (value, meta) {
+                    // This logic prevents the intermediate automatically generated Y-axis labels
+                    // from overlapping with the static Min and Max labels at the bottom and top of the chart.
                     if (value != meta.min && value != meta.max) {
                       final range = meta.max - meta.min;
                       final minDiff = (value - meta.min).abs();
                       final maxDiff = (meta.max - value).abs();
+                      // Hide the label if it falls within 10% of the top or bottom of the visible range.
                       if (minDiff < range * 0.1 || maxDiff < range * 0.1) {
                         return const SizedBox.shrink();
                       }
@@ -273,6 +279,8 @@ class TickerDetailScreen extends ConsumerWidget {
                 getTooltipColor: (spot) => Colors.blueGrey,
                 getTooltipItems: (touchedSpots) {
                   return touchedSpots.map((LineBarSpot touchedSpot) {
+                    // Extract the index of the spot in the X-axis and map it back to our full
+                    // ChartPoint data object to display a comprehensive hover tooltip.
                     final index = touchedSpot.x.toInt();
                     if (index >= 0 && index < chartPoints.length) {
                       final point = chartPoints[index];
