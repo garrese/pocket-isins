@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import '../../../core/network/dio_provider.dart';
 
 import '../../../core/database/models/isin.dart';
 import '../domain/portfolio_form_data.dart';
@@ -80,13 +81,16 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
     });
 
     try {
-      final dio = Dio();
-      dio.options.headers['User-Agent'] = 'yaak';
-      dio.options.headers['Accept'] = '*/*';
-
+      final dio = ref.read(dioProvider);
       final response = await dio.get(
         'https://query2.finance.yahoo.com/v1/finance/search',
         queryParameters: {'newsCount': 0, 'q': isin},
+        options: Options(
+          headers: {
+            'User-Agent': 'yaak',
+            'Accept': '*/*',
+          },
+        ),
       );
       final quotes = response.data['quotes'] as List<dynamic>? ?? [];
 
@@ -153,9 +157,13 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
     });
 
     try {
-      final dio = Dio();
-      dio.options.headers['User-Agent'] = 'yaak';
-      dio.options.headers['Accept'] = '*/*';
+      final dio = ref.read(dioProvider);
+      final options = Options(
+        headers: {
+          'User-Agent': 'yaak',
+          'Accept': '*/*',
+        },
+      );
 
       List<dynamic> quotes = [];
 
@@ -163,6 +171,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
         final response = await dio.get(
           'https://query2.finance.yahoo.com/v1/finance/search',
           queryParameters: {'newsCount': 0, 'q': isin},
+          options: options,
         );
         final firstQuotes = response.data['quotes'] as List<dynamic>? ?? [];
 
@@ -177,6 +186,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
              final secondResponse = await dio.get(
                'https://query2.finance.yahoo.com/v1/finance/search',
                queryParameters: {'newsCount': 0, 'q': nameToSearch},
+               options: options,
              );
              quotes = secondResponse.data['quotes'] as List<dynamic>? ?? [];
            } else {
@@ -190,6 +200,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
         final response = await dio.get(
           'https://query2.finance.yahoo.com/v1/finance/search',
           queryParameters: {'newsCount': 0, 'q': name},
+          options: options,
         );
         quotes = response.data['quotes'] as List<dynamic>? ?? [];
       }
