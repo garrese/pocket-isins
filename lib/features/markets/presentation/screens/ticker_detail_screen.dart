@@ -5,6 +5,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../data/ticker_detail_provider.dart';
 
+class ChartPoint {
+  final double close;
+  final double? high;
+  final double? low;
+  final int? volume;
+  final int timestamp;
+
+  ChartPoint({
+    required this.close,
+    this.high,
+    this.low,
+    this.volume,
+    required this.timestamp,
+  });
+}
+
 class TickerDetailScreen extends ConsumerWidget {
   final String symbol;
   final String? displayName;
@@ -43,12 +59,14 @@ class TickerDetailScreen extends ConsumerWidget {
       BuildContext context, WidgetRef ref, TickerDetailState state) {
     return Wrap(
       spacing: 8.0,
+      runSpacing: 8.0,
       alignment: WrapAlignment.center,
       children: TimeRange.values.map((range) {
         final isSelected = state.selectedRange == range;
         return ChoiceChip(
           label: Text(range.label),
           selected: isSelected,
+          showCheckmark: false,
           onSelected: (selected) {
             if (selected) {
               ref.read(tickerDetailProvider(symbol).notifier).changeTimeRange(range);
@@ -95,23 +113,48 @@ class TickerDetailScreen extends ConsumerWidget {
       final color = isPositive ? Colors.green : Colors.red;
       final currency = meta['currency'] ?? '';
 
-      final List<double> prices = [];
-      final List<int> timestamps = [];
+      final List<ChartPoint> chartPoints = [];
       final closeArray = indicators['close'] as List<dynamic>? ?? [];
+      final highArray = indicators['high'] as List<dynamic>? ?? [];
+      final lowArray = indicators['low'] as List<dynamic>? ?? [];
+      final volumeArray = indicators['volume'] as List<dynamic>? ?? [];
 
       for (var i = 0; i < closeArray.length; i++) {
         final val = closeArray[i];
         if (val != null) {
-          prices.add((val as num).toDouble());
-          if (i < timestampsDynamic.length) {
-            timestamps.add((timestampsDynamic[i] as num).toInt());
-          } else {
-            timestamps.add(0);
+          final closePrice = (val as num).toDouble();
+
+          double? high;
+          if (i < highArray.length && highArray[i] != null) {
+            high = (highArray[i] as num).toDouble();
           }
+
+          double? low;
+          if (i < lowArray.length && lowArray[i] != null) {
+            low = (lowArray[i] as num).toDouble();
+          }
+
+          int? volume;
+          if (i < volumeArray.length && volumeArray[i] != null) {
+            volume = (volumeArray[i] as num).toInt();
+          }
+
+          int timestamp = 0;
+          if (i < timestampsDynamic.length) {
+            timestamp = (timestampsDynamic[i] as num).toInt();
+          }
+
+          chartPoints.add(ChartPoint(
+            close: closePrice,
+            high: high,
+            low: low,
+            volume: volume,
+            timestamp: timestamp,
+          ));
         }
       }
 
-      if (prices.length < 2) {
+      if (chartPoints.length < 2) {
         return const Center(child: Text('Not enough price data available.'));
       }
 
@@ -128,7 +171,7 @@ class TickerDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: _buildLineChart(prices, timestamps, state.selectedRange, color),
+            child: _buildLineChart(chartPoints, state.selectedRange, color),
           ),
           const SizedBox(height: 16),
           _buildMetaData(meta),
@@ -145,7 +188,8 @@ class TickerDetailScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildLineChart(List<double> prices, List<int> timestamps, TimeRange timeRange, Color color) {
+  Widget _buildLineChart(List<ChartPoint> chartPoints, TimeRange timeRange, Color color) {
+    final prices = chartPoints.map((e) => e.close).toList();
     final minPrice = prices.reduce((a, b) => a < b ? a : b);
     final maxPrice = prices.reduce((a, b) => a > b ? a : b);
 
@@ -160,9 +204,9 @@ class TickerDetailScreen extends ConsumerWidget {
     String firstTime = '';
     String lastTime = '';
 
-    if (timestamps.isNotEmpty) {
-      int firstTs = timestamps.firstWhere((ts) => ts > 0, orElse: () => 0);
-      int lastTs = timestamps.lastWhere((ts) => ts > 0, orElse: () => 0);
+    if (chartPoints.isNotEmpty) {
+      int firstTs = chartPoints.map((e) => e.timestamp).firstWhere((ts) => ts > 0, orElse: () => 0);
+      int lastTs = chartPoints.map((e) => e.timestamp).lastWhere((ts) => ts > 0, orElse: () => 0);
 
       String formatString = (timeRange == TimeRange.day || timeRange == TimeRange.week)
           ? 'HH:mm'
@@ -204,6 +248,14 @@ class TickerDetailScreen extends ConsumerWidget {
                   showTitles: true,
                   reservedSize: 40,
                   getTitlesWidget: (value, meta) {
+                    if (value != meta.min && value != meta.max) {
+                      final range = meta.max - meta.min;
+                      final minDiff = (value - meta.min).abs();
+                      final maxDiff = (meta.max - value).abs();
+                      if (minDiff < range * 0.1 || maxDiff < range * 0.1) {
+                        return const SizedBox.shrink();
+                      }
+                    }
                     return SideTitleWidget(
                       axisSide: meta.axisSide,
                       child: Text(
@@ -221,6 +273,27 @@ class TickerDetailScreen extends ConsumerWidget {
                 getTooltipColor: (spot) => Colors.blueGrey,
                 getTooltipItems: (touchedSpots) {
                   return touchedSpots.map((LineBarSpot touchedSpot) {
+                    final index = touchedSpot.x.toInt();
+                    if (index >= 0 && index < chartPoints.length) {
+                      final point = chartPoints[index];
+                      String timeStr = '';
+                      if (point.timestamp > 0) {
+                        final formatString = (timeRange == TimeRange.day || timeRange == TimeRange.week)
+                            ? 'HH:mm'
+                            : 'dd/MM/yy';
+                        timeStr = DateFormat(formatString).format(DateTime.fromMillisecondsSinceEpoch(point.timestamp * 1000));
+                      }
+
+                      return LineTooltipItem(
+                        '$timeStr\n'
+                        'Close: ${point.close.toStringAsFixed(2)}\n'
+                        'High: ${point.high?.toStringAsFixed(2) ?? '-'}\n'
+                        'Low: ${point.low?.toStringAsFixed(2) ?? '-'}\n'
+                        'Vol: ${_formatVolume(point.volume)}',
+                        const TextStyle(color: Colors.white, fontSize: 12),
+                        textAlign: TextAlign.left,
+                      );
+                    }
                     return LineTooltipItem(
                       touchedSpot.y.toStringAsFixed(2),
                       const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -277,19 +350,9 @@ class TickerDetailScreen extends ConsumerWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        _buildMetaRow('Prev Close', meta['previousClose'], 'Prev Chart Close', meta['chartPreviousClose']),
-        _buildMetaRow('Day High', meta['regularMarketDayHigh'], 'Day Low', meta['regularMarketDayLow']),
-        _buildMetaRow('52w High', meta['fiftyTwoWeekHigh'], '52w Low', meta['fiftyTwoWeekLow']),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Volume', style: TextStyle(color: Colors.grey)),
-              Text(_formatVolume(meta['regularMarketVolume'])),
-            ],
-          ),
-        ),
+        _buildMetaRow('Prev Close', meta['chartPreviousClose'], 'Volume', _formatVolume(meta['regularMarketVolume'])),
+        _buildMetaRow('Day Low', meta['regularMarketDayLow'], 'Day High', meta['regularMarketDayHigh']),
+        _buildMetaRow('52w Low', meta['fiftyTwoWeekLow'], '52w High', meta['fiftyTwoWeekHigh']),
       ],
     );
   }
