@@ -54,9 +54,6 @@ class MainScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pocket ISINs'),
-      ),
       body: screens[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,

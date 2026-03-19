@@ -388,10 +388,14 @@ class TickerDetailScreen extends ConsumerWidget {
       }
     }
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-        Text(formattedVal, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        SizedBox(
+          width: 80,
+          child: Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        ),
+        Expanded(
+          child: Text(formattedVal, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        ),
         const SizedBox(width: 16),
       ],
     );
