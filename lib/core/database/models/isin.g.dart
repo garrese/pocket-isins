@@ -15,7 +15,7 @@ extension GetIsinCollection on Isar {
 
 const IsinSchema = CollectionSchema(
   name: r'Isin',
-  id: 4355349136519610,
+  id: -9173980691444550219,
   properties: {
     r'isinCode': PropertySchema(
       id: 0,
@@ -40,7 +40,7 @@ const IsinSchema = CollectionSchema(
   idName: r'id',
   indexes: {
     r'isinCode': IndexSchema(
-      id: 5135137561806416,
+      id: 8832190407207977596,
       name: r'isinCode',
       unique: true,
       replace: false,
@@ -55,7 +55,7 @@ const IsinSchema = CollectionSchema(
   },
   links: {
     r'tickers': LinkSchema(
-      id: 4632859611196934,
+      id: 6048463559542401895,
       name: r'tickers',
       target: r'Ticker',
       single: false,
