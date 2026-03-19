@@ -6,7 +6,7 @@ part 'ticker_detail_provider.g.dart';
 
 enum TimeRange {
   day('1D', '5m', '1d'),
-  week('1W', '15m', '5d'),
+  week('1W', '1h', '7d'),
   month('1M', '1d', '1mo'),
   threeMonths('3M', '1d', '3mo'),
   sixMonths('6M', '1d', '6mo'),

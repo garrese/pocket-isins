@@ -373,7 +373,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                     icon: _isAutoFillingName
                         ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                         : const Icon(Icons.search),
-                    label: const Text('Buscar Yahoo Name'),
+                    label: const Text('Autofill'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     ),
@@ -443,8 +443,10 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                       )
                     : TextButton.icon(
                         icon: const Icon(Icons.search, size: 16),
-                        label: const Text('Search Market'),
-                        onPressed: _searchingIndex != null ? null : () => _searchSymbol(tIndex),
+                        label: const Text('Autofill Market'),
+                        onPressed: _searchingIndex != null
+                            ? null
+                            : () => _searchSymbol(tIndex),
                       ),
               ],
             ),
