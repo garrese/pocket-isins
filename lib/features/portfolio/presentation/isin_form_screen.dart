@@ -28,6 +28,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
   final List<TickerFormData> _tickers = [];
   int? _searchingIndex;
   bool _isAutoFillingName = false;
+  bool _isNameManuallyEnabled = false;
 
   @override
   void initState() {
@@ -95,42 +96,49 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
       );
       final quotes = response.data['quotes'] as List<dynamic>? ?? [];
 
-      if (quotes.isNotEmpty) {
-        final firstQuote = quotes[0];
-        final longname = firstQuote['longname'];
-        final shortname = firstQuote['shortname'];
-
+      // Extract unique names
+      final Set<String> uniqueNames = {};
+      for (var q in quotes) {
+        final longname = q['longname'];
+        final shortname = q['shortname'];
         final nameToUse = longname ?? shortname;
+        if (nameToUse != null && nameToUse.toString().trim().isNotEmpty) {
+          uniqueNames.add(nameToUse.toString().trim());
+        }
+      }
 
-        if (nameToUse != null) {
+      if (uniqueNames.isEmpty) {
+        if (mounted) {
           setState(() {
-            _nameController.text = nameToUse;
+            _isNameManuallyEnabled = true;
           });
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Name auto-filled successfully.')),
-            );
-          }
-        } else {
-           if (mounted) {
-             ScaffoldMessenger.of(context).showSnackBar(
-               const SnackBar(content: Text('Could not find a name for this ISIN.')),
-             );
-           }
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se encontraron nombres. Edición manual habilitada.')),
+          );
+        }
+      } else if (uniqueNames.length == 1) {
+        if (mounted) {
+          setState(() {
+            _nameController.text = uniqueNames.first;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Yahoo Name completado automáticamente.')),
+          );
         }
       } else {
-         if (mounted) {
-           ScaffoldMessenger.of(context).showSnackBar(
-             const SnackBar(content: Text('No results found for this ISIN.')),
-           );
-         }
+        if (mounted) {
+          _showYahooNameSelectionDialog(uniqueNames.toList());
+        }
       }
     } catch (e, stack) {
-      debugPrint('Error auto-filling name: $e');
+      debugPrint('Error searching Yahoo Name: $e');
       debugPrint('Stacktrace: $stack');
       if (mounted) {
+        setState(() {
+          _isNameManuallyEnabled = true;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error auto-filling name.')),
+          const SnackBar(content: Text('Error en la búsqueda. Edición manual habilitada.')),
         );
       }
     } finally {
@@ -142,13 +150,35 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
     }
   }
 
+  void _showYahooNameSelectionDialog(List<String> names) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ListView.builder(
+          itemCount: names.length,
+          itemBuilder: (context, index) {
+            final name = names[index];
+            return ListTile(
+              title: Text(name),
+              onTap: () {
+                setState(() {
+                  _nameController.text = name;
+                });
+                Navigator.pop(context);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _searchSymbol(int tIndex) async {
-    final isin = _codeController.text.trim();
     final name = _nameController.text.trim();
 
-    if (isin.isEmpty && name.isEmpty) {
+    if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter an ISIN or Company Name first.')),
+        const SnackBar(content: Text('Por favor, busca o rellena primero el Yahoo Name.')),
       );
       return;
     }
@@ -166,45 +196,12 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
         },
       );
 
-      List<dynamic> quotes = [];
-
-      if (isin.isNotEmpty) {
-        final response = await dio.get(
-          'https://query2.finance.yahoo.com/v1/finance/search',
-          queryParameters: {'newsCount': 0, 'q': isin},
-          options: options,
-        );
-        final firstQuotes = response.data['quotes'] as List<dynamic>? ?? [];
-
-        if (firstQuotes.isNotEmpty) {
-           final firstQuote = firstQuotes[0];
-           final longname = firstQuote['longname'];
-           final shortname = firstQuote['shortname'];
-
-           final nameToSearch = longname ?? shortname;
-
-           if (nameToSearch != null && nameToSearch.toString().isNotEmpty) {
-             final secondResponse = await dio.get(
-               'https://query2.finance.yahoo.com/v1/finance/search',
-               queryParameters: {'newsCount': 0, 'q': nameToSearch},
-               options: options,
-             );
-             quotes = secondResponse.data['quotes'] as List<dynamic>? ?? [];
-           } else {
-             // fallback to direct ISIN search if no name available
-             quotes = firstQuotes;
-           }
-        } else {
-           quotes = firstQuotes;
-        }
-      } else if (name.isNotEmpty) {
-        final response = await dio.get(
-          'https://query2.finance.yahoo.com/v1/finance/search',
-          queryParameters: {'newsCount': 0, 'q': name},
-          options: options,
-        );
-        quotes = response.data['quotes'] as List<dynamic>? ?? [];
-      }
+      final response = await dio.get(
+        'https://query2.finance.yahoo.com/v1/finance/search',
+        queryParameters: {'newsCount': 0, 'q': name},
+        options: options,
+      );
+      final quotes = response.data['quotes'] as List<dynamic>? ?? [];
 
       if (quotes.isEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -290,20 +287,70 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                     ),
                   ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: _isAutoFillingName
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.auto_awesome),
-                  onPressed: _isAutoFillingName ? null : _autoFillName,
-                  tooltip: 'Auto-fill from Yahoo',
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      if (!_isNameManuallyEnabled) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Entrada Manual'),
+                            content: const Text(
+                                'Recomendamos usar la búsqueda automática por ISIN. ¿Quieres habilitar la edición manual?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Aceptar'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isNameManuallyEnabled = true;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Editar manualmente'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                    child: IgnorePointer(
+                      ignoring: !_isNameManuallyEnabled,
+                      child: TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          labelText: 'Yahoo Name',
+                          border: const OutlineInputBorder(),
+                          filled: !_isNameManuallyEnabled,
+                          fillColor: !_isNameManuallyEnabled ? Colors.grey.withAlpha(25) : null,
+                          helperText: _isNameManuallyEnabled ? 'Edición manual habilitada' : null,
+                        ),
+                        validator: (v) => v!.trim().isEmpty ? 'Required' : null,
+                        enabled: true, // We use IgnorePointer to block interaction without greying out completely if we prefer
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              validator: (v) => v!.trim().isEmpty ? 'Required' : null,
+                const SizedBox(width: 8),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0), // Align with text field
+                  child: ElevatedButton.icon(
+                    onPressed: _isAutoFillingName ? null : _autoFillName,
+                    icon: _isAutoFillingName
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.search),
+                    label: const Text('Buscar Yahoo Name'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -481,29 +528,27 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             final exchange = q['exchange'] ?? 'Unknown';
             final exchDisp = q['exchDisp'] ?? exchange;
             final symbol = q['symbol'] ?? 'Unknown';
-            final title = '$shortname ($exchDisp) - $symbol';
+
+            String? mappedCurrency = kExchangeToCurrencyMap[exchDisp.toString()];
+            if (mappedCurrency == null) {
+              for (final entry in kSymbolSuffixToCurrencyMap.entries) {
+                if (symbol.endsWith(entry.key)) {
+                  mappedCurrency = entry.value;
+                  break;
+                }
+              }
+            }
+
+            final title = mappedCurrency != null
+                ? '$shortname ($exchDisp - $mappedCurrency) - $symbol'
+                : '$shortname ($exchDisp) - $symbol';
 
             return ListTile(
               title: Text(title),
               onTap: () {
                 setState(() {
                   _tickers[tIndex].symbol = symbol;
-
-                  // Auto-map currency based on exchDisp
-                  _tickers[tIndex].currency = '';
-                  final matchingCurrency = kExchangeToCurrencyMap[exchDisp.toString()];
-                  if (matchingCurrency != null) {
-                    _tickers[tIndex].currency = matchingCurrency;
-                  } else {
-                    // Check common symbol suffixes if exchDisp wasn't mapped
-                    for (final entry in kSymbolSuffixToCurrencyMap.entries) {
-                      if (symbol.endsWith(entry.key)) {
-                        _tickers[tIndex].currency = entry.value;
-                        break;
-                      }
-                    }
-                  }
-
+                  _tickers[tIndex].currency = mappedCurrency ?? '';
                 });
                 Navigator.pop(context);
               },
