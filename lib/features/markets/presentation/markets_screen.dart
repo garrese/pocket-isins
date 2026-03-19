@@ -150,19 +150,10 @@ class MarketsScreen extends ConsumerWidget {
       return FlSpot(e.key.toDouble(), e.value);
     }).toList();
 
-    // The API fetches 5m data for 1d.
-    // We assume a minimum of 6 hours of trading to avoid the chart stretching fully
-    // if only a few data points are available at the start of the day.
-    // 6 hours = 360 minutes / 5 minutes = 72 data points.
-    const minExpectedDataPoints = 72;
-    final double calculatedMaxX = (spots.length > minExpectedDataPoints)
-        ? spots.length.toDouble() - 1
-        : minExpectedDataPoints.toDouble() - 1;
-
     return LineChart(
       LineChartData(
         minX: 0,
-        maxX: calculatedMaxX,
+        maxX: (spots.length - 1).toDouble(),
         minY: minPrice,
         maxY: maxPrice,
         gridData: const FlGridData(show: false),
