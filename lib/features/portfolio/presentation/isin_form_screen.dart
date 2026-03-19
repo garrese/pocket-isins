@@ -251,8 +251,37 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
       appBar: AppBar(
         title: Text(widget.isinToEdit == null ? 'Add ISIN' : 'Edit ISIN'),
         actions: [
+          if (widget.isinToEdit != null)
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.redAccent),
+              tooltip: 'Delete ISIN',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Confirm Delete'),
+                    content: const Text('Are you sure you want to delete this ISIN?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          ref.read(portfolioProvider.notifier).removeIsin(widget.isinToEdit!.id);
+                          Navigator.pop(context); // Close dialog
+                          Navigator.pop(context); // Close form screen
+                        },
+                        child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.save),
+            tooltip: 'Save ISIN',
             onPressed: _save,
           )
         ],
