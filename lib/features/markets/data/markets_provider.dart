@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:isar/isar.dart';
+import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/database/isar_service.dart';
+import '../../../core/database/drift_service.dart';
+import '../../../core/database/drift/app_database.dart' as drift;
 import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/market_data_cache.dart';
 import '../../../core/network/market_data_service.dart';
+import '../../portfolio/data/portfolio_provider.dart';
 
 part 'markets_provider.g.dart';
 
@@ -17,27 +19,35 @@ class Markets extends _$Markets {
   }
 
   Future<List<Isin>> _fetchAndSyncIntradayData() async {
-    final isar = ref.read(isarServiceProvider).db;
+    final db = ref.read(driftServiceProvider).db;
     final marketService = ref.read(marketDataServiceProvider);
 
-    // Get all ISINs with their tickers loaded
-    final isins = await isar.isins.where().findAll();
-    for (var isin in isins) {
-      await isin.tickers.load();
-    }
-
-    // Now check the cache for every ticker
+    // Get all ISINs via Portfolio provider to ensure identical structure
+    final isins = await ref.read(portfolioProvider.future);
     final now = DateTime.now();
     
     for (var isin in isins) {
       for (var ticker in isin.tickers) {
-        await ticker.marketDataCache.load();
+        final cacheRow = await (db.select(db.marketDataCaches)..where((c) => c.tickerId.equals(ticker.id))).getSingleOrNull();
+
+        if (cacheRow != null) {
+          ticker.marketDataCache = MarketDataCache(
+            id: cacheRow.id,
+            symbol: cacheRow.symbol,
+            lastUpdated: cacheRow.lastUpdated,
+            regularMarketPrice: cacheRow.regularMarketPrice,
+            chartPreviousClose: cacheRow.chartPreviousClose,
+            intradayPrices: cacheRow.intradayPrices,
+            intradayTimestamps: cacheRow.intradayTimestamps,
+            ticker: ticker,
+          );
+        }
 
         bool needsUpdate = false;
-        if (ticker.marketDataCache.value == null) {
+        if (ticker.marketDataCache == null) {
           needsUpdate = true;
         } else {
-          final cached = ticker.marketDataCache.value!;
+          final cached = ticker.marketDataCache!;
           // If the cache is older than 5 minutes OR the price is 0 (corrupt data), we update
           final lastUpdate = cached.lastUpdated;
           if (now.difference(lastUpdate).inMinutes > 5) {
@@ -91,19 +101,44 @@ class Markets extends _$Markets {
                   }
                 }
 
-                // Save to Isar
-                await isar.writeTxn(() async {
-                  MarketDataCache cache = ticker.marketDataCache.value ?? MarketDataCache();
-                  cache.symbol = ticker.symbol;
-                  cache.lastUpdated = now;
-                  cache.regularMarketPrice = regularMarketPrice;
-                  cache.chartPreviousClose = chartPreviousClose;
-                  cache.intradayPrices = intradayPrices;
-                  cache.intradayTimestamps = intradayTimestamps;
-                  await isar.marketDataCaches.put(cache);
-                  if (ticker.marketDataCache.value == null) {
-                    ticker.marketDataCache.value = cache;
-                    await ticker.marketDataCache.save();
+                // Save to Drift
+                await db.transaction(() async {
+                  if (ticker.marketDataCache != null) {
+                    await (db.update(db.marketDataCaches)..where((c) => c.id.equals(ticker.marketDataCache!.id))).write(
+                      drift.MarketDataCachesCompanion(
+                        lastUpdated: Value(now),
+                        regularMarketPrice: Value(regularMarketPrice),
+                        chartPreviousClose: Value(chartPreviousClose),
+                        intradayPrices: Value(intradayPrices),
+                        intradayTimestamps: Value(intradayTimestamps),
+                      )
+                    );
+                    ticker.marketDataCache!.lastUpdated = now;
+                    ticker.marketDataCache!.regularMarketPrice = regularMarketPrice;
+                    ticker.marketDataCache!.chartPreviousClose = chartPreviousClose;
+                    ticker.marketDataCache!.intradayPrices = intradayPrices;
+                    ticker.marketDataCache!.intradayTimestamps = intradayTimestamps;
+                  } else {
+                    final newId = await db.into(db.marketDataCaches).insert(drift.MarketDataCachesCompanion.insert(
+                      symbol: ticker.symbol,
+                      lastUpdated: now,
+                      regularMarketPrice: Value(regularMarketPrice),
+                      chartPreviousClose: Value(chartPreviousClose),
+                      intradayPrices: Value(intradayPrices),
+                      intradayTimestamps: Value(intradayTimestamps),
+                      tickerId: ticker.id,
+                    ));
+
+                    ticker.marketDataCache = MarketDataCache(
+                      id: newId,
+                      symbol: ticker.symbol,
+                      lastUpdated: now,
+                      regularMarketPrice: regularMarketPrice,
+                      chartPreviousClose: chartPreviousClose,
+                      intradayPrices: intradayPrices,
+                      intradayTimestamps: intradayTimestamps,
+                      ticker: ticker,
+                    );
                   }
                 });
               }
@@ -121,9 +156,8 @@ class Markets extends _$Markets {
 
   /// Clears all market data caches and forces a fresh fetch from Yahoo.
   Future<void> forceRefresh() async {
-    final isar = ref.read(isarServiceProvider).db;
-    // Clear all cached market data so everything gets re-fetched
-    await isar.writeTxn(() => isar.marketDataCaches.clear());
+    final db = ref.read(driftServiceProvider).db;
+    await db.delete(db.marketDataCaches).go();
     state = const AsyncLoading();
     state = await AsyncValue.guard(_fetchAndSyncIntradayData);
   }
