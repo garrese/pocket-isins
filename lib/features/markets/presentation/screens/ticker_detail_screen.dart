@@ -200,9 +200,12 @@ class TickerDetailScreen extends ConsumerWidget {
     final minY = minPrice - padding;
     final maxY = maxPrice + padding;
 
-    final spots = prices.asMap().entries.map((e) {
-      return FlSpot(e.key.toDouble(), e.value);
+    final spots = chartPoints.map((point) {
+      return FlSpot(point.timestamp.toDouble(), point.close);
     }).toList();
+
+    final minX = spots.first.x;
+    final maxX = spots.last.x;
 
     String firstTime = '';
     String lastTime = '';
@@ -227,8 +230,8 @@ class TickerDetailScreen extends ConsumerWidget {
       children: [
         LineChart(
           LineChartData(
-            minX: 0,
-            maxX: (spots.length - 1).toDouble(),
+            minX: minX,
+            maxX: maxX,
             minY: minY,
             maxY: maxY,
             gridData: FlGridData(
@@ -274,11 +277,11 @@ class TickerDetailScreen extends ConsumerWidget {
                 getTooltipColor: (spot) => Colors.blueGrey,
                 getTooltipItems: (touchedSpots) {
                   return touchedSpots.map((LineBarSpot touchedSpot) {
-                    // Extract the index of the spot in the X-axis and map it back to our full
-                    // ChartPoint data object to display a comprehensive hover tooltip.
-                    final index = touchedSpot.x.toInt();
-                    if (index >= 0 && index < chartPoints.length) {
-                      final point = chartPoints[index];
+                    // touchedSpot.x is the timestamp
+                    final timestamp = touchedSpot.x.toInt();
+
+                    try {
+                      final point = chartPoints.firstWhere((p) => p.timestamp == timestamp);
                       String timeStr = '';
                       if (point.timestamp > 0) {
                         final formatString = (timeRange == TimeRange.day || timeRange == TimeRange.week)
@@ -296,11 +299,12 @@ class TickerDetailScreen extends ConsumerWidget {
                         const TextStyle(color: Colors.white, fontSize: 12),
                         textAlign: TextAlign.left,
                       );
+                    } catch (e) {
+                      return LineTooltipItem(
+                        touchedSpot.y.toStringAsFixed(2),
+                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      );
                     }
-                    return LineTooltipItem(
-                      touchedSpot.y.toStringAsFixed(2),
-                      const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    );
                   }).toList();
                 },
               ),
@@ -364,10 +368,19 @@ class TickerDetailScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(child: _buildMetaItem(label1, val1)),
-          Expanded(child: _buildMetaItem(label2, val2)),
+          Expanded(
+            child: Align(
+              alignment: Alignment.center,
+              child: _buildMetaItem(label1, val1),
+            ),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.center,
+              child: _buildMetaItem(label2, val2),
+            ),
+          ),
         ],
       ),
     );
@@ -383,9 +396,10 @@ class TickerDetailScreen extends ConsumerWidget {
       }
     }
     return Row(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
+        Flexible(
           child: Text(
             label,
             style: const TextStyle(color: Colors.grey, fontSize: 13),
@@ -393,13 +407,12 @@ class TickerDetailScreen extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
         Text(
           formattedVal,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           textAlign: TextAlign.right,
         ),
-        const SizedBox(width: 8),
       ],
     );
   }

@@ -150,9 +150,17 @@ class MarketsScreen extends ConsumerWidget {
     final minPrice = prices.reduce((a, b) => a < b ? a : b);
     final maxPrice = prices.reduce((a, b) => a > b ? a : b);
 
-    final spots = prices.asMap().entries.map((e) {
-      return FlSpot(e.key.toDouble(), e.value);
-    }).toList();
+    final List<FlSpot> spots = [];
+    for (int i = 0; i < prices.length; i++) {
+      if (i < timestamps.length) {
+        spots.add(FlSpot(timestamps[i].toDouble(), prices[i]));
+      }
+    }
+
+    if (spots.isEmpty) return const SizedBox.shrink();
+
+    final minX = spots.first.x;
+    final maxX = spots.last.x;
 
     String firstTime = '';
     String lastTime = '';
@@ -174,8 +182,8 @@ class MarketsScreen extends ConsumerWidget {
       children: [
         LineChart(
           LineChartData(
-            minX: 0,
-            maxX: (spots.length - 1).toDouble(),
+            minX: minX,
+            maxX: maxX,
             minY: minPrice,
             maxY: maxPrice,
             gridData: const FlGridData(show: false),
