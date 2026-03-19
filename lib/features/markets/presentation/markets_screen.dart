@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:intl/intl.dart';
 import '../data/markets_provider.dart';
 import 'screens/ticker_detail_screen.dart';
 
@@ -30,7 +31,7 @@ class MarketsScreen extends ConsumerWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(8),
             itemCount: isins.length,
             itemBuilder: (context, index) {
               final isin = isins[index];
@@ -38,18 +39,18 @@ class MarketsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                     child: Text(
                       isin.displayName,
                       style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                   ...isin.tickers.map((ticker) {
                     final cache = ticker.marketDataCache.value;
                     if (cache == null) {
                       return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
+                        margin: const EdgeInsets.only(bottom: 4),
                         child: ListTile(
                           title: Text(ticker.symbol),
                           subtitle: const Text(
@@ -69,18 +70,21 @@ class MarketsScreen extends ConsumerWidget {
                     final color = isPositive ? Colors.green : Colors.red;
 
                     return Card(
-                      margin: const EdgeInsets.only(bottom: 8),
+                      margin: const EdgeInsets.only(bottom: 4),
                       child: InkWell(
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) =>
-                                  TickerDetailScreen(symbol: ticker.symbol),
+                                  TickerDetailScreen(
+                                    symbol: ticker.symbol,
+                                    displayName: isin.displayName,
+                                  ),
                             ),
                           );
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(8),
                           child: Row(
                             children: [
                               // Ticker Info
@@ -93,11 +97,11 @@ class MarketsScreen extends ConsumerWidget {
                                       ticker.symbol,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16),
+                                          fontSize: 14),
                                     ),
                                     Text(
                                       '${cache.regularMarketPrice.toStringAsFixed(2)} ${ticker.currency}',
-                                      style: const TextStyle(fontSize: 14),
+                                      style: const TextStyle(fontSize: 12),
                                     ),
                                     Text(
                                       '${isPositive ? '+' : ''}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
@@ -111,11 +115,11 @@ class MarketsScreen extends ConsumerWidget {
                               ),
                               // Sparkline Chart (Level 2)
                               Expanded(
-                                flex: 2,
+                                flex: 3,
                                 child: SizedBox(
                                   height: 50,
                                   child: _buildSparkline(
-                                      cache.intradayPrices, color),
+                                      cache.intradayPrices, cache.intradayTimestamps, color),
                                 ),
                               ),
                             ],
@@ -124,7 +128,7 @@ class MarketsScreen extends ConsumerWidget {
                       ),
                     );
                   }),
-                  const Divider(),
+                  const SizedBox(height: 8),
                 ],
               );
             },
@@ -140,7 +144,7 @@ class MarketsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSparkline(List<double> prices, Color color) {
+  Widget _buildSparkline(List<double> prices, List<int> timestamps, Color color) {
     if (prices.length < 2) return const SizedBox.shrink();
 
     final minPrice = prices.reduce((a, b) => a < b ? a : b);
@@ -150,31 +154,69 @@ class MarketsScreen extends ConsumerWidget {
       return FlSpot(e.key.toDouble(), e.value);
     }).toList();
 
-    return LineChart(
-      LineChartData(
-        minX: 0,
-        maxX: (spots.length - 1).toDouble(),
-        minY: minPrice,
-        maxY: maxPrice,
-        gridData: const FlGridData(show: false),
-        titlesData: const FlTitlesData(show: false),
-        borderData: FlBorderData(show: false),
-        lineTouchData: const LineTouchData(enabled: false),
-        lineBarsData: [
-          LineChartBarData(
-            spots: spots,
-            isCurved: true,
-            color: color,
-            barWidth: 2,
-            isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
-            belowBarData: BarAreaData(
-              show: true,
-              color: color.withValues(alpha: 0.1),
+    String firstTime = '';
+    String lastTime = '';
+
+    if (timestamps.isNotEmpty) {
+      // Find first non-zero timestamp
+      int firstTs = timestamps.firstWhere((ts) => ts > 0, orElse: () => 0);
+      int lastTs = timestamps.lastWhere((ts) => ts > 0, orElse: () => 0);
+
+      if (firstTs > 0) {
+        firstTime = DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(firstTs * 1000));
+      }
+      if (lastTs > 0) {
+        lastTime = DateFormat('HH:mm').format(DateTime.fromMillisecondsSinceEpoch(lastTs * 1000));
+      }
+    }
+
+    return Stack(
+      children: [
+        LineChart(
+          LineChartData(
+            minX: 0,
+            maxX: (spots.length - 1).toDouble(),
+            minY: minPrice,
+            maxY: maxPrice,
+            gridData: const FlGridData(show: false),
+            titlesData: const FlTitlesData(show: false),
+            borderData: FlBorderData(show: false),
+            lineTouchData: const LineTouchData(enabled: false),
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: color,
+                barWidth: 2,
+                isStrokeCapRound: true,
+                dotData: const FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: color.withValues(alpha: 0.1),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (firstTime.isNotEmpty)
+          Positioned(
+            left: 0,
+            bottom: 0,
+            child: Text(
+              firstTime,
+              style: TextStyle(fontSize: 9, color: Colors.grey.shade600),
             ),
           ),
-        ],
-      ),
+        if (lastTime.isNotEmpty)
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Text(
+              lastTime,
+              style: TextStyle(fontSize: 9, color: Colors.grey.shade600),
+            ),
+          ),
+      ],
     );
   }
 }

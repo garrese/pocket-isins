@@ -75,9 +75,20 @@ class Markets extends _$Markets {
                 final chartPreviousClose = (meta['chartPreviousClose'] as num?)?.toDouble() ?? regularMarketPrice;
 
                 final List<double> intradayPrices = [];
+                final List<int> intradayTimestamps = [];
                 final closeArray = indicators['close'] as List<dynamic>? ?? [];
-                for (final val in closeArray) {
-                  if (val != null) intradayPrices.add((val as num).toDouble());
+                final timestampArray = result['timestamp'] as List<dynamic>? ?? [];
+
+                for (var i = 0; i < closeArray.length; i++) {
+                  final val = closeArray[i];
+                  if (val != null) {
+                    intradayPrices.add((val as num).toDouble());
+                    if (i < timestampArray.length) {
+                      intradayTimestamps.add((timestampArray[i] as num).toInt());
+                    } else {
+                      intradayTimestamps.add(0);
+                    }
+                  }
                 }
 
                 // Save to Isar
@@ -88,6 +99,7 @@ class Markets extends _$Markets {
                   cache.regularMarketPrice = regularMarketPrice;
                   cache.chartPreviousClose = chartPreviousClose;
                   cache.intradayPrices = intradayPrices;
+                  cache.intradayTimestamps = intradayTimestamps;
                   await isar.marketDataCaches.put(cache);
                   if (ticker.marketDataCache.value == null) {
                     ticker.marketDataCache.value = cache;
