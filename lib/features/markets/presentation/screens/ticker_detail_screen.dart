@@ -251,17 +251,12 @@ class TickerDetailScreen extends ConsumerWidget {
                   showTitles: true,
                   reservedSize: 40,
                   getTitlesWidget: (value, meta) {
-                    // This logic prevents the intermediate automatically generated Y-axis labels
-                    // from overlapping with the static Min and Max labels at the bottom and top of the chart.
-                    if (value != meta.min && value != meta.max) {
-                      final range = meta.max - meta.min;
-                      final minDiff = (value - meta.min).abs();
-                      final maxDiff = (meta.max - value).abs();
-                      // Hide the label if it falls within 10% of the top or bottom of the visible range.
-                      if (minDiff < range * 0.1 || maxDiff < range * 0.1) {
-                        return const SizedBox.shrink();
-                      }
+                    // Hide exactly the min and max auto-generated labels,
+                    // preserving all the intermediate grid-aligned ones.
+                    if (value == meta.min || value == meta.max) {
+                      return const SizedBox.shrink();
                     }
+
                     return SideTitleWidget(
                       axisSide: meta.axisSide,
                       child: Text(
@@ -388,15 +383,23 @@ class TickerDetailScreen extends ConsumerWidget {
       }
     }
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 80,
-          child: Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-        ),
         Expanded(
-          child: Text(formattedVal, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          child: Text(
+            label,
+            style: const TextStyle(color: Colors.grey, fontSize: 13),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 4),
+        Text(
+          formattedVal,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          textAlign: TextAlign.right,
+        ),
+        const SizedBox(width: 8),
       ],
     );
   }
