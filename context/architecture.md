@@ -35,3 +35,6 @@ The application's development context is divided into the following levels, ensu
 * **Caching Strategy:** 
     * Heavily cache Level 1 (quote) and Level 2 (intraday 5m) via Isar using the `MarketDataCache` model. 
     * Fetch Level 3 (historical data) strictly on-demand in Detail screens to avoid overloading the local storage and network.
+
+## 6. Known Limitations
+* **Flutter Web Support:** The application uses Isar 3.x for local database storage. Isar 3.x generates 64-bit integer IDs (`fastHash`) for its schemas natively. When compiling for Flutter Web via `dart2js`, these integers exceed JavaScript's max safe integer limit (53 bits), resulting in compilation errors (`The integer literal ... can't be represented exactly in JavaScript`). Modifying or patching these IDs manually causes Isar Core native runtime errors (`IllegalArg: Collection id is invalid.`). Therefore, **Flutter Web is explicitly not supported** by this project architecture. Do not attempt to fix or patch web compilation for Isar.
