@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
@@ -55,12 +56,34 @@ class PortfolioScreen extends ConsumerWidget {
             onPressed: () async {
               try {
                 final jsonString = await ref.read(portfolioProvider.notifier).exportPortfolio();
-                final directory = await getTemporaryDirectory();
-                final file = File('${directory.path}/portfolio_export.json');
-                await file.writeAsString(jsonString);
 
-                final xFile = XFile(file.path);
-                await Share.shareXFiles([xFile], text: 'My Portfolio Export');
+                if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+                  // Guardar en PC
+                  final String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle: 'Please select an output file:',
+                    fileName: 'portfolio_export.json',
+                    type: FileType.custom,
+                    allowedExtensions: ['json'],
+                  );
+
+                  if (outputFile != null) {
+                    final file = File(outputFile);
+                    await file.writeAsString(jsonString);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Portfolio exported successfully')),
+                      );
+                    }
+                  }
+                } else {
+                  // Compartir en móvil
+                  final directory = await getTemporaryDirectory();
+                  final file = File('${directory.path}/portfolio_export.json');
+                  await file.writeAsString(jsonString);
+
+                  final xFile = XFile(file.path);
+                  await Share.shareXFiles([xFile], text: 'My Portfolio Export');
+                }
               } catch (e, st) {
                 debugPrint('Error exporting portfolio: $e\n$st');
                 if (context.mounted) {
