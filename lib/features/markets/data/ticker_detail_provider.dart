@@ -10,7 +10,9 @@ enum TimeRange {
   month('1M', '1d', '1mo'),
   threeMonths('3M', '1d', '3mo'),
   sixMonths('6M', '1d', '6mo'),
-  year('1Y', '1wk', '1y');
+  year('1Y', '1wk', '1y'),
+  fiveYears('5Y', '1mo', '5y'),
+  max('Max', '3mo', 'max');
 
   final String label;
   final String interval;
