@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 
+import '../../../core/constants/market_constants.dart';
 import '../../../core/database/models/isin.dart';
 import '../domain/portfolio_form_data.dart';
 import '../data/portfolio_provider.dart';
@@ -376,19 +377,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                   child: DropdownButtonFormField<String>(
                     value: ticker.currency.isEmpty ? null : ticker.currency,
                     decoration: const InputDecoration(labelText: 'Currency'),
-                    items: const [
-                      DropdownMenuItem(value: 'USD', child: Text('USD')),
-                      DropdownMenuItem(value: 'EUR', child: Text('EUR')),
-                      DropdownMenuItem(value: 'GBP', child: Text('GBP')),
-                      DropdownMenuItem(value: 'CHF', child: Text('CHF')),
-                      DropdownMenuItem(value: 'JPY', child: Text('JPY')),
-                      DropdownMenuItem(value: 'CAD', child: Text('CAD')),
-                      DropdownMenuItem(value: 'AUD', child: Text('AUD')),
-                      DropdownMenuItem(value: 'HKD', child: Text('HKD')),
-                      DropdownMenuItem(value: 'SEK', child: Text('SEK')),
-                      DropdownMenuItem(value: 'NOK', child: Text('NOK')),
-                      DropdownMenuItem(value: 'DKK', child: Text('DKK')),
-                    ],
+                    items: kSupportedCurrencies.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                     onChanged: (v) {
                       if (v != null) {
                         setState(() {
@@ -490,48 +479,18 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                   _tickers[tIndex].symbol = symbol;
 
                   // Auto-map currency based on exchDisp
-                  final currencyMap = {
-                    'XETRA': 'EUR',
-                    'Milan': 'EUR',
-                    'Stockholm': 'SEK',
-                    'London': 'GBP',
-                    'Stuttgart': 'EUR',
-                    'Swiss': 'CHF',
-                    'Paris': 'EUR',
-                    'NYSE': 'USD',
-                    'NASDAQ': 'USD',
-                    'Toronto': 'CAD',
-                    'Amsterdam': 'EUR',
-                    'Frankfurt': 'EUR',
-                    'Madrid': 'EUR',
-                    'Oslo': 'NOK',
-                    'Copenhagen': 'DKK',
-                    'Helsinki': 'EUR',
-                    'Tokyo': 'JPY',
-                    'Hong Kong': 'HKD',
-                    'Sydney': 'AUD',
-                  };
-
-                  // Reset currency first
                   _tickers[tIndex].currency = '';
-
-                  // Try to find a match
-                  final matchingCurrency = currencyMap[exchDisp.toString()];
+                  final matchingCurrency = kExchangeToCurrencyMap[exchDisp.toString()];
                   if (matchingCurrency != null) {
                     _tickers[tIndex].currency = matchingCurrency;
                   } else {
-                     // Check common symbol suffixes if exchDisp wasn't mapped
-                     if (symbol.endsWith('.L')) { _tickers[tIndex].currency = 'GBP'; }
-                     else if (symbol.endsWith('.MI')) { _tickers[tIndex].currency = 'EUR'; }
-                     else if (symbol.endsWith('.DE') || symbol.endsWith('.F') || symbol.endsWith('.SG') || symbol.endsWith('.MU') || symbol.endsWith('.HM')) { _tickers[tIndex].currency = 'EUR'; }
-                     else if (symbol.endsWith('.PA')) { _tickers[tIndex].currency = 'EUR'; }
-                     else if (symbol.endsWith('.AS')) { _tickers[tIndex].currency = 'EUR'; }
-                     else if (symbol.endsWith('.MA')) { _tickers[tIndex].currency = 'EUR'; }
-                     else if (symbol.endsWith('.SW')) { _tickers[tIndex].currency = 'CHF'; }
-                     else if (symbol.endsWith('.TO')) { _tickers[tIndex].currency = 'CAD'; }
-                     else if (symbol.endsWith('.AX')) { _tickers[tIndex].currency = 'AUD'; }
-                     else if (symbol.endsWith('.T')) { _tickers[tIndex].currency = 'JPY'; }
-                     else if (symbol.endsWith('.HK')) { _tickers[tIndex].currency = 'HKD'; }
+                    // Check common symbol suffixes if exchDisp wasn't mapped
+                    for (final entry in kSymbolSuffixToCurrencyMap.entries) {
+                      if (symbol.endsWith(entry.key)) {
+                        _tickers[tIndex].currency = entry.value;
+                        break;
+                      }
+                    }
                   }
 
                 });
