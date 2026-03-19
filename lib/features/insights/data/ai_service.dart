@@ -1,13 +1,10 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/network/dio_provider.dart';
 import '../domain/ai_settings.dart';
 import '../domain/news_card_model.dart';
 import 'ai_settings_repository.dart';
-
-final dioProvider = Provider<Dio>((ref) {
-  return Dio();
-});
 
 final aiServiceProvider = Provider<AiService>((ref) {
   return AiService(
