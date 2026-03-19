@@ -15,7 +15,7 @@ extension GetPositionCollection on Isar {
 
 const PositionSchema = CollectionSchema(
   name: r'Position',
-  id: 5246518687786643573,
+  id: 4328721527386811,
   properties: {
     r'capitalInvested': PropertySchema(
       id: 0,
@@ -36,7 +36,7 @@ const PositionSchema = CollectionSchema(
   indexes: {},
   links: {
     r'ticker': LinkSchema(
-      id: -1866620895216258272,
+      id: 6876549769867856,
       name: r'ticker',
       target: r'Ticker',
       single: true,

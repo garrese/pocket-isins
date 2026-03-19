@@ -15,7 +15,7 @@ extension GetMarketDataCacheCollection on Isar {
 
 const MarketDataCacheSchema = CollectionSchema(
   name: r'MarketDataCache',
-  id: 9054608117232239594,
+  id: 2372866217543639,
   properties: {
     r'chartPreviousClose': PropertySchema(
       id: 0,
@@ -50,7 +50,7 @@ const MarketDataCacheSchema = CollectionSchema(
   idName: r'id',
   indexes: {
     r'symbol': IndexSchema(
-      id: -7050953154795990356,
+      id: 1683861666205597,
       name: r'symbol',
       unique: true,
       replace: false,
@@ -65,7 +65,7 @@ const MarketDataCacheSchema = CollectionSchema(
   },
   links: {
     r'ticker': LinkSchema(
-      id: -5762245600520024605,
+      id: 2361922514209635,
       name: r'ticker',
       target: r'Ticker',
       single: true,
