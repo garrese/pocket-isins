@@ -79,8 +79,9 @@ class MarketsScreen extends ConsumerWidget {
                                 child: Container(
                                   width: 360,
                                   decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).cardTheme.color
+                                    color: Theme.of(context)
+                                            .cardTheme
+                                            .color
                                             ?.withValues(alpha: 0.5) ??
                                         const Color(
                                           0xFF1E1E2C,
@@ -141,13 +142,14 @@ class MarketsScreen extends ConsumerWidget {
 
                                             final variation =
                                                 cache.regularMarketPrice -
-                                                cache.chartPreviousClose;
-                                            final variationPercent =
-                                                cache.chartPreviousClose > 0
+                                                    cache.chartPreviousClose;
+                                            final variationPercent = cache
+                                                        .chartPreviousClose >
+                                                    0
                                                 ? (variation /
-                                                          cache
-                                                              .chartPreviousClose) *
-                                                      100
+                                                        cache
+                                                            .chartPreviousClose) *
+                                                    100
                                                 : 0.0;
                                             final isPositive = variation >= 0;
                                             final color = isPositive
@@ -164,11 +166,10 @@ class MarketsScreen extends ConsumerWidget {
                                                     MaterialPageRoute(
                                                       builder: (_) =>
                                                           TickerDetailScreen(
-                                                            symbol:
-                                                                ticker.symbol,
-                                                            displayName: isin
-                                                                .displayName,
-                                                          ),
+                                                        symbol: ticker.symbol,
+                                                        displayName:
+                                                            isin.displayName,
+                                                      ),
                                                     ),
                                                   );
                                                 },
@@ -187,23 +188,28 @@ class MarketsScreen extends ConsumerWidget {
                                                                   .start,
                                                           children: [
                                                             _buildMarqueeText(
+                                                              context,
                                                               ticker.symbol,
-                                                              style: const TextStyle(
+                                                              style:
+                                                                  const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                                 fontSize: 14,
                                                               ),
+                                                              maxWidth: 110.0,
                                                             ),
                                                             _buildMarqueeText(
+                                                              context,
                                                               '${cache.regularMarketPrice.toStringAsFixed(2)} ${ticker.currency}',
                                                               style:
                                                                   const TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                  ),
+                                                                fontSize: 12,
+                                                              ),
+                                                              maxWidth: 110.0,
                                                             ),
                                                             _buildMarqueeText(
+                                                              context,
                                                               '${isPositive ? '+' : ''}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
                                                               style: TextStyle(
                                                                 fontSize: 12,
@@ -212,6 +218,7 @@ class MarketsScreen extends ConsumerWidget {
                                                                     FontWeight
                                                                         .bold,
                                                               ),
+                                                              maxWidth: 110.0,
                                                             ),
                                                           ],
                                                         ),
@@ -221,7 +228,8 @@ class MarketsScreen extends ConsumerWidget {
                                                       Expanded(
                                                         child: SizedBox(
                                                           height: 50,
-                                                          child: _buildSparkline(
+                                                          child:
+                                                              _buildSparkline(
                                                             cache
                                                                 .intradayPrices,
                                                             cache
@@ -295,42 +303,43 @@ class MarketsScreen extends ConsumerWidget {
     return variation;
   }
 
-  Widget _buildMarqueeText(String text, {required TextStyle style}) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Measure the text width
-        final textSpan = TextSpan(text: text, style: style);
-        final textPainter = TextPainter(
-          text: textSpan,
-          maxLines: 1,
-          textDirection: Directionality.of(context),
-        )..layout(minWidth: 0, maxWidth: double.infinity);
+  Widget _buildMarqueeText(
+    BuildContext context,
+    String text, {
+    required TextStyle style,
+    required double maxWidth,
+  }) {
+    // Measure the text width
+    final textSpan = TextSpan(text: text, style: style);
+    final textPainter = TextPainter(
+      text: textSpan,
+      maxLines: 1,
+      textDirection: Directionality.of(context),
+    )..layout(minWidth: 0, maxWidth: double.infinity);
 
-        if (textPainter.size.width > constraints.maxWidth) {
-          // If text is wider than container, use Marquee
-          return SizedBox(
-            height: style.fontSize != null ? style.fontSize! * 1.5 : 20,
-            child: Marquee(
-              text: text,
-              style: style,
-              scrollAxis: Axis.horizontal,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              blankSpace: 20.0,
-              velocity: 30.0,
-              pauseAfterRound: const Duration(seconds: 1),
-              startPadding: 0.0,
-              accelerationDuration: const Duration(milliseconds: 500),
-              accelerationCurve: Curves.linear,
-              decelerationDuration: const Duration(milliseconds: 500),
-              decelerationCurve: Curves.easeOut,
-            ),
-          );
-        } else {
-          // If it fits, just display the normal Text
-          return Text(text, style: style, overflow: TextOverflow.ellipsis);
-        }
-      },
-    );
+    if (textPainter.size.width > maxWidth) {
+      // If text is wider than container, use Marquee
+      return SizedBox(
+        height: style.fontSize != null ? style.fontSize! * 1.5 : 20,
+        child: Marquee(
+          text: text,
+          style: style,
+          scrollAxis: Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          blankSpace: 20.0,
+          velocity: 30.0,
+          pauseAfterRound: const Duration(seconds: 1),
+          startPadding: 0.0,
+          accelerationDuration: const Duration(milliseconds: 500),
+          accelerationCurve: Curves.linear,
+          decelerationDuration: const Duration(milliseconds: 500),
+          decelerationCurve: Curves.easeOut,
+        ),
+      );
+    } else {
+      // If it fits, just display the normal Text
+      return Text(text, style: style, overflow: TextOverflow.ellipsis);
+    }
   }
 
   Widget _buildSparkline(
