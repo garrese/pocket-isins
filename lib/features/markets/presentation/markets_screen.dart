@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:intl/intl.dart';
+import '../../../core/database/models/isin.dart';
 import '../data/markets_provider.dart';
 import 'screens/ticker_detail_screen.dart';
 
@@ -30,11 +31,19 @@ class MarketsScreen extends ConsumerWidget {
             return const Center(child: Text('No ISINs in your portfolio.'));
           }
 
+          final sortedIsins = List<Isin>.from(isins);
+          sortedIsins.sort((a, b) {
+            final varA = _getRepresentativeVariation(a);
+            final varB = _getRepresentativeVariation(b);
+            // Descending order: highest positive first
+            return varB.compareTo(varA);
+          });
+
           return ListView.builder(
             padding: const EdgeInsets.all(8),
-            itemCount: isins.length,
+            itemCount: sortedIsins.length,
             itemBuilder: (context, index) {
-              final isin = isins[index];
+              final isin = sortedIsins[index];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -142,6 +151,35 @@ class MarketsScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  double _getRepresentativeVariation(Isin isin) {
+    if (isin.tickers.isEmpty) return 0.0;
+
+    double variation = 0.0;
+    int mostRecentTimestamp = -1;
+
+    for (final ticker in isin.tickers) {
+      final cache = ticker.marketDataCache.value;
+      if (cache == null) continue;
+
+      int lastTs = -1;
+      if (cache.intradayTimestamps.isNotEmpty) {
+        lastTs = cache.intradayTimestamps.lastWhere((ts) => ts > 0, orElse: () => -1);
+      }
+
+      if (lastTs > mostRecentTimestamp) {
+        mostRecentTimestamp = lastTs;
+        if (cache.chartPreviousClose > 0) {
+          final diff = cache.regularMarketPrice - cache.chartPreviousClose;
+          variation = (diff / cache.chartPreviousClose) * 100;
+        } else {
+          variation = 0.0;
+        }
+      }
+    }
+
+    return variation;
   }
 
   Widget _buildSparkline(List<double> prices, List<int> timestamps, Color color) {
