@@ -157,6 +157,21 @@ class TickerDetailScreen extends ConsumerWidget {
         }
       }
 
+      // Yahoo Finance sometimes returns out-of-order timestamps, and fl_chart requires X values to be strictly sorted.
+      chartPoints.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+      // Remove duplicates with the same timestamp (keeping the last one) to prevent fl_chart errors with multiple Y values for the exact same X.
+      final List<ChartPoint> uniquePoints = [];
+      for (var point in chartPoints) {
+        if (uniquePoints.isNotEmpty && uniquePoints.last.timestamp == point.timestamp) {
+          uniquePoints[uniquePoints.length - 1] = point; // Replace with the latest data for this timestamp
+        } else {
+          uniquePoints.add(point);
+        }
+      }
+      chartPoints.clear();
+      chartPoints.addAll(uniquePoints);
+
       if (chartPoints.length < 2) {
         return const Center(child: Text('Not enough price data available.'));
       }
