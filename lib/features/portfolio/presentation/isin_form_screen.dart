@@ -279,11 +279,6 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                 );
               },
             ),
-          IconButton(
-            icon: const Icon(Icons.save),
-            tooltip: 'Save ISIN',
-            onPressed: _save,
-          )
         ],
       ),
       body: Form(
@@ -373,7 +368,7 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                     icon: _isAutoFillingName
                         ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                         : const Icon(Icons.search),
-                    label: const Text('Buscar Yahoo Name'),
+                    label: const Text('Search Yahoo Name'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     ),
