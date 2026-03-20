@@ -102,7 +102,7 @@ class PortfolioScreen extends ConsumerWidget {
             return const Center(child: Text('Your portfolio is empty. Add some ISINs!'));
           }
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             itemCount: isins.length,
             itemBuilder: (context, index) {
               final isin = isins[index];
@@ -110,10 +110,10 @@ class PortfolioScreen extends ConsumerWidget {
               // Helper to calculate total position metrics across all nested instances
               double totalCapital = 0.0;
               double numShares = 0.0;
-              String primaryCurrency = 'USD';
+              // String primaryCurrency = 'USD';
 
               if (isin.tickers.isNotEmpty) {
-                 primaryCurrency = isin.tickers.first.currency;
+                 // primaryCurrency = isin.tickers.first.currency;
                  for (var t in isin.tickers) {
                     for (var p in t.positions) {
                        totalCapital += p.capitalInvested;
@@ -123,10 +123,10 @@ class PortfolioScreen extends ConsumerWidget {
               }
               String tickersList = isin.tickers.map((t) => t.symbol).join(', '); // Although we change UI to Yahoo Symbol, we keep variable names internal as isin.tickers.map((t) => t.symbol)
 
-              bool hasPositions = numShares > 0 || totalCapital > 0;
+              // bool hasPositions = numShares > 0 || totalCapital > 0;
 
               return Card(
-                margin: const EdgeInsets.only(bottom: 12),
+                margin: const EdgeInsets.only(bottom: 4.0),
                 child: ListTile(
                   onTap: () {
                     Navigator.push(
@@ -142,11 +142,11 @@ class PortfolioScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(tickersList),
-                      if (hasPositions)
-                        Text('$totalCapital $primaryCurrency • $numShares Shares'),
+                      // if (hasPositions)
+                      //   Text('$totalCapital $primaryCurrency • $numShares Shares'),
                     ],
                   ),
-                  isThreeLine: hasPositions,
+                  isThreeLine: false, // hasPositions
                 ),
               );
             },
