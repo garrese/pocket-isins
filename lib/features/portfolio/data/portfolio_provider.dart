@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'package:isar/isar.dart';
+import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/database/isar_service.dart';
+import '../../../core/database/drift_service.dart';
+import '../../../core/database/drift/app_database.dart' as drift;
 import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/ticker.dart';
 import '../../../core/database/models/position.dart';
@@ -47,7 +48,7 @@ class Portfolio extends _$Portfolio {
     }
 
     Future<void> importPortfolio(String jsonString) async {
-      final isar = ref.read(isarServiceProvider).db;
+      final db = ref.read(driftServiceProvider).db;
       List<dynamic> importData = [];
       try {
         importData = jsonDecode(jsonString);
@@ -55,7 +56,7 @@ class Portfolio extends _$Portfolio {
         throw Exception('Invalid JSON format');
       }
 
-      await isar.writeTxn(() async {
+      await db.transaction(() async {
         for (var isinData in importData) {
           if (isinData is! Map<String, dynamic>) continue;
 
@@ -63,22 +64,17 @@ class Portfolio extends _$Portfolio {
           if (isinCode == null) continue;
 
           // Check if an ISIN with this code already exists
-          final existingIsin =
-              await isar.isins.filter().isinCodeEqualTo(isinCode).findFirst();
-          if (existingIsin != null) {
-            // Conflict: we skip this ISIN
-            continue;
-          }
+          final existingIsin = await (db.select(db.isins)..where((t) => t.isinCode.equals(isinCode))).getSingleOrNull();
+          if (existingIsin != null) continue;
 
           final name = isinData['name'] as String? ?? 'Unknown';
           final shortName = isinData['shortName'] as String?;
 
-          final newIsin = Isin()
-            ..isinCode = isinCode
-            ..name = name
-            ..shortName = shortName;
-
-          await isar.isins.put(newIsin);
+          final newIsinId = await db.into(db.isins).insert(drift.IsinsCompanion.insert(
+            isinCode: isinCode,
+            name: name,
+            shortName: Value(shortName),
+          ));
 
           final tickersData = isinData['tickers'] as List<dynamic>? ?? [];
           for (var tData in tickersData) {
@@ -87,45 +83,33 @@ class Portfolio extends _$Portfolio {
             final symbol = tData['symbol'] as String?;
             if (symbol == null) continue;
 
-            // Check for ticker conflict. If symbol already exists, we skip creating it to prevent unique constraint errors
-            // Ideally symbols should be unique system-wide, but since it's linked to a new ISIN,
-            // a conflict here means the export is corrupted or there's a symbol collision.
-            final existingTicker =
-                await isar.tickers.filter().symbolEqualTo(symbol).findFirst();
+            final existingTicker = await (db.select(db.tickers)..where((t) => t.symbol.equals(symbol))).getSingleOrNull();
             if (existingTicker != null) continue;
 
             final exchange = tData['exchange'] as String? ?? '';
             final currency = tData['currency'] as String? ?? 'USD';
 
-            final newTicker = Ticker()
-              ..symbol = symbol
-              ..exchange = exchange
-              ..currency = currency
-              ..isin.value = newIsin;
-
-            await isar.tickers.put(newTicker);
-            newIsin.tickers.add(newTicker);
+            final newTickerId = await db.into(db.tickers).insert(drift.TickersCompanion.insert(
+              symbol: symbol,
+              exchange: exchange,
+              currency: currency,
+              isinId: newIsinId,
+            ));
 
             final positionsData = tData['positions'] as List<dynamic>? ?? [];
             for (var pData in positionsData) {
               if (pData is! Map<String, dynamic>) continue;
 
-              final capitalInvested =
-                  (pData['capitalInvested'] as num?)?.toDouble() ?? 0.0;
-              final purchasePrice =
-                  (pData['purchasePrice'] as num?)?.toDouble() ?? 0.0;
+              final capitalInvested = (pData['capitalInvested'] as num?)?.toDouble() ?? 0.0;
+              final purchasePrice = (pData['purchasePrice'] as num?)?.toDouble() ?? 0.0;
 
-              final newPos = Position()
-                ..capitalInvested = capitalInvested
-                ..purchasePrice = purchasePrice
-                ..ticker.value = newTicker;
-
-              await isar.positions.put(newPos);
-              newTicker.positions.add(newPos);
+              await db.into(db.positions).insert(drift.PositionsCompanion.insert(
+                capitalInvested: Value(capitalInvested),
+                purchasePrice: Value(purchasePrice),
+                tickerId: newTickerId,
+              ));
             }
-            await newTicker.positions.save();
           }
-          await newIsin.tickers.save();
         }
       });
 
@@ -134,13 +118,45 @@ class Portfolio extends _$Portfolio {
     }
 
   Future<List<Isin>> _fetchIsins() async {
-    final isar = ref.read(isarServiceProvider).db;
-    final isins = await isar.isins.where().findAll();
-    for (var isin in isins) {
-      await isin.tickers.load();
-      for (var ticker in isin.tickers) {
-        await ticker.positions.load();
+    final db = ref.read(driftServiceProvider).db;
+
+    final isinsData = await db.select(db.isins).get();
+    final allTickersData = await db.select(db.tickers).get();
+    final allPositionsData = await db.select(db.positions).get();
+
+    final List<Isin> isins = [];
+    for (final isinRow in isinsData) {
+      final isinModel = Isin(
+        id: isinRow.id,
+        isinCode: isinRow.isinCode,
+        name: isinRow.name,
+        shortName: isinRow.shortName,
+        tickers: [],
+      );
+
+      final isinTickers = allTickersData.where((t) => t.isinId == isinRow.id).toList();
+      for (final tickerRow in isinTickers) {
+        final tickerModel = Ticker(
+          id: tickerRow.id,
+          symbol: tickerRow.symbol,
+          exchange: tickerRow.exchange,
+          currency: tickerRow.currency,
+          isin: isinModel,
+          positions: [],
+        );
+
+        final tickerPositions = allPositionsData.where((p) => p.tickerId == tickerRow.id).toList();
+        for (final posRow in tickerPositions) {
+          tickerModel.positions.add(Position(
+            id: posRow.id,
+            capitalInvested: posRow.capitalInvested,
+            purchasePrice: posRow.purchasePrice,
+            ticker: tickerModel,
+          ));
+        }
+        isinModel.tickers.add(tickerModel);
       }
+      isins.add(isinModel);
     }
     return isins;
   }
@@ -152,77 +168,76 @@ class Portfolio extends _$Portfolio {
     String? shortName,
     required List<TickerFormData> tickersData,
   }) async {
-    final isar = ref.read(isarServiceProvider).db;
+    final db = ref.read(driftServiceProvider).db;
 
-    await isar.writeTxn(() async {
-      final isin = id != null ? await isar.isins.get(id) : Isin();
-      if (isin == null) return;
-
-      isin.isinCode = isinCode;
-      isin.name = name;
-      isin.shortName = shortName;
-      await isar.isins.put(isin);
+    await db.transaction(() async {
+      int currentIsinId;
 
       if (id != null) {
-        await isin.tickers.load();
+        currentIsinId = id;
+        await (db.update(db.isins)..where((t) => t.id.equals(id))).write(
+          drift.IsinsCompanion(
+            isinCode: Value(isinCode),
+            name: Value(name),
+            shortName: Value(shortName),
+          )
+        );
 
         // Identify and remove tickers that are no longer present
         final retainedSymbols = tickersData.map((e) => e.symbol).toSet();
-        final toRemove = isin.tickers
-            .where((t) => !retainedSymbols.contains(t.symbol))
-            .toList();
-        for (var t in toRemove) {
-          await t.positions.load();
-          for (var p in t.positions) {
-            await isar.positions.delete(p.id);
-          }
-          await isar.tickers.delete(t.id);
-          isin.tickers.remove(t);
+        final currentTickers = await (db.select(db.tickers)..where((t) => t.isinId.equals(id))).get();
+        final toRemove = currentTickers.where((t) => !retainedSymbols.contains(t.symbol)).toList();
+
+        for (final t in toRemove) {
+          await (db.delete(db.positions)..where((p) => p.tickerId.equals(t.id))).go();
+          await (db.delete(db.tickers)..where((t2) => t2.id.equals(t.id))).go();
         }
+      } else {
+        currentIsinId = await db.into(db.isins).insert(drift.IsinsCompanion.insert(
+          isinCode: isinCode,
+          name: name,
+          shortName: Value(shortName),
+        ));
       }
 
       // Upsert current tickers and positions
       for (final tData in tickersData) {
-        Ticker? ticker;
+        drift.TickerData? tickerRow;
+
         if (id != null) {
-          ticker = isin.tickers
-              .cast<Ticker?>()
-              .firstWhere((t) => t?.symbol == tData.symbol, orElse: () => null);
+          tickerRow = await (db.select(db.tickers)..where((t) => t.isinId.equals(currentIsinId) & t.symbol.equals(tData.symbol))).getSingleOrNull();
         }
 
-        if (ticker == null) {
-          ticker = Ticker()
-            ..symbol = tData.symbol
-            ..isin.value = isin;
-          isin.tickers.add(ticker);
+        int currentTickerId;
+        if (tickerRow == null) {
+          currentTickerId = await db.into(db.tickers).insert(drift.TickersCompanion.insert(
+            symbol: tData.symbol,
+            exchange: tData.exchange,
+            currency: tData.currency,
+            isinId: currentIsinId,
+          ));
+        } else {
+          currentTickerId = tickerRow.id;
+          await (db.update(db.tickers)..where((t) => t.id.equals(currentTickerId))).write(
+            drift.TickersCompanion(
+              exchange: Value(tData.exchange),
+              currency: Value(tData.currency),
+            )
+          );
         }
-
-        ticker.exchange = tData.exchange;
-        ticker.currency = tData.currency;
-        await isar.tickers.put(ticker);
-
-        await ticker.positions.load();
 
         // For simplicity in the dynamic form without position IDs, we replace all nested positions on save
-        for (var oldPos in ticker.positions) {
-          await isar.positions.delete(oldPos.id);
-        }
-        ticker.positions.clear();
+        await (db.delete(db.positions)..where((p) => p.tickerId.equals(currentTickerId))).go();
 
         // Add positions
         for (final pData in tData.positions) {
-          final pos = Position()
-            ..capitalInvested = pData.capitalInvested
-            ..purchasePrice = pData.purchasePrice
-            ..ticker.value = ticker;
-          await isar.positions.put(pos);
-          ticker.positions.add(pos);
+          await db.into(db.positions).insert(drift.PositionsCompanion.insert(
+            capitalInvested: Value(pData.capitalInvested),
+            purchasePrice: Value(pData.purchasePrice),
+            tickerId: currentTickerId,
+          ));
         }
-
-        await ticker.positions.save();
       }
-
-      await isin.tickers.save();
     });
 
     state = const AsyncValue.loading();
@@ -230,21 +245,16 @@ class Portfolio extends _$Portfolio {
   }
 
   Future<void> removeIsin(int id) async {
-    final isar = ref.read(isarServiceProvider).db;
+    final db = ref.read(driftServiceProvider).db;
 
-    await isar.writeTxn(() async {
-      final isin = await isar.isins.get(id);
-      if (isin != null) {
-        await isin.tickers.load();
-        for (var ticker in isin.tickers) {
-          await ticker.positions.load();
-          for (var pos in ticker.positions) {
-            await isar.positions.delete(pos.id);
-          }
-          await isar.tickers.delete(ticker.id);
-        }
-        await isar.isins.delete(id);
+    await db.transaction(() async {
+      final tickers = await (db.select(db.tickers)..where((t) => t.isinId.equals(id))).get();
+      for (final tickerRow in tickers) {
+        await (db.delete(db.positions)..where((p) => p.tickerId.equals(tickerRow.id))).go();
+        await (db.delete(db.marketDataCaches)..where((c) => c.tickerId.equals(tickerRow.id))).go();
+        await (db.delete(db.tickers)..where((t) => t.id.equals(tickerRow.id))).go();
       }
+      await (db.delete(db.isins)..where((i) => i.id.equals(id))).go();
     });
 
     state = const AsyncValue.loading();
