@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
-import 'core/database/isar_service.dart';
+import 'core/database/drift_service.dart';
 import 'features/portfolio/presentation/portfolio_screen.dart';
 import 'features/markets/presentation/markets_screen.dart';
 import 'features/insights/presentation/insights_screen.dart';
@@ -9,14 +9,14 @@ import 'features/insights/presentation/insights_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Isar
-  final isarServiceInstance = IsarService();
-  await isarServiceInstance.init();
+  // Initialize Drift
+  final driftServiceInstance = DriftService();
+  await driftServiceInstance.init();
 
   runApp(
     ProviderScope(
       overrides: [
-        isarServiceProvider.overrideWithValue(isarServiceInstance),
+        driftServiceProvider.overrideWithValue(driftServiceInstance),
       ],
       child: const PocketIsinsApp(),
     ),

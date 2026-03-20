@@ -1,7 +1,8 @@
-# Local Database Schema (Isar)
+# Local Database Schema (Drift)
 
-This document defines the local data persistence model using Isar Database.
-The application operates entirely client-side, making Isar the single source of truth for the user's portfolio.
+This document defines the local data persistence model using Drift (SQLite).
+The application operates entirely client-side, making Drift the single source of truth for the user's portfolio.
+We originally used Isar, but migrated to Drift to maintain compatibility with Flutter Web. The structure in SQLite mimics a NoSQL structure with relations via IDs, keeping massive arrays encoded as JSON strings to maintain low RAM usage.
 
 ## 1. Entities and Relationships
 
@@ -11,17 +12,11 @@ We structure the portfolio in a relational hierarchy where the `Isin` acts as a 
 Represents a unique financial asset in the user's portfolio acting as a global grouper.
 
 ```dart
-@collection
-class Isin {
-  Id id = Isar.autoIncrement;
-
-  @Index(unique: true)
-  late String isinCode; // e.g., "US0378331005"
-
-  late String name; // e.g., "Apple Inc."
-  
-  // 1 to N relationship: One ISIN can be tracked via multiple markets
-  final tickers = IsarLinks<Ticker>(); 
+class Isins extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get isinCode => text().unique()();
+  TextColumn get name => text()();
+  TextColumn get shortName => text().nullable()();
 }
 ```
 
@@ -29,25 +24,14 @@ class Isin {
 Represents a specific market symbol for an ISIN. Determines market and quotation currency locally.
 
 ```dart
-@collection
-class Ticker {
-  Id id = Isar.autoIncrement;
+class Tickers extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get symbol => text().unique()();
+  TextColumn get exchange => text()();
+  TextColumn get currency => text()();
   
-  @Index(unique: true)
-  late String symbol; // e.g., "AAPL" (NASDAQ) or "APC.F" (Frankfurt)
-  
-  late String exchange; // e.g., "NASDAQ" or "LSE"
-  
-  // Currency in which this ticker trades (e.g., "USD", "EUR", "GBP")
-  // The position relies on this currency for its valuation.
-  late String currency;
-  
-  // Backlink to the parent Isin
-  @Backlink(to: 'tickers')
-  final isin = IsarLink<Isin>();
-
-  // 1 to N relationship: One Ticker can have multiple positions
-  final positions = IsarLinks<Position>();
+  // 1 to N relationship (Foreign Key to ISIN)
+  IntColumn get isinId => integer().references(Isins, #id)();
 }
 ```
 
@@ -55,48 +39,34 @@ class Ticker {
 Represents an investment transaction. It delegates currency control to the Ticker, so it only needs to store the invested capital and the purchase price.
 
 ```dart
-@collection
-class Position {
-  Id id = Isar.autoIncrement;
+class Positions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  RealColumn get capitalInvested => real().withDefault(const Constant(0.0))();
+  RealColumn get purchasePrice => real().withDefault(const Constant(0.0))();
 
-  // The total capital invested in this transaction (in the Ticker's currency)
-  double capitalInvested = 0.0;
-
-  // The price of one share at the time of purchase
-  double purchasePrice = 0.0;
-
-  // Mathematical derivation to get the number of shares
-  @ignore
-  double get shares => purchasePrice > 0 ? capitalInvested / purchasePrice : 0.0;
-
-  // Backlink to the parent Ticker
-  @Backlink(to: 'positions')
-  final ticker = IsarLink<Ticker>();
+  // 1 to N relationship (Foreign Key to Ticker)
+  IntColumn get tickerId => integer().references(Tickers, #id)();
 }
 ```
 
 ## 2. Caching Entities
 
 ### Entity: `MarketDataCache`
-Designed to cache Yahoo Finance data, avoiding network saturation and providing offline capabilities for the **Markets Tab**. Contains Level 1 and Level 2 data.
+Designed to cache Yahoo Finance data, avoiding network saturation and providing offline capabilities for the **Markets Tab**. Contains Level 1 and Level 2 data. The Level 2 Data (huge arrays) are kept as JSON text strings emulating NoSQL.
 
 ```dart
-@collection
-class MarketDataCache {
-  Id id = Isar.autoIncrement;
-
-  @Index(unique: true)
-  late String symbol;
-
-  late DateTime lastUpdated;
-
-  double regularMarketPrice = 0.0;
-  double chartPreviousClose = 0.0;
+class MarketDataCaches extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get symbol => text().unique()();
+  DateTimeColumn get lastUpdated => dateTime()();
+  RealColumn get regularMarketPrice => real().withDefault(const Constant(0.0))();
+  RealColumn get chartPreviousClose => real().withDefault(const Constant(0.0))();
   
-  List<double> intradayPrices = [];
+  // Stored as JSON string to maintain NoSQL-like capability and avoid memory issues
+  TextColumn get intradayPrices => text().map(const DoubleListConverter()).withDefault(const Constant('[]'))();
+  TextColumn get intradayTimestamps => text().map(const IntListConverter()).withDefault(const Constant('[]'))();
 
-  @Backlink(to: 'marketDataCache')
-  final ticker = IsarLink<Ticker>();
+  IntColumn get tickerId => integer().references(Tickers, #id)();
 }
 ```
 

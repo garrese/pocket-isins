@@ -23,7 +23,7 @@ The application's development context is divided into the following levels, ensu
 * **Paradigm:** 100% Local (Client-Side). There is no proprietary backend or cloud server. All orchestration logic resides in the application.
 * **State Management:** Riverpod. In charge of separating the data layer from the visual interface and handling reactivity.
 * **Data Persistence:**
-    * Local database (Isar) to store the portfolio (ISINs, Tickers, caches).
+    * Local database (Drift/SQLite) to store the portfolio (ISINs, Tickers, caches).
     * Secure storage layer (`flutter_secure_storage`) to encrypt the user's API Keys on the device.
 
 ## 4. Artificial Intelligence Integration (BYOK Approach)
@@ -37,4 +37,4 @@ The application's development context is divided into the following levels, ensu
     * Fetch Level 3 (historical data) strictly on-demand in Detail screens to avoid overloading the local storage and network.
 
 ## 6. Known Limitations
-* **Flutter Web Support:** The application uses Isar 3.x for local database storage. Isar 3.x generates 64-bit integer IDs (`fastHash`) for its schemas natively. When compiling for Flutter Web via `dart2js`, these integers exceed JavaScript's max safe integer limit (53 bits), resulting in compilation errors (`The integer literal ... can't be represented exactly in JavaScript`). Modifying or patching these IDs manually causes Isar Core native runtime errors (`IllegalArg: Collection id is invalid.`). Therefore, **Flutter Web is explicitly not supported** by this project architecture. Do not attempt to fix or patch web compilation for Isar.
+* **Flutter Web Support:** Previously the app used Isar, which was fundamentally incompatible with Web due to its usage of 64-bit integers breaking Javascript's safety limit. **The project now uses Drift**, resolving this compilation error. Sembast was considered as a NoSQL alternative but discarded because it loads the entire database into RAM upon initialization, which is inefficient since the app stores massive JSON payloads for historical charts and news. Drift was chosen because it provides robust support for WebAssembly and OPFS file systems for proper disk storage on the Web, resolving the 1:N relations while emulating NoSQL capabilities using JSON strings for heavy payload columns.
