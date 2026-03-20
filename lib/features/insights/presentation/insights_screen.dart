@@ -128,7 +128,7 @@ class InsightsScreen extends ConsumerWidget {
                                 const SizedBox(height: 4),
                                 if (news.relevanceRating != null) ...[
                                   Text(
-                                    'Relevancia: ${news.relevanceRating}/10',
+                                    'Relevance: ${news.relevanceRating}',
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
                                           fontWeight: FontWeight.bold,
@@ -170,6 +170,11 @@ class InsightsScreen extends ConsumerWidget {
     try {
       final aiService = ref.read(aiServiceProvider);
       final fetchedNews = await aiService.fetchMarketNews();
+      fetchedNews.sort((a, b) {
+        final aRating = a.relevanceRating ?? 0;
+        final bRating = b.relevanceRating ?? 0;
+        return bRating.compareTo(aRating);
+      });
       ref.read(newsListProvider.notifier).state = fetchedNews;
     } catch (e) {
       ref.read(searchErrorProvider.notifier).state = e.toString();
