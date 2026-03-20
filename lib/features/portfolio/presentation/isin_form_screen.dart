@@ -279,11 +279,6 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                 );
               },
             ),
-          IconButton(
-            icon: const Icon(Icons.save),
-            tooltip: 'Save ISIN',
-            onPressed: _save,
-          )
         ],
       ),
       body: Form(
