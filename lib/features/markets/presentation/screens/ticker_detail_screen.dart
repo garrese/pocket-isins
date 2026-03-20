@@ -33,14 +33,15 @@ class TickerDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(displayName != null ? '$displayName ($symbol)' : symbol),
+        title: Text(symbol),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.only(
+            left: 4.0, right: 12.0, top: 16.0, bottom: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -59,8 +60,8 @@ class TickerDetailScreen extends ConsumerWidget {
     TickerDetailState state,
   ) {
     return Wrap(
-      spacing: 8.0,
-      runSpacing: 8.0,
+      spacing: 4.0,
+      runSpacing: 4.0,
       alignment: WrapAlignment.center,
       children: TimeRange.values.map((range) {
         final isSelected = state.selectedRange == range;
@@ -68,6 +69,9 @@ class TickerDetailScreen extends ConsumerWidget {
           label: Text(range.label),
           selected: isSelected,
           showCheckmark: false,
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          labelPadding: const EdgeInsets.symmetric(horizontal: 8),
           onSelected: (selected) {
             if (selected) {
               ref
@@ -112,7 +116,7 @@ class TickerDetailScreen extends ConsumerWidget {
       final regularMarketPrice = (meta['regularMarketPrice'] as num).toDouble();
       final chartPreviousClose =
           (meta['chartPreviousClose'] as num?)?.toDouble() ??
-          regularMarketPrice;
+              regularMarketPrice;
       final variation = regularMarketPrice - chartPreviousClose;
       final variationPercent = (variation / chartPreviousClose) * 100;
       final isPositive = variation >= 0;
@@ -172,17 +176,33 @@ class TickerDetailScreen extends ConsumerWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '${regularMarketPrice.toStringAsFixed(2)} $currency',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            '${isPositive ? "+" : ""}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
-            style: TextStyle(
-              fontSize: 16,
-              color: color,
-              fontWeight: FontWeight.bold,
+          if (displayName != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Text(
+                displayName!,
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
+              ),
             ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                '${regularMarketPrice.toStringAsFixed(2)} $currency',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${isPositive ? "+" : ""}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -236,8 +256,8 @@ class TickerDetailScreen extends ConsumerWidget {
 
       String formatString =
           (timeRange == TimeRange.day || timeRange == TimeRange.week)
-          ? 'HH:mm'
-          : 'dd/MM/yy';
+              ? 'HH:mm'
+              : 'dd/MM/yy';
 
       if (firstTs > 0) {
         firstTime = DateFormat(
@@ -283,7 +303,7 @@ class TickerDetailScreen extends ConsumerWidget {
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 40,
+                  reservedSize: 34,
                   getTitlesWidget: (value, meta) {
                     // Hide exactly the min and max auto-generated labels,
                     // preserving all the intermediate grid-aligned ones.
@@ -317,8 +337,7 @@ class TickerDetailScreen extends ConsumerWidget {
                       );
                       String timeStr = '';
                       if (point.timestamp > 0) {
-                        final formatString =
-                            (timeRange == TimeRange.day ||
+                        final formatString = (timeRange == TimeRange.day ||
                                 timeRange == TimeRange.week)
                             ? 'HH:mm'
                             : 'dd/MM/yy';
@@ -370,7 +389,7 @@ class TickerDetailScreen extends ConsumerWidget {
         ),
         if (firstTime.isNotEmpty)
           Positioned(
-            left: 48, // left padding for the Y-axis labels
+            left: 36, // left padding for the Y-axis labels
             bottom: 0,
             child: Text(
               firstTime,
