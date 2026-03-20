@@ -118,7 +118,7 @@ class MarketsScreen extends ConsumerWidget {
                                               MainAxisAlignment.center,
                                           children: isin.tickers.map((ticker) {
                                             final cache =
-                                                ticker.marketDataCache.value;
+                                                ticker.marketDataCache;
                                             if (cache == null) {
                                               return Card(
                                                 margin: const EdgeInsets.only(
@@ -276,7 +276,7 @@ class MarketsScreen extends ConsumerWidget {
     int mostRecentTimestamp = -1;
 
     for (final ticker in isin.tickers) {
-      final cache = ticker.marketDataCache.value;
+      final cache = ticker.marketDataCache;
       if (cache == null) continue;
 
       int lastTs = -1;
