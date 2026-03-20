@@ -53,10 +53,13 @@ class InsightsScreen extends ConsumerWidget {
                     )
                   : const Icon(Icons.search),
               label: Text(
-                  isSearching ? 'Searching News...' : 'Search Market News'),
+                isSearching ? 'Searching News...' : 'Search Market News',
+              ),
               style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 textStyle: const TextStyle(fontSize: 16),
               ),
             ),
@@ -88,7 +91,9 @@ class InsightsScreen extends ConsumerWidget {
                       final news = newsList[index];
                       return Card(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 8.0),
+                          vertical: 8.0,
+                          horizontal: 8.0,
+                        ),
                         elevation: 4,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -114,40 +119,36 @@ class InsightsScreen extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.article_outlined,
-                                        color: Colors.blueAccent, size: 20),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        news.source,
-                                        style: const TextStyle(
+                                Text(
+                                  news.title,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 4),
+                                if (news.relevanceRating != null) ...[
+                                  Text(
+                                    'Relevancia: ${news.relevanceRating}/10',
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.blueAccent,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  news.title,
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
-                                ),
-                                const SizedBox(height: 8),
+                                  ),
+                                  const SizedBox(height: 4),
+                                ],
                                 Text(
                                   news.summary,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        color: Colors.grey[400],
-                                      ),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(color: Colors.grey[400]),
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '- ${news.source}',
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(color: Colors.grey[400]),
                                 ),
                               ],
                             ),

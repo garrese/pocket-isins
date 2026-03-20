@@ -3,12 +3,14 @@ class NewsCardModel {
   final String summary;
   final String url;
   final String source;
+  final int? relevanceRating;
 
   NewsCardModel({
     required this.title,
     required this.summary,
     required this.url,
     required this.source,
+    this.relevanceRating,
   });
 
   factory NewsCardModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,9 @@ class NewsCardModel {
       summary: json['summary'] as String,
       url: json['url'] as String,
       source: json['source'] as String,
+      relevanceRating: json['relevance-rating'] != null
+          ? int.tryParse(json['relevance-rating'].toString())
+          : null,
     );
   }
 
@@ -26,6 +31,7 @@ class NewsCardModel {
       'summary': summary,
       'url': url,
       'source': source,
+      'relevance-rating': relevanceRating,
     };
   }
 }
