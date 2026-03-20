@@ -75,7 +75,7 @@ class InsightsScreen extends ConsumerWidget {
                     child: Padding(
                       padding: EdgeInsets.all(24.0),
                       child: Text(
-                        'No news yet. Tap search to fetch market insights.\\nMake sure you configured your API Key in Settings.',
+                        'No news yet. Tap search to fetch market insights.\nMake sure you configured your API Key in Settings.',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
                       ),

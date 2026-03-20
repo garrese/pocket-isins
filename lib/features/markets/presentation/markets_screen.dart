@@ -192,9 +192,6 @@ class MarketsScreen extends ConsumerWidget {
                                                               ticker.symbol,
                                                               style:
                                                                   const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
                                                                 fontSize: 14,
                                                               ),
                                                               maxWidth: 110.0,
