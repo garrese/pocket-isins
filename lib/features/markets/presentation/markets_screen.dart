@@ -43,9 +43,9 @@ class MarketsScreen extends ConsumerWidget {
           return LayoutBuilder(
             builder: (context, constraints) {
               final double availableWidth =
-                  constraints.maxWidth - 32; // 16 padding on each side
+                  constraints.maxWidth - 16; // 8 padding on each side
               int crossAxisCount =
-                  (availableWidth + 16) ~/ 376; // 360 width + 16 spacing
+                  (availableWidth + 8) ~/ 368; // 360 width + 8 spacing
               if (crossAxisCount < 1) crossAxisCount = 1;
 
               final List<List<Isin>> chunks = [];
@@ -62,7 +62,7 @@ class MarketsScreen extends ConsumerWidget {
 
               return Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
                   child: Column(
                     children: chunks.map((rowIsins) {
                       return Padding(
@@ -74,10 +74,10 @@ class MarketsScreen extends ConsumerWidget {
                             children: rowIsins.map((isin) {
                               return Padding(
                                 padding: EdgeInsets.only(
-                                  right: isin == rowIsins.last ? 0 : 16.0,
+                                  right: isin == rowIsins.last ? 0 : 8.0,
                                 ),
                                 child: Container(
-                                  width: 360,
+                                  width: availableWidth < 360 ? availableWidth : 360,
                                   decoration: BoxDecoration(
                                     color: Theme.of(context)
                                             .cardTheme
@@ -94,7 +94,7 @@ class MarketsScreen extends ConsumerWidget {
                                       width: 1,
                                     ),
                                   ),
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -174,8 +174,9 @@ class MarketsScreen extends ConsumerWidget {
                                                   );
                                                 },
                                                 child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                    8,
+                                                  padding: const EdgeInsets.symmetric(
+                                                    horizontal: 4,
+                                                    vertical: 8,
                                                   ),
                                                   child: Row(
                                                     children: [
