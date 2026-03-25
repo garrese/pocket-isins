@@ -41,11 +41,7 @@ class TickerDetailScreen extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.only(
-          left: 4.0,
-          right: 12.0,
-          top: 16.0,
-          bottom: 16.0,
-        ),
+            left: 4.0, right: 12.0, top: 16.0, bottom: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -120,7 +116,7 @@ class TickerDetailScreen extends ConsumerWidget {
       final regularMarketPrice = (meta['regularMarketPrice'] as num).toDouble();
       final chartPreviousClose =
           (meta['chartPreviousClose'] as num?)?.toDouble() ??
-          regularMarketPrice;
+              regularMarketPrice;
       final variation = regularMarketPrice - chartPreviousClose;
       final variationPercent = (variation / chartPreviousClose) * 100;
       final isPositive = variation >= 0;
@@ -194,10 +190,8 @@ class TickerDetailScreen extends ConsumerWidget {
             children: [
               Text(
                 '${regularMarketPrice.toStringAsFixed(2)} $currency',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 8),
               Text(
@@ -262,8 +256,8 @@ class TickerDetailScreen extends ConsumerWidget {
 
       String formatString =
           (timeRange == TimeRange.day || timeRange == TimeRange.week)
-          ? 'HH:mm'
-          : 'dd/MM/yy';
+              ? 'HH:mm'
+              : 'dd/MM/yy';
 
       if (firstTs > 0) {
         firstTime = DateFormat(
@@ -343,8 +337,7 @@ class TickerDetailScreen extends ConsumerWidget {
                       );
                       String timeStr = '';
                       if (point.timestamp > 0) {
-                        final formatString =
-                            (timeRange == TimeRange.day ||
+                        final formatString = (timeRange == TimeRange.day ||
                                 timeRange == TimeRange.week)
                             ? 'HH:mm'
                             : 'dd/MM/yy';
@@ -455,17 +448,21 @@ class TickerDetailScreen extends ConsumerWidget {
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 500),
-          child: Row(
-            children: [
-              Expanded(child: _buildMetaItem(label1, val1)),
-              const SizedBox(width: 32),
-              Expanded(child: _buildMetaItem(label2, val2)),
-            ],
+      child: Row(
+        children: [
+          Expanded(
+            child: Align(
+              alignment: Alignment.center,
+              child: _buildMetaItem(label1, val1),
+            ),
           ),
-        ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.center,
+              child: _buildMetaItem(label2, val2),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -480,27 +477,22 @@ class TickerDetailScreen extends ConsumerWidget {
       }
     }
     return Row(
-      mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
+        Flexible(
           child: Text(
             label,
             style: const TextStyle(color: Colors.grey, fontSize: 13),
-            textAlign: TextAlign.right,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            formattedVal,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            textAlign: TextAlign.left,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+        Text(
+          formattedVal,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          textAlign: TextAlign.right,
         ),
       ],
     );
