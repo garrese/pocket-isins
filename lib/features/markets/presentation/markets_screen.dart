@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../core/database/models/isin.dart';
 import '../data/markets_provider.dart';
 import 'screens/ticker_detail_screen.dart';
+import '../../../core/theme/app_drawer.dart';
 
 class MarketsScreen extends ConsumerWidget {
   const MarketsScreen({super.key});
@@ -16,6 +17,7 @@ class MarketsScreen extends ConsumerWidget {
     final marketsAsync = ref.watch(marketsProvider);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Markets Overview'),
         actions: [

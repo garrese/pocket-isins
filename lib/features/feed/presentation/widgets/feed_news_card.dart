@@ -72,13 +72,28 @@ class FeedNewsCard extends StatelessWidget {
                       color: theme.colorScheme.secondary,
                     ),
                   ),
-                  Text(
-                    'Round ${news.round}',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color:
-                          theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  if (news.relevanceScore != null)
+                    Row(
+                      children: [
+                        const Icon(Icons.star, size: 14, color: Colors.amber),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${news.relevanceScore}/10',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      'Round ${news.round}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color:
+                            theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ],

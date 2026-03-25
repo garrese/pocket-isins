@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../domain/news_card_model.dart';
-import '../data/ai_service.dart';
-import 'byok_config_screen.dart';
+import '../../../core/services/ai/ai_service.dart';
+import '../../../core/theme/app_drawer.dart';
 
 final newsListProvider = StateProvider<List<NewsCardModel>>((ref) => []);
 final isSearchingProvider = StateProvider<bool>((ref) => false);
@@ -19,21 +19,9 @@ class InsightsScreen extends ConsumerWidget {
     final searchError = ref.watch(searchErrorProvider);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('AI Insights'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'Configure AI Provider',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ByokConfigScreen(),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [

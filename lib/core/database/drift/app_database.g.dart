@@ -1353,6 +1353,12 @@ class $FeedNewsTable extends FeedNews
   late final GeneratedColumn<int> subround = GeneratedColumn<int>(
       'subround', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _relevanceScoreMeta =
+      const VerificationMeta('relevanceScore');
+  @override
+  late final GeneratedColumn<int> relevanceScore = GeneratedColumn<int>(
+      'relevance_score', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1363,7 +1369,8 @@ class $FeedNewsTable extends FeedNews
         sourceName,
         pubDate,
         round,
-        subround
+        subround,
+        relevanceScore
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1428,6 +1435,12 @@ class $FeedNewsTable extends FeedNews
     } else if (isInserting) {
       context.missing(_subroundMeta);
     }
+    if (data.containsKey('relevance_score')) {
+      context.handle(
+          _relevanceScoreMeta,
+          relevanceScore.isAcceptableOrUnknown(
+              data['relevance_score']!, _relevanceScoreMeta));
+    }
     return context;
   }
 
@@ -1455,6 +1468,8 @@ class $FeedNewsTable extends FeedNews
           .read(DriftSqlType.int, data['${effectivePrefix}round'])!,
       subround: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}subround'])!,
+      relevanceScore: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}relevance_score']),
     );
   }
 
@@ -1474,6 +1489,7 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
   final DateTime pubDate;
   final int round;
   final int subround;
+  final int? relevanceScore;
   const FeedNewsData(
       {required this.id,
       required this.isinId,
@@ -1483,7 +1499,8 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
       required this.sourceName,
       required this.pubDate,
       required this.round,
-      required this.subround});
+      required this.subround,
+      this.relevanceScore});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1496,6 +1513,9 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
     map['pub_date'] = Variable<DateTime>(pubDate);
     map['round'] = Variable<int>(round);
     map['subround'] = Variable<int>(subround);
+    if (!nullToAbsent || relevanceScore != null) {
+      map['relevance_score'] = Variable<int>(relevanceScore);
+    }
     return map;
   }
 
@@ -1510,6 +1530,9 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
       pubDate: Value(pubDate),
       round: Value(round),
       subround: Value(subround),
+      relevanceScore: relevanceScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relevanceScore),
     );
   }
 
@@ -1526,6 +1549,7 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
       pubDate: serializer.fromJson<DateTime>(json['pubDate']),
       round: serializer.fromJson<int>(json['round']),
       subround: serializer.fromJson<int>(json['subround']),
+      relevanceScore: serializer.fromJson<int?>(json['relevanceScore']),
     );
   }
   @override
@@ -1541,6 +1565,7 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
       'pubDate': serializer.toJson<DateTime>(pubDate),
       'round': serializer.toJson<int>(round),
       'subround': serializer.toJson<int>(subround),
+      'relevanceScore': serializer.toJson<int?>(relevanceScore),
     };
   }
 
@@ -1553,7 +1578,8 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
           String? sourceName,
           DateTime? pubDate,
           int? round,
-          int? subround}) =>
+          int? subround,
+          Value<int?> relevanceScore = const Value.absent()}) =>
       FeedNewsData(
         id: id ?? this.id,
         isinId: isinId ?? this.isinId,
@@ -1564,6 +1590,8 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
         pubDate: pubDate ?? this.pubDate,
         round: round ?? this.round,
         subround: subround ?? this.subround,
+        relevanceScore:
+            relevanceScore.present ? relevanceScore.value : this.relevanceScore,
       );
   FeedNewsData copyWithCompanion(FeedNewsCompanion data) {
     return FeedNewsData(
@@ -1577,6 +1605,9 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
       pubDate: data.pubDate.present ? data.pubDate.value : this.pubDate,
       round: data.round.present ? data.round.value : this.round,
       subround: data.subround.present ? data.subround.value : this.subround,
+      relevanceScore: data.relevanceScore.present
+          ? data.relevanceScore.value
+          : this.relevanceScore,
     );
   }
 
@@ -1591,14 +1622,15 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
           ..write('sourceName: $sourceName, ')
           ..write('pubDate: $pubDate, ')
           ..write('round: $round, ')
-          ..write('subround: $subround')
+          ..write('subround: $subround, ')
+          ..write('relevanceScore: $relevanceScore')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, isinId, title, link, sourceUrl, sourceName, pubDate, round, subround);
+  int get hashCode => Object.hash(id, isinId, title, link, sourceUrl,
+      sourceName, pubDate, round, subround, relevanceScore);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1611,7 +1643,8 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
           other.sourceName == this.sourceName &&
           other.pubDate == this.pubDate &&
           other.round == this.round &&
-          other.subround == this.subround);
+          other.subround == this.subround &&
+          other.relevanceScore == this.relevanceScore);
 }
 
 class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
@@ -1624,6 +1657,7 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
   final Value<DateTime> pubDate;
   final Value<int> round;
   final Value<int> subround;
+  final Value<int?> relevanceScore;
   const FeedNewsCompanion({
     this.id = const Value.absent(),
     this.isinId = const Value.absent(),
@@ -1634,6 +1668,7 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
     this.pubDate = const Value.absent(),
     this.round = const Value.absent(),
     this.subround = const Value.absent(),
+    this.relevanceScore = const Value.absent(),
   });
   FeedNewsCompanion.insert({
     this.id = const Value.absent(),
@@ -1645,6 +1680,7 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
     required DateTime pubDate,
     required int round,
     required int subround,
+    this.relevanceScore = const Value.absent(),
   })  : isinId = Value(isinId),
         title = Value(title),
         link = Value(link),
@@ -1663,6 +1699,7 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
     Expression<DateTime>? pubDate,
     Expression<int>? round,
     Expression<int>? subround,
+    Expression<int>? relevanceScore,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1674,6 +1711,7 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
       if (pubDate != null) 'pub_date': pubDate,
       if (round != null) 'round': round,
       if (subround != null) 'subround': subround,
+      if (relevanceScore != null) 'relevance_score': relevanceScore,
     });
   }
 
@@ -1686,7 +1724,8 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
       Value<String>? sourceName,
       Value<DateTime>? pubDate,
       Value<int>? round,
-      Value<int>? subround}) {
+      Value<int>? subround,
+      Value<int?>? relevanceScore}) {
     return FeedNewsCompanion(
       id: id ?? this.id,
       isinId: isinId ?? this.isinId,
@@ -1697,6 +1736,7 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
       pubDate: pubDate ?? this.pubDate,
       round: round ?? this.round,
       subround: subround ?? this.subround,
+      relevanceScore: relevanceScore ?? this.relevanceScore,
     );
   }
 
@@ -1730,6 +1770,9 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
     if (subround.present) {
       map['subround'] = Variable<int>(subround.value);
     }
+    if (relevanceScore.present) {
+      map['relevance_score'] = Variable<int>(relevanceScore.value);
+    }
     return map;
   }
 
@@ -1744,7 +1787,8 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
           ..write('sourceName: $sourceName, ')
           ..write('pubDate: $pubDate, ')
           ..write('round: $round, ')
-          ..write('subround: $subround')
+          ..write('subround: $subround, ')
+          ..write('relevanceScore: $relevanceScore')
           ..write(')'))
         .toString();
   }
@@ -3071,6 +3115,7 @@ typedef $$FeedNewsTableCreateCompanionBuilder = FeedNewsCompanion Function({
   required DateTime pubDate,
   required int round,
   required int subround,
+  Value<int?> relevanceScore,
 });
 typedef $$FeedNewsTableUpdateCompanionBuilder = FeedNewsCompanion Function({
   Value<int> id,
@@ -3082,6 +3127,7 @@ typedef $$FeedNewsTableUpdateCompanionBuilder = FeedNewsCompanion Function({
   Value<DateTime> pubDate,
   Value<int> round,
   Value<int> subround,
+  Value<int?> relevanceScore,
 });
 
 final class $$FeedNewsTableReferences
@@ -3135,6 +3181,10 @@ class $$FeedNewsTableFilterComposer
 
   ColumnFilters<int> get subround => $composableBuilder(
       column: $table.subround, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get relevanceScore => $composableBuilder(
+      column: $table.relevanceScore,
+      builder: (column) => ColumnFilters(column));
 
   $$IsinsTableFilterComposer get isinId {
     final $$IsinsTableFilterComposer composer = $composerBuilder(
@@ -3190,6 +3240,10 @@ class $$FeedNewsTableOrderingComposer
   ColumnOrderings<int> get subround => $composableBuilder(
       column: $table.subround, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get relevanceScore => $composableBuilder(
+      column: $table.relevanceScore,
+      builder: (column) => ColumnOrderings(column));
+
   $$IsinsTableOrderingComposer get isinId {
     final $$IsinsTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -3244,6 +3298,9 @@ class $$FeedNewsTableAnnotationComposer
   GeneratedColumn<int> get subround =>
       $composableBuilder(column: $table.subround, builder: (column) => column);
 
+  GeneratedColumn<int> get relevanceScore => $composableBuilder(
+      column: $table.relevanceScore, builder: (column) => column);
+
   $$IsinsTableAnnotationComposer get isinId {
     final $$IsinsTableAnnotationComposer composer = $composerBuilder(
         composer: this,
@@ -3297,6 +3354,7 @@ class $$FeedNewsTableTableManager extends RootTableManager<
             Value<DateTime> pubDate = const Value.absent(),
             Value<int> round = const Value.absent(),
             Value<int> subround = const Value.absent(),
+            Value<int?> relevanceScore = const Value.absent(),
           }) =>
               FeedNewsCompanion(
             id: id,
@@ -3308,6 +3366,7 @@ class $$FeedNewsTableTableManager extends RootTableManager<
             pubDate: pubDate,
             round: round,
             subround: subround,
+            relevanceScore: relevanceScore,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -3319,6 +3378,7 @@ class $$FeedNewsTableTableManager extends RootTableManager<
             required DateTime pubDate,
             required int round,
             required int subround,
+            Value<int?> relevanceScore = const Value.absent(),
           }) =>
               FeedNewsCompanion.insert(
             id: id,
@@ -3330,6 +3390,7 @@ class $$FeedNewsTableTableManager extends RootTableManager<
             pubDate: pubDate,
             round: round,
             subround: subround,
+            relevanceScore: relevanceScore,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) =>

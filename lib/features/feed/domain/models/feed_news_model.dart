@@ -8,6 +8,7 @@ class FeedNewsModel {
   final DateTime pubDate;
   final int round;
   final int subround;
+  final int? relevanceScore;
 
   // Non-DB related property for displaying the name in the feed
   final String isinName;
@@ -23,6 +24,7 @@ class FeedNewsModel {
     required this.round,
     required this.subround,
     required this.isinName,
+    this.relevanceScore,
   });
 
   FeedNewsModel copyWith({
@@ -36,6 +38,7 @@ class FeedNewsModel {
     int? round,
     int? subround,
     String? isinName,
+    int? relevanceScore,
   }) {
     return FeedNewsModel(
       id: id ?? this.id,
@@ -48,6 +51,7 @@ class FeedNewsModel {
       round: round ?? this.round,
       subround: subround ?? this.subround,
       isinName: isinName ?? this.isinName,
+      relevanceScore: relevanceScore ?? this.relevanceScore,
     );
   }
 }

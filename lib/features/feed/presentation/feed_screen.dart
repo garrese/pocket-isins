@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/feed_provider.dart';
 import '../application/feed_service.dart';
 import 'widgets/feed_news_card.dart';
+import '../../../core/theme/app_drawer.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
@@ -47,6 +48,15 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     }
   }
 
+  Future<void> _analyzeRatings() async {
+    ref.read(feedLoadingStateProvider.notifier).setLoading(true);
+    try {
+      await ref.read(feedServiceProvider).analyzeRatings();
+    } finally {
+      ref.read(feedLoadingStateProvider.notifier).setLoading(false);
+    }
+  }
+
   Future<void> _startSearch() async {
     // 1. Change sort order to natural automatically
     ref
@@ -83,6 +93,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     final newsStream = ref.watch(feedNewsStreamProvider);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('News Feed'),
         actions: [
@@ -94,6 +105,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             ),
             tooltip: 'Sort Order (${sortOrder.name})',
             onPressed: isLoading ? null : _toggleSortOrder,
+          ),
+          IconButton(
+            icon: const Icon(Icons.auto_awesome),
+            tooltip: 'Analyze ratings with AI',
+            onPressed: isLoading ? null : _analyzeRatings,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),

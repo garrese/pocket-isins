@@ -52,6 +52,7 @@ class FeedNews extends Table {
   DateTimeColumn get pubDate => dateTime()();
   IntColumn get round => integer()();
   IntColumn get subround => integer()();
+  IntColumn get relevanceScore => integer().nullable()();
 }
 
 // Custom converters for JSON arrays
