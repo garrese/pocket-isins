@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/models/feed_news_model.dart';
+import '../../../../core/settings/application/developer_settings_provider.dart';
 
-class FeedNewsCard extends StatelessWidget {
+class FeedNewsCard extends ConsumerWidget {
   final FeedNewsModel news;
 
   const FeedNewsCard({super.key, required this.news});
@@ -19,9 +21,10 @@ class FeedNewsCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final formattedDate = DateFormat('MMM dd, HH:mm').format(news.pubDate);
+    final debugLabelsEnabled = ref.watch(developerSettingsProvider);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
@@ -72,9 +75,9 @@ class FeedNewsCard extends StatelessWidget {
                       color: theme.colorScheme.secondary,
                     ),
                   ),
-                  if (news.relevanceScore != null)
-                    Row(
-                      children: [
+                  Row(
+                    children: [
+                      if (news.relevanceScore != null) ...[
                         const Icon(Icons.star, size: 14, color: Colors.amber),
                         const SizedBox(width: 4),
                         Text(
@@ -84,16 +87,18 @@ class FeedNewsCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        if (debugLabelsEnabled) const SizedBox(width: 8),
                       ],
-                    )
-                  else
-                    Text(
-                      'Round ${news.round}',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                      ),
-                    ),
+                      if (debugLabelsEnabled)
+                        Text(
+                          'Round ${news.round}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.5),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ],
