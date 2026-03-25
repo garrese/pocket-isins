@@ -145,11 +145,13 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                           childCount: newsList.length,
                           // This keeps the scroll from jumping if elements are added above the viewport in some setups
                           findChildIndexCallback: (Key key) {
-                            final ValueKey<int> valueKey = key as ValueKey<int>;
-                            final index = newsList
-                                .indexWhere((n) => n.id == valueKey.value);
-                            if (index == -1) return null;
-                            return index;
+                            if (key is ValueKey<int?>) {
+                              final int? id = key.value;
+                              final index = newsList.indexWhere((n) => n.id == id);
+                              if (index == -1) return null;
+                              return index;
+                            }
+                            return null;
                           },
                         ),
                       ),
