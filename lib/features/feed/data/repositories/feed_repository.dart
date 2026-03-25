@@ -18,6 +18,8 @@ class FeedRepository {
     required String isinName,
     required int round,
     required int subround,
+    required Set<String> existingLinks,
+    required Set<String> existingTitles,
   }) async {
     try {
       final encodedQuery =
@@ -42,8 +44,6 @@ class FeedRepository {
         final items = document.findAllElements('item');
 
         List<FeedNewsModel> newsList = [];
-        Set<String> seenTitles = {};
-        Set<String> seenLinks = {};
 
         for (final item in items) {
           if (newsList.length >= 6) break;
@@ -61,11 +61,15 @@ class FeedRepository {
 
           if (title.isEmpty || link.isEmpty) continue;
 
-          // Prevent duplicates in the current parsed batch
-          if (seenTitles.contains(title) || seenLinks.contains(link)) continue;
+          final normalizedTitle = title.toLowerCase().trim();
 
-          seenTitles.add(title);
-          seenLinks.add(link);
+          // Prevent duplicates against database and current batch
+          if (existingTitles.contains(normalizedTitle) || existingLinks.contains(link)) {
+            continue;
+          }
+
+          existingTitles.add(normalizedTitle);
+          existingLinks.add(link);
 
           DateTime pubDate;
           try {
