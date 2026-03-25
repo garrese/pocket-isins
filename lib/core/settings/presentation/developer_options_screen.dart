@@ -41,6 +41,18 @@ class DeveloperOptionsScreen extends ConsumerWidget {
               }
             },
           ),
+          CheckboxListTile(
+            title: const Text('Log HTTP Bodies'),
+            subtitle: const Text('Include large request/response bodies in logs'),
+            value: settings.logHttpBodies,
+            onChanged: (value) {
+              if (value != null) {
+                ref
+                    .read(developerSettingsProvider.notifier)
+                    .setLogHttpBodies(value);
+              }
+            },
+          ),
           const Divider(),
           ListTile(
             title: const Text('Purge Data'),
