@@ -76,14 +76,36 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     }
   }
 
-  void _toggleSortOrder() {
-    final currentOrder = ref.read(feedSortOrderStateProvider);
-    final newOrder = currentOrder == FeedSortOrder.natural
-        ? FeedSortOrder.date
-        : FeedSortOrder.natural;
-
+  void _setSortOrder(FeedSortOrder newOrder) {
     ref.read(feedSortOrderStateProvider.notifier).setOrder(newOrder);
     _scrollToTop();
+  }
+
+  Future<void> _confirmAndClearFeed() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear Feed'),
+        content: const Text('Are you sure you want to delete all news from the feed?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      await ref.read(feedServiceProvider).clearFeed();
+    }
   }
 
   @override
@@ -97,14 +119,58 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       appBar: AppBar(
         title: const Text('News Feed'),
         actions: [
-          IconButton(
-            icon: Icon(
-              sortOrder == FeedSortOrder.natural
-                  ? Icons.sort_by_alpha
-                  : Icons.calendar_today,
-            ),
-            tooltip: 'Sort Order (${sortOrder.name})',
-            onPressed: isLoading ? null : _toggleSortOrder,
+          PopupMenuButton<FeedSortOrder>(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Sort Options',
+            enabled: !isLoading,
+            onSelected: _setSortOrder,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: FeedSortOrder.natural,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.sort_by_alpha,
+                      color: sortOrder == FeedSortOrder.natural
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Natural'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: FeedSortOrder.date,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      color: sortOrder == FeedSortOrder.date
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Date'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: FeedSortOrder.relevance,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.star_outline,
+                      color: sortOrder == FeedSortOrder.relevance
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Relevance'),
+                  ],
+                ),
+              ),
+            ],
           ),
           IconButton(
             icon: const Icon(Icons.auto_awesome),
@@ -115,6 +181,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             icon: const Icon(Icons.refresh),
             tooltip: 'Search news',
             onPressed: isLoading ? null : _startSearch,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_sweep),
+            tooltip: 'Clear feed',
+            onPressed: isLoading ? null : _confirmAndClearFeed,
           ),
         ],
       ),

@@ -78,14 +78,28 @@ Example format:
     }
   }
 
-  // Feed rating feature
-  Future<int?> rateNewsRelevance(String title) async {
+  // Feed rating feature (batch)
+  Future<Map<int, int>> rateNewsRelevanceBatch(List<Map<String, dynamic>> newsBatch) async {
     const systemPrompt = '''
-You are a financial AI assistant. Your task is to rate the relevance of the following news title for a stock market investor.
-Return STRICTLY a single integer from 1 to 10. Do not include any other text, formatting, or explanation.
+You are a financial AI assistant. Your task is to rate the relevance of the following news titles for a stock market investor.
+You will be provided with a JSON array of news items, each containing an 'id' and a 'title'.
+You must return the result STRICTLY as a JSON array of objects, with no markdown formatting, no code blocks, and no other text.
+Each object in the array must contain the original 'id' (as an integer) and a 'rating' (as an integer from 1 to 10).
+
+Example format:
+[
+  {
+    "id": 123,
+    "rating": 8
+  },
+  {
+    "id": 124,
+    "rating": 3
+  }
+]
 ''';
 
-    final userPrompt = 'News title: "$title"';
+    final userPrompt = jsonEncode(newsBatch);
 
     try {
       final content = await getGenericCompletion(
@@ -94,11 +108,27 @@ Return STRICTLY a single integer from 1 to 10. Do not include any other text, fo
         webSearch: false,
       );
 
-      final cleanedContent = content.trim();
-      return int.tryParse(cleanedContent);
+      final cleanedContent = content
+          .replaceAll(RegExp(r'```json\n?'), '')
+          .replaceAll(RegExp(r'```\n?'), '')
+          .trim();
+
+      final List<dynamic> jsonList = jsonDecode(cleanedContent);
+      final Map<int, int> results = {};
+
+      for (final item in jsonList) {
+        if (item is Map && item.containsKey('id') && item.containsKey('rating')) {
+          final id = int.tryParse(item['id'].toString());
+          final rating = int.tryParse(item['rating'].toString());
+          if (id != null && rating != null) {
+            results[id] = rating;
+          }
+        }
+      }
+      return results;
     } catch (e) {
-      // Return null instead of crashing if rating fails
-      return null;
+      // Return empty map instead of crashing if rating fails
+      return {};
     }
   }
 

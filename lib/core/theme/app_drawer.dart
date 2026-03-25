@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../features/bot/presentation/byok_config_screen.dart';
+import '../settings/presentation/developer_options_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -30,6 +31,19 @@ class AppDrawer extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const ByokConfigScreen(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.developer_mode),
+            title: const Text('Developer Options'),
+            onTap: () {
+              // Close the drawer before navigating
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const DeveloperOptionsScreen(),
                 ),
               );
             },
