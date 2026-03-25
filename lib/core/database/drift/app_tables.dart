@@ -55,6 +55,14 @@ class FeedNews extends Table {
   IntColumn get relevanceScore => integer().nullable()();
 }
 
+@DataClassName('ChatMessageData')
+class ChatMessages extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get role => text()(); // 'user' or 'assistant'
+  TextColumn get content => text()();
+  DateTimeColumn get timestamp => dateTime()();
+}
+
 // Custom converters for JSON arrays
 class DoubleListConverter extends TypeConverter<List<double>, String> {
   const DoubleListConverter();
