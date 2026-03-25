@@ -59,6 +59,7 @@ Stream<List<FeedNewsModel>> feedNewsStream(FeedNewsStreamRef ref) {
         pubDate: newsData.pubDate,
         round: newsData.round,
         subround: newsData.subround,
+        relevanceScore: newsData.relevanceScore,
         isinName: isinData.name,
       );
     }).toList();

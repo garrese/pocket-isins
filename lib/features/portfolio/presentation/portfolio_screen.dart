@@ -8,7 +8,7 @@ import 'package:file_picker/file_picker.dart';
 
 import '../data/portfolio_provider.dart';
 import 'isin_form_screen.dart';
-
+import '../../../core/theme/app_drawer.dart';
 
 class PortfolioScreen extends ConsumerWidget {
   const PortfolioScreen({super.key});
@@ -18,6 +18,7 @@ class PortfolioScreen extends ConsumerWidget {
     final portfolioAsync = ref.watch(portfolioProvider);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Portfolio'),
         actions: [
