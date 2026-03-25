@@ -6,12 +6,11 @@ part of 'markets_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$marketsHash() => r'087662a580ce1603083f30abe771dfd358bc4e89';
+String _$marketsHash() => r'04003b5019a6b628f1db290c775b0314ff07cbad';
 
 /// See also [Markets].
 @ProviderFor(Markets)
-final marketsProvider =
-    AutoDisposeAsyncNotifierProvider<Markets, List<Isin>>.internal(
+final marketsProvider = AsyncNotifierProvider<Markets, List<Isin>>.internal(
   Markets.new,
   name: r'marketsProvider',
   debugGetCreateSourceHash:
@@ -20,6 +19,6 @@ final marketsProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$Markets = AutoDisposeAsyncNotifier<List<Isin>>;
+typedef _$Markets = AsyncNotifier<List<Isin>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
