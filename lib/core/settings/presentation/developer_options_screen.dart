@@ -41,27 +41,6 @@ class DeveloperOptionsScreen extends ConsumerWidget {
               }
             },
           ),
-          ListTile(
-            title: const Text('Log Level'),
-            subtitle: const Text('Select the minimum level of logs to display'),
-            trailing: DropdownButton<int>(
-              value: settings.logLevel,
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('Verbose')),
-                DropdownMenuItem(value: 1, child: Text('Debug')),
-                DropdownMenuItem(value: 2, child: Text('Info')),
-                DropdownMenuItem(value: 3, child: Text('Warning')),
-                DropdownMenuItem(value: 4, child: Text('Error')),
-              ],
-              onChanged: (value) {
-                if (value != null) {
-                  ref
-                      .read(developerSettingsProvider.notifier)
-                      .setLogLevel(value);
-                }
-              },
-            ),
-          ),
           const Divider(),
           ListTile(
             title: const Text('Purge Data'),

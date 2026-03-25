@@ -1,9 +1,10 @@
+import 'package:talker_flutter/talker_flutter.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../network/dio_provider.dart';
-import '../log/log_service.dart';
+import '../log/talker_provider.dart';
 import '../../../features/bot/domain/ai_settings.dart';
 import '../../../features/bot/domain/news_card_model.dart';
 import '../../../features/bot/data/ai_settings_repository.dart';
@@ -12,14 +13,14 @@ final aiServiceProvider = Provider<AiService>((ref) {
   return AiService(
     ref.watch(dioProvider),
     ref.watch(aiSettingsRepositoryProvider),
-    ref.watch(logServiceProvider.notifier),
+    ref.watch(talkerProvider),
   );
 });
 
 class AiService {
   final Dio _dio;
   final AiSettingsRepository _settingsRepo;
-  final LogService _log;
+  final Talker _log;
 
   AiService(this._dio, this._settingsRepo, this._log);
 
@@ -32,8 +33,7 @@ class AiService {
   }) async {
     final settings = await _settingsRepo.getSettings();
 
-    final activeMessages =
-        messages ??
+    final activeMessages = messages ??
         (userPrompt != null
             ? [
                 {'role': 'user', 'content': userPrompt},
@@ -48,7 +48,7 @@ class AiService {
         'Prompt: ${lastMsg["content"]}',
       );
     } else {
-      _log.info('AI Request [${settings.apiProvider}]', 'No prompt provided.');
+      _log.info('AI Request [${settings.apiProvider}] No prompt provided.');
     }
 
     if (settings.apiProvider == 'google_ai_studio') {
@@ -106,7 +106,7 @@ Example format:
       final List<dynamic> jsonList = jsonDecode(cleanedContent);
       return jsonList.map((item) => NewsCardModel.fromJson(item)).toList();
     } catch (e, stackTrace) {
-      _log.error('Failed to fetch market news', e, stackTrace);
+      _log.handle(e, stackTrace, 'Failed to fetch market news');
       throw Exception('Failed to fetch market news: $e');
     }
   }
@@ -162,10 +162,10 @@ Example format:
           }
         }
       }
-      _log.debug('AI rating parsed successfully for \${results.length} items');
+      _log.debug('AI rating parsed successfully for ${results.length} items');
       return results;
-    } catch (e, stackTrace) {
-      _log.warning('AI rating failed, returning empty map', e, stackTrace);
+    } catch (e) {
+      _log.warning('AI rating failed, returning empty map', e);
       // Return empty map instead of crashing if rating fails
       return {};
     }
@@ -222,22 +222,22 @@ Example format:
       );
 
       if (response.statusCode == 200) {
-        final reply =
-            response.data['candidates'][0]['content']['parts'][0]['text']
-                as String;
+        final reply = response.data['candidates'][0]['content']['parts'][0]
+            ['text'] as String;
         _log.info(
           'AI Response (Google)',
           '${reply.substring(0, reply.length > 100 ? 100 : reply.length)}...',
         );
         return reply;
       } else {
-        _log.error('Failed completion Google', response.data);
+        _log.handle(Exception('Failed completion Google'), null,
+            response.data.toString());
         throw Exception(
           'Failed completion: ${response.statusCode} - ${response.data}',
         );
       }
     } on DioException catch (e, stackTrace) {
-      _log.error('Network or API Error in Google AI Studio', e, stackTrace);
+      _log.handle(e, stackTrace, 'Network or API Error in Google AI Studio');
       throw Exception(
         'Network or API Error: ${e.message}\n${e.response?.data}',
       );
@@ -300,13 +300,14 @@ Example format:
         );
         return reply;
       } else {
-        _log.error('Failed completion OpenAI', response.data);
+        _log.handle(Exception('Failed completion OpenAI'), null,
+            response.data.toString());
         throw Exception(
           'Failed completion: ${response.statusCode} - ${response.data}',
         );
       }
     } on DioException catch (e, stackTrace) {
-      _log.error('Network or API Error in OpenAI Compatible', e, stackTrace);
+      _log.handle(e, stackTrace, 'Network or API Error in OpenAI Compatible');
       throw Exception(
         'Network or API Error: ${e.message}\n${e.response?.data}',
       );

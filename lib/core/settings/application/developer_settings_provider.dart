@@ -9,7 +9,6 @@ part 'developer_settings_provider.g.dart';
 class DeveloperSettings extends _$DeveloperSettings {
   static const _debugLabelsKey = 'debug_labels_enabled';
   static const _showLogConsoleKey = 'show_log_console';
-  static const _logLevelKey = 'log_level';
 
   @override
   DeveloperSettingsState build() {
@@ -17,7 +16,6 @@ class DeveloperSettings extends _$DeveloperSettings {
     return const DeveloperSettingsState(
       debugLabelsEnabled: false,
       showLogConsole: false,
-      logLevel: 1, // Default to DEBUG
     );
   }
 
@@ -26,7 +24,6 @@ class DeveloperSettings extends _$DeveloperSettings {
     state = DeveloperSettingsState(
       debugLabelsEnabled: prefs.getBool(_debugLabelsKey) ?? false,
       showLogConsole: prefs.getBool(_showLogConsoleKey) ?? false,
-      logLevel: prefs.getInt(_logLevelKey) ?? 1,
     );
   }
 
@@ -40,11 +37,5 @@ class DeveloperSettings extends _$DeveloperSettings {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_showLogConsoleKey, value);
     state = state.copyWith(showLogConsole: value);
-  }
-
-  Future<void> setLogLevel(int value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_logLevelKey, value);
-    state = state.copyWith(logLevel: value);
   }
 }

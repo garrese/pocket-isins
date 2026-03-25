@@ -5,9 +5,14 @@ import 'core/database/drift_service.dart';
 import 'core/settings/application/developer_settings_provider.dart';
 import 'features/portfolio/presentation/portfolio_screen.dart';
 import 'features/markets/presentation/markets_screen.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import 'package:talker_riverpod_logger/talker_riverpod_logger.dart';
+
 import 'features/feed/presentation/feed_screen.dart';
 import 'features/bot/presentation/bot_screen.dart';
 import 'features/logs/presentation/log_screen.dart';
+import 'core/services/log/talker_provider.dart';
+import 'core/theme/app_drawer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +21,28 @@ void main() async {
   final driftServiceInstance = DriftService();
   await driftServiceInstance.init();
 
+  final talker = TalkerFlutter.init(
+    settings: TalkerSettings(
+      useHistory: true,
+      maxHistoryItems: 1000,
+      useConsoleLogs: true,
+    ),
+  );
+
   runApp(
     ProviderScope(
+      observers: [
+        TalkerRiverpodObserver(
+          talker: talker,
+          settings: const TalkerRiverpodLoggerSettings(
+            printProviderDisposed: true,
+            printProviderFailed: true,
+          ),
+        ),
+      ],
       overrides: [
         driftServiceProvider.overrideWithValue(driftServiceInstance),
+        talkerProvider.overrideWithValue(talker),
       ],
       child: const PocketIsinsApp(),
     ),
@@ -70,6 +93,10 @@ class MainScreen extends ConsumerWidget {
     });
 
     return Scaffold(
+      drawer:
+          activeIndex == screens.length - 1 && developerSettings.showLogConsole
+              ? const AppDrawer()
+              : null,
       body: screens[activeIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: activeIndex,
