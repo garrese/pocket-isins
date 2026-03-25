@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../features/insights/presentation/byok_config_screen.dart';
+import '../../features/bot/presentation/byok_config_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
