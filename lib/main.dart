@@ -5,7 +5,7 @@ import 'core/database/drift_service.dart';
 import 'features/portfolio/presentation/portfolio_screen.dart';
 import 'features/markets/presentation/markets_screen.dart';
 import 'features/feed/presentation/feed_screen.dart';
-import 'features/insights/presentation/insights_screen.dart';
+import 'features/bot/presentation/bot_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +52,7 @@ class MainScreen extends ConsumerWidget {
       const PortfolioScreen(),
       const MarketsScreen(),
       const FeedScreen(),
-      const InsightsScreen(),
+      const BotScreen(),
     ];
 
     return Scaffold(
@@ -76,7 +76,7 @@ class MainScreen extends ConsumerWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.psychology),
-            label: 'AI Insights',
+            label: 'Bot',
           ),
         ],
       ),
