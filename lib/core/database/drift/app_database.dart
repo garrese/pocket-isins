@@ -5,12 +5,12 @@ import 'connection/connection.dart' as impl;
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Isins, Tickers, Positions, MarketDataCaches, FeedNews])
+@DriftDatabase(tables: [Isins, Tickers, Positions, MarketDataCaches, FeedNews, ChatMessages])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(impl.connect());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -24,6 +24,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 3) {
           await m.addColumn(feedNews, feedNews.relevanceScore);
+        }
+        if (from < 4) {
+          await m.createTable(chatMessages);
         }
       },
     );

@@ -3,9 +3,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../network/dio_provider.dart';
-import '../../../features/insights/domain/ai_settings.dart';
-import '../../../features/insights/domain/news_card_model.dart';
-import '../../../features/insights/data/ai_settings_repository.dart';
+import '../../../features/bot/domain/ai_settings.dart';
+import '../../../features/bot/domain/news_card_model.dart';
+import '../../../features/bot/data/ai_settings_repository.dart';
 
 final aiServiceProvider = Provider<AiService>((ref) {
   return AiService(
@@ -23,17 +23,20 @@ class AiService {
   /// Helper to get generic response from AI provider
   Future<String> getGenericCompletion({
     required String systemPrompt,
-    required String userPrompt,
+    String? userPrompt,
+    List<Map<String, String>>? messages,
     bool webSearch = false,
   }) async {
     final settings = await _settingsRepo.getSettings();
 
+    final activeMessages = messages ?? (userPrompt != null ? [{'role': 'user', 'content': userPrompt}] : []);
+
     if (settings.apiProvider == 'google_ai_studio') {
-      return _generateGoogleAIStudio(settings, systemPrompt, userPrompt, webSearch: webSearch);
+      return _generateGoogleAIStudio(settings, systemPrompt, activeMessages, webSearch: webSearch);
     } else {
       // By default use open ai compatible syntax (including OpenRouter)
       final useOpenRouterWeb = webSearch && settings.apiProvider == 'openrouter_web';
-      return _generateOpenAICompatible(settings, systemPrompt, userPrompt, openRouterWeb: useOpenRouterWeb);
+      return _generateOpenAICompatible(settings, systemPrompt, activeMessages, openRouterWeb: useOpenRouterWeb);
     }
   }
 
@@ -100,7 +103,7 @@ Return STRICTLY a single integer from 1 to 10. Do not include any other text, fo
   }
 
   Future<String> _generateGoogleAIStudio(
-      AiSettings settings, String systemPrompt, String userPrompt,
+      AiSettings settings, String systemPrompt, List<Map<String, String>> messages,
       {bool webSearch = false}) async {
     if (settings.apiKey.isEmpty) {
       throw Exception('API Key is missing for Google AI Studio.');
@@ -123,14 +126,16 @@ Return STRICTLY a single integer from 1 to 10. Do not include any other text, fo
           {'text': systemPrompt}
         ]
       },
-      'contents': [
-        {
-          'role': 'user',
+      'contents': messages.map((m) {
+        // Google AI Studio expects 'user' and 'model'
+        final role = m['role'] == 'assistant' ? 'model' : 'user';
+        return {
+          'role': role,
           'parts': [
-            {'text': userPrompt}
+            {'text': m['content']}
           ]
-        }
-      ],
+        };
+      }).toList(),
       if (webSearch)
         'tools': [
           {'googleSearch': {}}
@@ -155,7 +160,7 @@ Return STRICTLY a single integer from 1 to 10. Do not include any other text, fo
   }
 
   Future<String> _generateOpenAICompatible(
-      AiSettings settings, String systemPrompt, String userPrompt,
+      AiSettings settings, String systemPrompt, List<Map<String, String>> messages,
       {bool openRouterWeb = false}) async {
     if (settings.apiKey.isEmpty && settings.baseUrl.contains('openai.com')) {
       throw Exception('API Key is missing for OpenAI.');
@@ -176,10 +181,7 @@ Return STRICTLY a single integer from 1 to 10. Do not include any other text, fo
           'role': 'system',
           'content': systemPrompt,
         },
-        {
-          'role': 'user',
-          'content': userPrompt
-        }
+        ...messages
       ],
       if (openRouterWeb)
         'plugins': [
