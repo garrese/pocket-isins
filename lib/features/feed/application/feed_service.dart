@@ -36,45 +36,53 @@ class FeedService {
         return;
       }
 
+      // Pre-load all existing links and titles globally to prevent duplicate news
+      final existingNewsQuery = db.selectOnly(db.feedNews)
+        ..addColumns([db.feedNews.link, db.feedNews.title]);
+      final existingNewsResult = await existingNewsQuery.get();
+
+      final Set<String> globalExistingLinks = {};
+      final Set<String> globalExistingTitles = {};
+
+      for (final row in existingNewsResult) {
+        final link = row.read(db.feedNews.link);
+        final title = row.read(db.feedNews.title);
+
+        if (link != null) globalExistingLinks.add(link);
+        if (title != null) globalExistingTitles.add(title.toLowerCase().trim());
+      }
+
       int subround = 1;
 
       for (final isin in isins) {
-        // Fetch news for this ISIN
+        // Fetch news for this ISIN, passing the global sets to filter duplicates efficiently
         final newsList = await _repository.fetchNewsForIsin(
           isinId: isin.id,
           isinName: isin.name,
           round: newRound,
           subround: subround,
+          existingLinks: globalExistingLinks,
+          existingTitles: globalExistingTitles,
         );
 
         if (newsList.isNotEmpty) {
-          // Get existing links to avoid duplicates
-          final existingLinksQuery = db.selectOnly(db.feedNews)..addColumns([db.feedNews.link]);
-          final existingLinksResult = await existingLinksQuery.get();
-          final existingLinks = existingLinksResult.map((row) => row.read(db.feedNews.link)).toSet();
-
-          // Filter out existing links
-          final newNewsList = newsList.where((news) => !existingLinks.contains(news.link)).toList();
-
-          if (newNewsList.isNotEmpty) {
-            // Insert into database
-            await db.batch((batch) {
-              for (final news in newNewsList) {
-                batch.insert(
-                    db.feedNews,
-                    FeedNewsCompanion.insert(
-                      isinId: news.isinId,
-                      title: news.title,
-                      link: news.link,
-                      sourceUrl: news.sourceUrl,
-                      sourceName: news.sourceName,
-                      pubDate: news.pubDate,
-                      round: news.round,
-                      subround: news.subround,
-                    ));
-              }
-            });
-          }
+          // Insert new news into database
+          await db.batch((batch) {
+            for (final news in newsList) {
+              batch.insert(
+                  db.feedNews,
+                  FeedNewsCompanion.insert(
+                    isinId: news.isinId,
+                    title: news.title,
+                    link: news.link,
+                    sourceUrl: news.sourceUrl,
+                    sourceName: news.sourceName,
+                    pubDate: news.pubDate,
+                    round: news.round,
+                    subround: news.subround,
+                  ));
+            }
+          });
         }
 
         // Increment subround so the next ISIN gets a higher subround within the same round
