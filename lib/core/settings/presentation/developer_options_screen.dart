@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 import '../application/developer_settings_provider.dart';
 import 'purge_data_screen.dart';
@@ -43,7 +44,8 @@ class DeveloperOptionsScreen extends ConsumerWidget {
           ),
           CheckboxListTile(
             title: const Text('Log HTTP Bodies'),
-            subtitle: const Text('Include large request/response bodies in logs'),
+            subtitle:
+                const Text('Include large request/response bodies in logs'),
             value: settings.logHttpBodies,
             onChanged: (value) {
               if (value != null) {
@@ -52,6 +54,27 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                     .setLogHttpBodies(value);
               }
             },
+          ),
+          ListTile(
+            title: const Text('Log Level'),
+            subtitle: const Text('Set the minimum log level to display'),
+            trailing: DropdownButton<LogLevel>(
+              value: settings.logLevel,
+              onChanged: (LogLevel? newValue) {
+                if (newValue != null) {
+                  ref
+                      .read(developerSettingsProvider.notifier)
+                      .setLogLevel(newValue);
+                }
+              },
+              items: LogLevel.values
+                  .map<DropdownMenuItem<LogLevel>>((LogLevel level) {
+                return DropdownMenuItem<LogLevel>(
+                  value: level,
+                  child: Text(level.name.toUpperCase()),
+                );
+              }).toList(),
+            ),
           ),
           const Divider(),
           ListTile(

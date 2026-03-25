@@ -15,12 +15,11 @@ class LogScreen extends ConsumerWidget {
       appBarTitle: 'Logs',
       isLogsExpanded: false,
       isLogOrderReversed: true,
-      appBarLeading: Builder(
-        builder: (context) {
-          return IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          );
+      appBarLeading: IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () {
+          // Open the root Scaffold's drawer (which belongs to MainScreen)
+          Scaffold.maybeOf(context)?.openDrawer();
         },
       ),
       theme: TalkerScreenTheme(

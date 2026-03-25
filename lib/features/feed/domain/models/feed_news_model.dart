@@ -54,4 +54,9 @@ class FeedNewsModel {
       relevanceScore: relevanceScore ?? this.relevanceScore,
     );
   }
+
+  @override
+  String toString() {
+    return 'FeedNewsModel{id: $id, isinId: $isinId, title: $title, sourceName: $sourceName, round: $round, subround: $subround, relevanceScore: $relevanceScore}';
+  }
 }
