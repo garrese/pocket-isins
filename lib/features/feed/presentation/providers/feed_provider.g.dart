@@ -6,7 +6,7 @@ part of 'feed_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$feedNewsStreamHash() => r'1616677733dd974877e9a9c429e8f8f250341aff';
+String _$feedNewsStreamHash() => r'c571b8d585b166906d3eb3e6d81b59b1b5cc1e92';
 
 /// See also [feedNewsStream].
 @ProviderFor(feedNewsStream)

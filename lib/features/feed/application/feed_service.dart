@@ -107,17 +107,48 @@ class FeedService {
         return;
       }
 
-      for (final news in unratedNews) {
-        final score = await _aiService.rateNewsRelevance(news.title);
+      // Process in batches of 10
+      const batchSize = 10;
+      for (var i = 0; i < unratedNews.length; i += batchSize) {
+        final end = (i + batchSize < unratedNews.length) ? i + batchSize : unratedNews.length;
+        final batch = unratedNews.sublist(i, end);
 
-        if (score != null && score >= 1 && score <= 10) {
-          await (db.update(db.feedNews)..where((tbl) => tbl.id.equals(news.id))).write(
-            FeedNewsCompanion(relevanceScore: drift.Value(score)),
-          );
+        final newsBatchPayload = batch.map((news) => {
+          'id': news.id,
+          'title': news.title,
+        }).toList();
+
+        final results = await _aiService.rateNewsRelevanceBatch(newsBatchPayload);
+
+        if (results.isNotEmpty) {
+          await db.batch((batchWriter) {
+            for (final entry in results.entries) {
+              final newsId = entry.key;
+              final score = entry.value;
+
+              if (score >= 1 && score <= 10) {
+                batchWriter.update(
+                  db.feedNews,
+                  FeedNewsCompanion(relevanceScore: drift.Value(score)),
+                  where: (tbl) => tbl.id.equals(newsId),
+                );
+              }
+            }
+          });
         }
       }
     } catch (e, st) {
       debugPrint('Error analyzing ratings: $e\n$st');
+    }
+  }
+
+  // Deletes all feed news
+  Future<void> clearFeed() async {
+    try {
+      final db = _driftService.db;
+      await db.delete(db.feedNews).go();
+    } catch (e, st) {
+      debugPrint('Error clearing feed: $e\n$st');
     }
   }
 }

@@ -6,7 +6,7 @@ import '../../domain/models/feed_news_model.dart';
 
 part 'feed_provider.g.dart';
 
-enum FeedSortOrder { natural, date }
+enum FeedSortOrder { natural, date, relevance }
 
 // Provider for controlling the sort order
 @riverpod
@@ -36,6 +36,13 @@ Stream<List<FeedNewsModel>> feedNewsStream(FeedNewsStreamRef ref) {
     query.orderBy([
       OrderingTerm(expression: db.feedNews.round, mode: OrderingMode.desc),
       OrderingTerm(expression: db.feedNews.subround, mode: OrderingMode.desc),
+    ]);
+  } else if (sortOrder == FeedSortOrder.relevance) {
+    // Relevance order: Highest rating first. Nulls will be handled natively by sqlite (usually they go first or last depending on db, sqlite puts nulls first in ascending, so we use desc to put highest first)
+    query.orderBy([
+      OrderingTerm(expression: db.feedNews.relevanceScore, mode: OrderingMode.desc),
+      OrderingTerm(expression: db.feedNews.round, mode: OrderingMode.desc), // secondary sort
+      OrderingTerm(expression: db.feedNews.subround, mode: OrderingMode.desc), // secondary sort
     ]);
   } else {
     // Date order: Newest date first
