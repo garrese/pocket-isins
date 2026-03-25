@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'providers/feed_provider.dart';
+import '../application/feed_service.dart';
+import 'widgets/feed_news_card.dart';
+
+class FeedScreen extends ConsumerStatefulWidget {
+  const FeedScreen({super.key});
+
+  @override
+  ConsumerState<FeedScreen> createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends ConsumerState<FeedScreen> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollToTop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.offset > 200 && !_showScrollToTop) {
+      setState(() => _showScrollToTop = true);
+    } else if (_scrollController.offset <= 200 && _showScrollToTop) {
+      setState(() => _showScrollToTop = false);
+    }
+  }
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  Future<void> _startSearch() async {
+    // 1. Change sort order to natural automatically
+    ref
+        .read(feedSortOrderStateProvider.notifier)
+        .setOrder(FeedSortOrder.natural);
+    // 2. Scroll to top
+    _scrollToTop();
+    // 3. Start fetching
+    ref.read(feedLoadingStateProvider.notifier).setLoading(true);
+
+    // We run it without awaiting in the UI thread so the UI remains responsive,
+    // but we await it to turn off the loading indicator
+    try {
+      await ref.read(feedServiceProvider).startNewRound();
+    } finally {
+      ref.read(feedLoadingStateProvider.notifier).setLoading(false);
+    }
+  }
+
+  void _toggleSortOrder() {
+    final currentOrder = ref.read(feedSortOrderStateProvider);
+    final newOrder = currentOrder == FeedSortOrder.natural
+        ? FeedSortOrder.date
+        : FeedSortOrder.natural;
+
+    ref.read(feedSortOrderStateProvider.notifier).setOrder(newOrder);
+    _scrollToTop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isLoading = ref.watch(feedLoadingStateProvider);
+    final sortOrder = ref.watch(feedSortOrderStateProvider);
+    final newsStream = ref.watch(feedNewsStreamProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('News Feed'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              sortOrder == FeedSortOrder.natural
+                  ? Icons.sort_by_alpha
+                  : Icons.calendar_today,
+            ),
+            tooltip: 'Sort Order (${sortOrder.name})',
+            onPressed: isLoading ? null : _toggleSortOrder,
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Search news',
+            onPressed: isLoading ? null : _startSearch,
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          if (isLoading) const LinearProgressIndicator(),
+          Expanded(
+            child: newsStream.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, st) => Center(child: Text('Error: $err')),
+              data: (newsList) {
+                if (newsList.isEmpty) {
+                  return const Center(
+                    child: Text('No news available. Try searching.'),
+                  );
+                }
+
+                // Using ListView with center key to maintain scroll position natively in Flutter 3.13+
+                // However, an easier and very reliable way to maintain scroll when inserting at index 0
+                // is to just use ListView.builder without modifications if we are NOT at the top.
+                // Flutter's ListView doesn't jump automatically to top if items are inserted at index 0
+                // IF we use keepScrollOffset (default). But actually, if we insert at 0, everything shifts down.
+                // To anchor it, reverse: true could be used, but since we want standard order, we can use a custom CustomScrollView with center.
+                // Actually, standard ListView.builder *does* shift content down if index 0 is modified.
+                // For simplicity and since user wants it simple, let's use ListView.builder and
+                // maintainScrollPositionForThisScrollDirection if possible, or just standard for now.
+
+                return CustomScrollView(
+                  controller: _scrollController,
+                  // In flutter 3.x, if we want to anchor to bottom when inserting top, we'd use a special package or key.
+                  // For now, we keep it simple. If we want it to not move when reading, one trick is reverse list but we want newest on top.
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.only(top: 8.0, bottom: 80.0),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            return FeedNewsCard(
+                              key: ValueKey(newsList[index].id),
+                              news: newsList[index],
+                            );
+                          },
+                          childCount: newsList.length,
+                          // This keeps the scroll from jumping if elements are added above the viewport in some setups
+                          findChildIndexCallback: (Key key) {
+                            final ValueKey<int> valueKey = key as ValueKey<int>;
+                            final index = newsList
+                                .indexWhere((n) => n.id == valueKey.value);
+                            if (index == -1) return null;
+                            return index;
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: _showScrollToTop
+          ? FloatingActionButton(
+              mini: true,
+              onPressed: _scrollToTop,
+              child: const Icon(Icons.arrow_upward),
+            )
+          : null,
+    );
+  }
+}
