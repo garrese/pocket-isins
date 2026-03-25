@@ -1291,6 +1291,465 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
   }
 }
 
+class $FeedNewsTable extends FeedNews
+    with TableInfo<$FeedNewsTable, FeedNewsData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FeedNewsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _isinIdMeta = const VerificationMeta('isinId');
+  @override
+  late final GeneratedColumn<int> isinId = GeneratedColumn<int>(
+      'isin_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES isins (id)'));
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _linkMeta = const VerificationMeta('link');
+  @override
+  late final GeneratedColumn<String> link = GeneratedColumn<String>(
+      'link', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sourceUrlMeta =
+      const VerificationMeta('sourceUrl');
+  @override
+  late final GeneratedColumn<String> sourceUrl = GeneratedColumn<String>(
+      'source_url', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sourceNameMeta =
+      const VerificationMeta('sourceName');
+  @override
+  late final GeneratedColumn<String> sourceName = GeneratedColumn<String>(
+      'source_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _pubDateMeta =
+      const VerificationMeta('pubDate');
+  @override
+  late final GeneratedColumn<DateTime> pubDate = GeneratedColumn<DateTime>(
+      'pub_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _roundMeta = const VerificationMeta('round');
+  @override
+  late final GeneratedColumn<int> round = GeneratedColumn<int>(
+      'round', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _subroundMeta =
+      const VerificationMeta('subround');
+  @override
+  late final GeneratedColumn<int> subround = GeneratedColumn<int>(
+      'subround', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        isinId,
+        title,
+        link,
+        sourceUrl,
+        sourceName,
+        pubDate,
+        round,
+        subround
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'feed_news';
+  @override
+  VerificationContext validateIntegrity(Insertable<FeedNewsData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('isin_id')) {
+      context.handle(_isinIdMeta,
+          isinId.isAcceptableOrUnknown(data['isin_id']!, _isinIdMeta));
+    } else if (isInserting) {
+      context.missing(_isinIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('link')) {
+      context.handle(
+          _linkMeta, link.isAcceptableOrUnknown(data['link']!, _linkMeta));
+    } else if (isInserting) {
+      context.missing(_linkMeta);
+    }
+    if (data.containsKey('source_url')) {
+      context.handle(_sourceUrlMeta,
+          sourceUrl.isAcceptableOrUnknown(data['source_url']!, _sourceUrlMeta));
+    } else if (isInserting) {
+      context.missing(_sourceUrlMeta);
+    }
+    if (data.containsKey('source_name')) {
+      context.handle(
+          _sourceNameMeta,
+          sourceName.isAcceptableOrUnknown(
+              data['source_name']!, _sourceNameMeta));
+    } else if (isInserting) {
+      context.missing(_sourceNameMeta);
+    }
+    if (data.containsKey('pub_date')) {
+      context.handle(_pubDateMeta,
+          pubDate.isAcceptableOrUnknown(data['pub_date']!, _pubDateMeta));
+    } else if (isInserting) {
+      context.missing(_pubDateMeta);
+    }
+    if (data.containsKey('round')) {
+      context.handle(
+          _roundMeta, round.isAcceptableOrUnknown(data['round']!, _roundMeta));
+    } else if (isInserting) {
+      context.missing(_roundMeta);
+    }
+    if (data.containsKey('subround')) {
+      context.handle(_subroundMeta,
+          subround.isAcceptableOrUnknown(data['subround']!, _subroundMeta));
+    } else if (isInserting) {
+      context.missing(_subroundMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FeedNewsData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FeedNewsData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      isinId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}isin_id'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
+      link: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}link'])!,
+      sourceUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source_url'])!,
+      sourceName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source_name'])!,
+      pubDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}pub_date'])!,
+      round: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}round'])!,
+      subround: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}subround'])!,
+    );
+  }
+
+  @override
+  $FeedNewsTable createAlias(String alias) {
+    return $FeedNewsTable(attachedDatabase, alias);
+  }
+}
+
+class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
+  final int id;
+  final int isinId;
+  final String title;
+  final String link;
+  final String sourceUrl;
+  final String sourceName;
+  final DateTime pubDate;
+  final int round;
+  final int subround;
+  const FeedNewsData(
+      {required this.id,
+      required this.isinId,
+      required this.title,
+      required this.link,
+      required this.sourceUrl,
+      required this.sourceName,
+      required this.pubDate,
+      required this.round,
+      required this.subround});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['isin_id'] = Variable<int>(isinId);
+    map['title'] = Variable<String>(title);
+    map['link'] = Variable<String>(link);
+    map['source_url'] = Variable<String>(sourceUrl);
+    map['source_name'] = Variable<String>(sourceName);
+    map['pub_date'] = Variable<DateTime>(pubDate);
+    map['round'] = Variable<int>(round);
+    map['subround'] = Variable<int>(subround);
+    return map;
+  }
+
+  FeedNewsCompanion toCompanion(bool nullToAbsent) {
+    return FeedNewsCompanion(
+      id: Value(id),
+      isinId: Value(isinId),
+      title: Value(title),
+      link: Value(link),
+      sourceUrl: Value(sourceUrl),
+      sourceName: Value(sourceName),
+      pubDate: Value(pubDate),
+      round: Value(round),
+      subround: Value(subround),
+    );
+  }
+
+  factory FeedNewsData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FeedNewsData(
+      id: serializer.fromJson<int>(json['id']),
+      isinId: serializer.fromJson<int>(json['isinId']),
+      title: serializer.fromJson<String>(json['title']),
+      link: serializer.fromJson<String>(json['link']),
+      sourceUrl: serializer.fromJson<String>(json['sourceUrl']),
+      sourceName: serializer.fromJson<String>(json['sourceName']),
+      pubDate: serializer.fromJson<DateTime>(json['pubDate']),
+      round: serializer.fromJson<int>(json['round']),
+      subround: serializer.fromJson<int>(json['subround']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'isinId': serializer.toJson<int>(isinId),
+      'title': serializer.toJson<String>(title),
+      'link': serializer.toJson<String>(link),
+      'sourceUrl': serializer.toJson<String>(sourceUrl),
+      'sourceName': serializer.toJson<String>(sourceName),
+      'pubDate': serializer.toJson<DateTime>(pubDate),
+      'round': serializer.toJson<int>(round),
+      'subround': serializer.toJson<int>(subround),
+    };
+  }
+
+  FeedNewsData copyWith(
+          {int? id,
+          int? isinId,
+          String? title,
+          String? link,
+          String? sourceUrl,
+          String? sourceName,
+          DateTime? pubDate,
+          int? round,
+          int? subround}) =>
+      FeedNewsData(
+        id: id ?? this.id,
+        isinId: isinId ?? this.isinId,
+        title: title ?? this.title,
+        link: link ?? this.link,
+        sourceUrl: sourceUrl ?? this.sourceUrl,
+        sourceName: sourceName ?? this.sourceName,
+        pubDate: pubDate ?? this.pubDate,
+        round: round ?? this.round,
+        subround: subround ?? this.subround,
+      );
+  FeedNewsData copyWithCompanion(FeedNewsCompanion data) {
+    return FeedNewsData(
+      id: data.id.present ? data.id.value : this.id,
+      isinId: data.isinId.present ? data.isinId.value : this.isinId,
+      title: data.title.present ? data.title.value : this.title,
+      link: data.link.present ? data.link.value : this.link,
+      sourceUrl: data.sourceUrl.present ? data.sourceUrl.value : this.sourceUrl,
+      sourceName:
+          data.sourceName.present ? data.sourceName.value : this.sourceName,
+      pubDate: data.pubDate.present ? data.pubDate.value : this.pubDate,
+      round: data.round.present ? data.round.value : this.round,
+      subround: data.subround.present ? data.subround.value : this.subround,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FeedNewsData(')
+          ..write('id: $id, ')
+          ..write('isinId: $isinId, ')
+          ..write('title: $title, ')
+          ..write('link: $link, ')
+          ..write('sourceUrl: $sourceUrl, ')
+          ..write('sourceName: $sourceName, ')
+          ..write('pubDate: $pubDate, ')
+          ..write('round: $round, ')
+          ..write('subround: $subround')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id, isinId, title, link, sourceUrl, sourceName, pubDate, round, subround);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FeedNewsData &&
+          other.id == this.id &&
+          other.isinId == this.isinId &&
+          other.title == this.title &&
+          other.link == this.link &&
+          other.sourceUrl == this.sourceUrl &&
+          other.sourceName == this.sourceName &&
+          other.pubDate == this.pubDate &&
+          other.round == this.round &&
+          other.subround == this.subround);
+}
+
+class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
+  final Value<int> id;
+  final Value<int> isinId;
+  final Value<String> title;
+  final Value<String> link;
+  final Value<String> sourceUrl;
+  final Value<String> sourceName;
+  final Value<DateTime> pubDate;
+  final Value<int> round;
+  final Value<int> subround;
+  const FeedNewsCompanion({
+    this.id = const Value.absent(),
+    this.isinId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.link = const Value.absent(),
+    this.sourceUrl = const Value.absent(),
+    this.sourceName = const Value.absent(),
+    this.pubDate = const Value.absent(),
+    this.round = const Value.absent(),
+    this.subround = const Value.absent(),
+  });
+  FeedNewsCompanion.insert({
+    this.id = const Value.absent(),
+    required int isinId,
+    required String title,
+    required String link,
+    required String sourceUrl,
+    required String sourceName,
+    required DateTime pubDate,
+    required int round,
+    required int subround,
+  })  : isinId = Value(isinId),
+        title = Value(title),
+        link = Value(link),
+        sourceUrl = Value(sourceUrl),
+        sourceName = Value(sourceName),
+        pubDate = Value(pubDate),
+        round = Value(round),
+        subround = Value(subround);
+  static Insertable<FeedNewsData> custom({
+    Expression<int>? id,
+    Expression<int>? isinId,
+    Expression<String>? title,
+    Expression<String>? link,
+    Expression<String>? sourceUrl,
+    Expression<String>? sourceName,
+    Expression<DateTime>? pubDate,
+    Expression<int>? round,
+    Expression<int>? subround,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (isinId != null) 'isin_id': isinId,
+      if (title != null) 'title': title,
+      if (link != null) 'link': link,
+      if (sourceUrl != null) 'source_url': sourceUrl,
+      if (sourceName != null) 'source_name': sourceName,
+      if (pubDate != null) 'pub_date': pubDate,
+      if (round != null) 'round': round,
+      if (subround != null) 'subround': subround,
+    });
+  }
+
+  FeedNewsCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? isinId,
+      Value<String>? title,
+      Value<String>? link,
+      Value<String>? sourceUrl,
+      Value<String>? sourceName,
+      Value<DateTime>? pubDate,
+      Value<int>? round,
+      Value<int>? subround}) {
+    return FeedNewsCompanion(
+      id: id ?? this.id,
+      isinId: isinId ?? this.isinId,
+      title: title ?? this.title,
+      link: link ?? this.link,
+      sourceUrl: sourceUrl ?? this.sourceUrl,
+      sourceName: sourceName ?? this.sourceName,
+      pubDate: pubDate ?? this.pubDate,
+      round: round ?? this.round,
+      subround: subround ?? this.subround,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (isinId.present) {
+      map['isin_id'] = Variable<int>(isinId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (link.present) {
+      map['link'] = Variable<String>(link.value);
+    }
+    if (sourceUrl.present) {
+      map['source_url'] = Variable<String>(sourceUrl.value);
+    }
+    if (sourceName.present) {
+      map['source_name'] = Variable<String>(sourceName.value);
+    }
+    if (pubDate.present) {
+      map['pub_date'] = Variable<DateTime>(pubDate.value);
+    }
+    if (round.present) {
+      map['round'] = Variable<int>(round.value);
+    }
+    if (subround.present) {
+      map['subround'] = Variable<int>(subround.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FeedNewsCompanion(')
+          ..write('id: $id, ')
+          ..write('isinId: $isinId, ')
+          ..write('title: $title, ')
+          ..write('link: $link, ')
+          ..write('sourceUrl: $sourceUrl, ')
+          ..write('sourceName: $sourceName, ')
+          ..write('pubDate: $pubDate, ')
+          ..write('round: $round, ')
+          ..write('subround: $subround')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1299,12 +1758,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PositionsTable positions = $PositionsTable(this);
   late final $MarketDataCachesTable marketDataCaches =
       $MarketDataCachesTable(this);
+  late final $FeedNewsTable feedNews = $FeedNewsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [isins, tickers, positions, marketDataCaches];
+      [isins, tickers, positions, marketDataCaches, feedNews];
 }
 
 typedef $$IsinsTableCreateCompanionBuilder = IsinsCompanion Function({
@@ -1334,6 +1794,20 @@ final class $$IsinsTableReferences
         .filter((f) => f.isinId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_tickersRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$FeedNewsTable, List<FeedNewsData>>
+      _feedNewsRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.feedNews,
+              aliasName: $_aliasNameGenerator(db.isins.id, db.feedNews.isinId));
+
+  $$FeedNewsTableProcessedTableManager get feedNewsRefs {
+    final manager = $$FeedNewsTableTableManager($_db, $_db.feedNews)
+        .filter((f) => f.isinId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_feedNewsRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -1372,6 +1846,27 @@ class $$IsinsTableFilterComposer extends Composer<_$AppDatabase, $IsinsTable> {
             $$TickersTableFilterComposer(
               $db: $db,
               $table: $db.tickers,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> feedNewsRefs(
+      Expression<bool> Function($$FeedNewsTableFilterComposer f) f) {
+    final $$FeedNewsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.feedNews,
+        getReferencedColumn: (t) => t.isinId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FeedNewsTableFilterComposer(
+              $db: $db,
+              $table: $db.feedNews,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1444,6 +1939,27 @@ class $$IsinsTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> feedNewsRefs<T extends Object>(
+      Expression<T> Function($$FeedNewsTableAnnotationComposer a) f) {
+    final $$FeedNewsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.feedNews,
+        getReferencedColumn: (t) => t.isinId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$FeedNewsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.feedNews,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$IsinsTableTableManager extends RootTableManager<
@@ -1457,7 +1973,7 @@ class $$IsinsTableTableManager extends RootTableManager<
     $$IsinsTableUpdateCompanionBuilder,
     (IsinData, $$IsinsTableReferences),
     IsinData,
-    PrefetchHooks Function({bool tickersRefs})> {
+    PrefetchHooks Function({bool tickersRefs, bool feedNewsRefs})> {
   $$IsinsTableTableManager(_$AppDatabase db, $IsinsTable table)
       : super(TableManagerState(
           db: db,
@@ -1496,10 +2012,13 @@ class $$IsinsTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$IsinsTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({tickersRefs = false}) {
+          prefetchHooksCallback: ({tickersRefs = false, feedNewsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (tickersRefs) db.tickers],
+              explicitlyWatchedTables: [
+                if (tickersRefs) db.tickers,
+                if (feedNewsRefs) db.feedNews
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -1511,6 +2030,18 @@ class $$IsinsTableTableManager extends RootTableManager<
                             $$IsinsTableReferences._tickersRefsTable(db),
                         managerFromTypedResult: (p0) =>
                             $$IsinsTableReferences(db, table, p0).tickersRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.isinId == item.id),
+                        typedResults: items),
+                  if (feedNewsRefs)
+                    await $_getPrefetchedData<IsinData, $IsinsTable,
+                            FeedNewsData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$IsinsTableReferences._feedNewsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$IsinsTableReferences(db, table, p0).feedNewsRefs,
                         referencedItemsForCurrentItem: (item,
                                 referencedItems) =>
                             referencedItems.where((e) => e.isinId == item.id),
@@ -1533,7 +2064,7 @@ typedef $$IsinsTableProcessedTableManager = ProcessedTableManager<
     $$IsinsTableUpdateCompanionBuilder,
     (IsinData, $$IsinsTableReferences),
     IsinData,
-    PrefetchHooks Function({bool tickersRefs})>;
+    PrefetchHooks Function({bool tickersRefs, bool feedNewsRefs})>;
 typedef $$TickersTableCreateCompanionBuilder = TickersCompanion Function({
   Value<int> id,
   required String symbol,
@@ -2530,6 +3061,329 @@ typedef $$MarketDataCachesTableProcessedTableManager = ProcessedTableManager<
     (MarketDataCacheData, $$MarketDataCachesTableReferences),
     MarketDataCacheData,
     PrefetchHooks Function({bool tickerId})>;
+typedef $$FeedNewsTableCreateCompanionBuilder = FeedNewsCompanion Function({
+  Value<int> id,
+  required int isinId,
+  required String title,
+  required String link,
+  required String sourceUrl,
+  required String sourceName,
+  required DateTime pubDate,
+  required int round,
+  required int subround,
+});
+typedef $$FeedNewsTableUpdateCompanionBuilder = FeedNewsCompanion Function({
+  Value<int> id,
+  Value<int> isinId,
+  Value<String> title,
+  Value<String> link,
+  Value<String> sourceUrl,
+  Value<String> sourceName,
+  Value<DateTime> pubDate,
+  Value<int> round,
+  Value<int> subround,
+});
+
+final class $$FeedNewsTableReferences
+    extends BaseReferences<_$AppDatabase, $FeedNewsTable, FeedNewsData> {
+  $$FeedNewsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $IsinsTable _isinIdTable(_$AppDatabase db) => db.isins
+      .createAlias($_aliasNameGenerator(db.feedNews.isinId, db.isins.id));
+
+  $$IsinsTableProcessedTableManager get isinId {
+    final $_column = $_itemColumn<int>('isin_id')!;
+
+    final manager = $$IsinsTableTableManager($_db, $_db.isins)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_isinIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$FeedNewsTableFilterComposer
+    extends Composer<_$AppDatabase, $FeedNewsTable> {
+  $$FeedNewsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get link => $composableBuilder(
+      column: $table.link, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get sourceUrl => $composableBuilder(
+      column: $table.sourceUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get sourceName => $composableBuilder(
+      column: $table.sourceName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get pubDate => $composableBuilder(
+      column: $table.pubDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get round => $composableBuilder(
+      column: $table.round, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get subround => $composableBuilder(
+      column: $table.subround, builder: (column) => ColumnFilters(column));
+
+  $$IsinsTableFilterComposer get isinId {
+    final $$IsinsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.isinId,
+        referencedTable: $db.isins,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$IsinsTableFilterComposer(
+              $db: $db,
+              $table: $db.isins,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$FeedNewsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FeedNewsTable> {
+  $$FeedNewsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get link => $composableBuilder(
+      column: $table.link, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get sourceUrl => $composableBuilder(
+      column: $table.sourceUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get sourceName => $composableBuilder(
+      column: $table.sourceName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get pubDate => $composableBuilder(
+      column: $table.pubDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get round => $composableBuilder(
+      column: $table.round, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get subround => $composableBuilder(
+      column: $table.subround, builder: (column) => ColumnOrderings(column));
+
+  $$IsinsTableOrderingComposer get isinId {
+    final $$IsinsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.isinId,
+        referencedTable: $db.isins,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$IsinsTableOrderingComposer(
+              $db: $db,
+              $table: $db.isins,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$FeedNewsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FeedNewsTable> {
+  $$FeedNewsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get link =>
+      $composableBuilder(column: $table.link, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceUrl =>
+      $composableBuilder(column: $table.sourceUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceName => $composableBuilder(
+      column: $table.sourceName, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get pubDate =>
+      $composableBuilder(column: $table.pubDate, builder: (column) => column);
+
+  GeneratedColumn<int> get round =>
+      $composableBuilder(column: $table.round, builder: (column) => column);
+
+  GeneratedColumn<int> get subround =>
+      $composableBuilder(column: $table.subround, builder: (column) => column);
+
+  $$IsinsTableAnnotationComposer get isinId {
+    final $$IsinsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.isinId,
+        referencedTable: $db.isins,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$IsinsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.isins,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$FeedNewsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $FeedNewsTable,
+    FeedNewsData,
+    $$FeedNewsTableFilterComposer,
+    $$FeedNewsTableOrderingComposer,
+    $$FeedNewsTableAnnotationComposer,
+    $$FeedNewsTableCreateCompanionBuilder,
+    $$FeedNewsTableUpdateCompanionBuilder,
+    (FeedNewsData, $$FeedNewsTableReferences),
+    FeedNewsData,
+    PrefetchHooks Function({bool isinId})> {
+  $$FeedNewsTableTableManager(_$AppDatabase db, $FeedNewsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FeedNewsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FeedNewsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FeedNewsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> isinId = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<String> link = const Value.absent(),
+            Value<String> sourceUrl = const Value.absent(),
+            Value<String> sourceName = const Value.absent(),
+            Value<DateTime> pubDate = const Value.absent(),
+            Value<int> round = const Value.absent(),
+            Value<int> subround = const Value.absent(),
+          }) =>
+              FeedNewsCompanion(
+            id: id,
+            isinId: isinId,
+            title: title,
+            link: link,
+            sourceUrl: sourceUrl,
+            sourceName: sourceName,
+            pubDate: pubDate,
+            round: round,
+            subround: subround,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int isinId,
+            required String title,
+            required String link,
+            required String sourceUrl,
+            required String sourceName,
+            required DateTime pubDate,
+            required int round,
+            required int subround,
+          }) =>
+              FeedNewsCompanion.insert(
+            id: id,
+            isinId: isinId,
+            title: title,
+            link: link,
+            sourceUrl: sourceUrl,
+            sourceName: sourceName,
+            pubDate: pubDate,
+            round: round,
+            subround: subround,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$FeedNewsTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({isinId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (isinId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.isinId,
+                    referencedTable: $$FeedNewsTableReferences._isinIdTable(db),
+                    referencedColumn:
+                        $$FeedNewsTableReferences._isinIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$FeedNewsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $FeedNewsTable,
+    FeedNewsData,
+    $$FeedNewsTableFilterComposer,
+    $$FeedNewsTableOrderingComposer,
+    $$FeedNewsTableAnnotationComposer,
+    $$FeedNewsTableCreateCompanionBuilder,
+    $$FeedNewsTableUpdateCompanionBuilder,
+    (FeedNewsData, $$FeedNewsTableReferences),
+    FeedNewsData,
+    PrefetchHooks Function({bool isinId})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2542,4 +3396,6 @@ class $AppDatabaseManager {
       $$PositionsTableTableManager(_db, _db.positions);
   $$MarketDataCachesTableTableManager get marketDataCaches =>
       $$MarketDataCachesTableTableManager(_db, _db.marketDataCaches);
+  $$FeedNewsTableTableManager get feedNews =>
+      $$FeedNewsTableTableManager(_db, _db.feedNews);
 }

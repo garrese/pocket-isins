@@ -41,6 +41,19 @@ class MarketDataCaches extends Table {
   IntColumn get tickerId => integer().references(Tickers, #id)();
 }
 
+@DataClassName('FeedNewsData')
+class FeedNews extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get isinId => integer().references(Isins, #id)();
+  TextColumn get title => text()();
+  TextColumn get link => text()();
+  TextColumn get sourceUrl => text()();
+  TextColumn get sourceName => text()();
+  DateTimeColumn get pubDate => dateTime()();
+  IntColumn get round => integer()();
+  IntColumn get subround => integer()();
+}
+
 // Custom converters for JSON arrays
 class DoubleListConverter extends TypeConverter<List<double>, String> {
   const DoubleListConverter();

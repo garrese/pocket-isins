@@ -4,6 +4,7 @@ import 'core/theme/app_theme.dart';
 import 'core/database/drift_service.dart';
 import 'features/portfolio/presentation/portfolio_screen.dart';
 import 'features/markets/presentation/markets_screen.dart';
+import 'features/feed/presentation/feed_screen.dart';
 import 'features/insights/presentation/insights_screen.dart';
 
 void main() async {
@@ -50,6 +51,7 @@ class MainScreen extends ConsumerWidget {
     final screens = [
       const PortfolioScreen(),
       const MarketsScreen(),
+      const FeedScreen(),
       const InsightsScreen(),
     ];
 
@@ -57,6 +59,7 @@ class MainScreen extends ConsumerWidget {
       body: screens[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
+        type: BottomNavigationBarType.fixed, // Ensure all items show well
         onTap: (index) => ref.read(currentTabProvider.notifier).state = index,
         items: const [
           BottomNavigationBarItem(
@@ -66,6 +69,10 @@ class MainScreen extends ConsumerWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.show_chart),
             label: 'Market',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.feed),
+            label: 'Feed',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.psychology),

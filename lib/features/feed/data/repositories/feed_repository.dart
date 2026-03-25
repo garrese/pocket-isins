@@ -1,0 +1,180 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:xml/xml.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../../core/network/dio_provider.dart';
+import '../../domain/models/feed_news_model.dart';
+
+part 'feed_repository.g.dart';
+
+class FeedRepository {
+  final Dio _dio;
+
+  FeedRepository(this._dio);
+
+  Future<List<FeedNewsModel>> fetchNewsForIsin({
+    required int isinId,
+    required String isinName,
+    required int round,
+    required int subround,
+  }) async {
+    try {
+      final encodedQuery =
+          Uri.encodeComponent('$isinName financial news when:24h');
+      final url = 'https://news.google.com/rss/search?q=$encodedQuery&hl=en-US';
+
+      final response = await _dio.get(
+        url,
+        options: Options(
+          headers: {
+            'User-Agent': 'yaak',
+            'Accept': '*/*',
+          },
+          responseType: ResponseType.plain,
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final String xmlString = response.data.toString();
+        final document = XmlDocument.parse(xmlString);
+
+        final items = document.findAllElements('item');
+
+        List<FeedNewsModel> newsList = [];
+        Set<String> seenTitles = {};
+        Set<String> seenLinks = {};
+
+        for (final item in items) {
+          if (newsList.length >= 6) break;
+
+          final title =
+              item.findElements('title').firstOrNull?.innerText.trim() ?? '';
+          final link =
+              item.findElements('link').firstOrNull?.innerText.trim() ?? '';
+          final pubDateStr =
+              item.findElements('pubDate').firstOrNull?.innerText.trim() ?? '';
+
+          final sourceElement = item.findElements('source').firstOrNull;
+          final sourceName = sourceElement?.innerText.trim() ?? '';
+          final sourceUrl = sourceElement?.getAttribute('url') ?? '';
+
+          if (title.isEmpty || link.isEmpty) continue;
+
+          // Prevent duplicates in the current parsed batch
+          if (seenTitles.contains(title) || seenLinks.contains(link)) continue;
+
+          seenTitles.add(title);
+          seenLinks.add(link);
+
+          DateTime pubDate;
+          try {
+            // e.g. "Thu, 26 Oct 2023 14:00:00 GMT" -> can use DateTime.parse on most standard RSS dates
+            // But Dart's standard parsing for HTTP dates sometimes requires custom parsing
+            // Let's rely on standard parsing first
+            pubDate = HttpDate.parse(pubDateStr);
+          } catch (e) {
+            // Fallback for custom format parsing if needed, but Google RSS usually provides valid standard formats
+            pubDate = DateTime.now();
+          }
+
+          newsList.add(FeedNewsModel(
+            isinId: isinId,
+            isinName: isinName,
+            title: title,
+            link: link,
+            sourceUrl: sourceUrl,
+            sourceName: sourceName,
+            pubDate: pubDate,
+            round: round,
+            subround: subround,
+          ));
+        }
+
+        return newsList;
+      } else {
+        debugPrint('Feed API Error: ${response.statusCode}');
+        return [];
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Error fetching news for $isinName: $e\n$stackTrace');
+      return [];
+    }
+  }
+}
+
+class HttpDate {
+  // Simple RFC 1123 parser for standard RSS dates
+  static DateTime parse(String date) {
+    try {
+      // Dart's core package can parse HTTP dates using format
+      // Or we can manually try to parse it
+      return _parseRfc1123(date);
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
+  static DateTime _parseRfc1123(String dateStr) {
+    // Format: "Day, dd MMM yyyy HH:mm:ss GMT"
+    // To handle timezone strings properly or simply use Dart's internal parser logic
+    // Luckily `DateTime.parse` is pretty good but doesn't handle the weekday part well sometimes.
+    // However, if we trim it to the main part, it might.
+    final parts = dateStr.split(',');
+    if (parts.length == 2) {
+      // We can use intl package or standard format
+      // For safety, let's use a very generic fallback:
+    }
+
+    // As a robust alternative for RSS pubDate
+    // The dart `HttpDate.parse` is available in `dart:io`
+    return _parseViaDartIo(dateStr);
+  }
+
+  static DateTime _parseViaDartIo(String dateStr) {
+    // We cannot import dart:io safely for flutter web (though we are only local),
+    // but we can parse the standard parts manually or use an existing library.
+    // Google News sends "Thu, 15 Feb 2024 12:34:56 GMT".
+    // Let's implement a robust manual parser for this specific format.
+    final regex = RegExp(
+        r'\w+,\s+(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+([A-Z]+|\+\d+)');
+    final match = regex.firstMatch(dateStr);
+
+    if (match != null) {
+      final day = int.parse(match.group(1)!);
+      final monthStr = match.group(2)!;
+      final year = int.parse(match.group(3)!);
+      final hour = int.parse(match.group(4)!);
+      final minute = int.parse(match.group(5)!);
+      final second = int.parse(match.group(6)!);
+
+      final month = _monthMap[monthStr] ?? 1;
+
+      final dt = DateTime.utc(year, month, day, hour, minute, second);
+      return dt.toLocal();
+    }
+
+    return DateTime.now();
+  }
+
+  static const _monthMap = {
+    'Jan': 1,
+    'Feb': 2,
+    'Mar': 3,
+    'Apr': 4,
+    'May': 5,
+    'Jun': 6,
+    'Jul': 7,
+    'Aug': 8,
+    'Sep': 9,
+    'Oct': 10,
+    'Nov': 11,
+    'Dec': 12
+  };
+}
+
+@riverpod
+FeedRepository feedRepository(FeedRepositoryRef ref) {
+  final dio = ref.watch(dioProvider);
+  return FeedRepository(dio);
+}
