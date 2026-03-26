@@ -11,7 +11,7 @@ import '../../portfolio/data/portfolio_provider.dart';
 
 part 'markets_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Markets extends _$Markets {
   @override
   Future<List<Isin>> build() async {
@@ -28,9 +28,9 @@ class Markets extends _$Markets {
 
     for (var isin in isins) {
       for (var ticker in isin.tickers) {
-        final cacheRow = await (db.select(db.marketDataCaches)
-              ..where((c) => c.tickerId.equals(ticker.id)))
-            .getSingleOrNull();
+        final cacheRow = await (db.select(
+          db.marketDataCaches,
+        )..where((c) => c.tickerId.equals(ticker.id))).getSingleOrNull();
 
         if (cacheRow != null) {
           ticker.marketDataCache = MarketDataCache(
@@ -71,7 +71,10 @@ class Markets extends _$Markets {
 
               if (closeArray.isEmpty) {
                 final fallbackData = await marketService.fetchHistoricalData(
-                    ticker.symbol, '1d', '1mo');
+                  ticker.symbol,
+                  '1d',
+                  '1mo',
+                );
                 if (fallbackData != null) {
                   rawData = fallbackData;
                 }
@@ -84,11 +87,11 @@ class Markets extends _$Markets {
               final indicators = result['indicators']?['quote']?[0];
 
               if (meta != null && indicators != null) {
-                final regularMarketPrice =
-                    (meta['regularMarketPrice'] as num).toDouble();
+                final regularMarketPrice = (meta['regularMarketPrice'] as num)
+                    .toDouble();
                 final chartPreviousClose =
                     (meta['chartPreviousClose'] as num?)?.toDouble() ??
-                        regularMarketPrice;
+                    regularMarketPrice;
 
                 final List<double> intradayPrices = [];
                 final List<int> intradayTimestamps = [];
@@ -101,8 +104,9 @@ class Markets extends _$Markets {
                   if (val != null) {
                     intradayPrices.add((val as num).toDouble());
                     if (i < timestampArray.length) {
-                      intradayTimestamps
-                          .add((timestampArray[i] as num).toInt());
+                      intradayTimestamps.add(
+                        (timestampArray[i] as num).toInt(),
+                      );
                     } else {
                       intradayTimestamps.add(0);
                     }
@@ -112,16 +116,18 @@ class Markets extends _$Markets {
                 // Save to Drift
                 await db.transaction(() async {
                   if (ticker.marketDataCache != null) {
-                    await (db.update(db.marketDataCaches)
-                          ..where(
-                              (c) => c.id.equals(ticker.marketDataCache!.id)))
-                        .write(drift.MarketDataCachesCompanion(
-                      lastUpdated: Value(now),
-                      regularMarketPrice: Value(regularMarketPrice),
-                      chartPreviousClose: Value(chartPreviousClose),
-                      intradayPrices: Value(intradayPrices),
-                      intradayTimestamps: Value(intradayTimestamps),
-                    ));
+                    await (db.update(db.marketDataCaches)..where(
+                          (c) => c.id.equals(ticker.marketDataCache!.id),
+                        ))
+                        .write(
+                          drift.MarketDataCachesCompanion(
+                            lastUpdated: Value(now),
+                            regularMarketPrice: Value(regularMarketPrice),
+                            chartPreviousClose: Value(chartPreviousClose),
+                            intradayPrices: Value(intradayPrices),
+                            intradayTimestamps: Value(intradayTimestamps),
+                          ),
+                        );
                     ticker.marketDataCache!.lastUpdated = now;
                     ticker.marketDataCache!.regularMarketPrice =
                         regularMarketPrice;
@@ -133,15 +139,17 @@ class Markets extends _$Markets {
                   } else {
                     final newId = await db
                         .into(db.marketDataCaches)
-                        .insert(drift.MarketDataCachesCompanion.insert(
-                          symbol: ticker.symbol,
-                          lastUpdated: now,
-                          regularMarketPrice: Value(regularMarketPrice),
-                          chartPreviousClose: Value(chartPreviousClose),
-                          intradayPrices: Value(intradayPrices),
-                          intradayTimestamps: Value(intradayTimestamps),
-                          tickerId: ticker.id,
-                        ));
+                        .insert(
+                          drift.MarketDataCachesCompanion.insert(
+                            symbol: ticker.symbol,
+                            lastUpdated: now,
+                            regularMarketPrice: Value(regularMarketPrice),
+                            chartPreviousClose: Value(chartPreviousClose),
+                            intradayPrices: Value(intradayPrices),
+                            intradayTimestamps: Value(intradayTimestamps),
+                            tickerId: ticker.id,
+                          ),
+                        );
 
                     ticker.marketDataCache = MarketDataCache(
                       id: newId,
@@ -159,7 +167,8 @@ class Markets extends _$Markets {
             }
           } catch (e, stack) {
             debugPrint(
-                'MarketsProvider Error parsing data for ${ticker.symbol}: $e\n$stack');
+              'MarketsProvider Error parsing data for ${ticker.symbol}: $e\n$stack',
+            );
             rethrow;
           }
         }
