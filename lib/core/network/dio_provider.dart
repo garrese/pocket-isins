@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/log/log_service.dart';
+import 'package:talker_dio_logger/talker_dio_logger.dart';
+import '../services/log/talker_provider.dart';
 
 final dioProvider = Provider<Dio>((ref) {
   final dio = Dio(
@@ -14,26 +15,16 @@ final dioProvider = Provider<Dio>((ref) {
     ),
   );
 
-  final log = ref.read(logServiceProvider.notifier);
+  final talker = ref.read(talkerProvider);
 
   dio.interceptors.add(
-    InterceptorsWrapper(
-      onRequest: (options, handler) {
-        log.debug('REQUEST [${options.method}] => PATH: ${options.uri}');
-        return handler.next(options);
-      },
-      onResponse: (response, handler) {
-        log.debug(
-            'RESPONSE [${response.statusCode}] => PATH: ${response.requestOptions.uri}');
-        return handler.next(response);
-      },
-      onError: (DioException e, handler) {
-        log.error(
-            'ERROR [${e.response?.statusCode}] => PATH: ${e.requestOptions.uri}',
-            e,
-            e.stackTrace);
-        return handler.next(e);
-      },
+    TalkerDioLogger(
+      talker: talker,
+      settings: const TalkerDioLoggerSettings(
+        printRequestHeaders: true,
+        printResponseHeaders: false,
+        printResponseMessage: true,
+      ),
     ),
   );
 

@@ -51,6 +51,9 @@ dependencies:
   marquee: ^2.3.0
   xml: ^6.6.1
   shared_preferences: ^2.5.5
+  talker_flutter: ^5.1.16
+  talker_dio_logger: ^5.1.16
+  talker_riverpod_logger: ^5.0.1
 
 dev_dependencies:
   flutter_test:
