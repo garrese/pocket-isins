@@ -33,9 +33,12 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
   @override
   void initState() {
     super.initState();
-    _codeController = TextEditingController(text: widget.isinToEdit?.isinCode ?? '');
-    _nameController = TextEditingController(text: widget.isinToEdit?.name ?? '');
-    _shortNameController = TextEditingController(text: widget.isinToEdit?.shortName ?? '');
+    _codeController =
+        TextEditingController(text: widget.isinToEdit?.isinCode ?? '');
+    _nameController =
+        TextEditingController(text: widget.isinToEdit?.name ?? '');
+    _shortNameController =
+        TextEditingController(text: widget.isinToEdit?.shortName ?? '');
 
     if (widget.isinToEdit != null) {
       for (final ticker in widget.isinToEdit!.tickers) {
@@ -113,7 +116,9 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             _isNameManuallyEnabled = true;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No se encontraron nombres. Edición manual habilitada.')),
+            const SnackBar(
+                content: Text(
+                    'No se encontraron nombres. Edición manual habilitada.')),
           );
         }
       } else if (uniqueNames.length == 1) {
@@ -122,7 +127,8 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             _nameController.text = uniqueNames.first;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Yahoo Name completado automáticamente.')),
+            const SnackBar(
+                content: Text('Yahoo Name completado automáticamente.')),
           );
         }
       } else {
@@ -138,7 +144,9 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
           _isNameManuallyEnabled = true;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error en la búsqueda. Edición manual habilitada.')),
+          const SnackBar(
+              content:
+                  Text('Error en la búsqueda. Edición manual habilitada.')),
         );
       }
     } finally {
@@ -178,7 +186,8 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
 
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, busca o rellena primero el Yahoo Name.')),
+        const SnackBar(
+            content: Text('Por favor, busca o rellena primero el Yahoo Name.')),
       );
       return;
     }
@@ -205,18 +214,21 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
 
       if (quotes.isEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not find a symbol. Please enter the Yahoo Symbol manually.')),
+          const SnackBar(
+              content: Text(
+                  'Could not find a symbol. Please enter the Yahoo Symbol manually.')),
         );
       } else if (mounted) {
-         _showSymbolSelectionDialog(tIndex, quotes);
+        _showSymbolSelectionDialog(tIndex, quotes);
       }
-
     } catch (e, stack) {
       debugPrint('Error searching symbol: $e');
       debugPrint('Stacktrace: $stack');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error searching symbol. Please enter the Yahoo Symbol manually.')),
+          const SnackBar(
+              content: Text(
+                  'Error searching symbol. Please enter the Yahoo Symbol manually.')),
         );
       }
     } finally {
@@ -232,15 +244,18 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       // Ensure we don't save empty symbols
-      final validTickers = _tickers.where((t) => t.symbol.trim().isNotEmpty).toList();
+      final validTickers =
+          _tickers.where((t) => t.symbol.trim().isNotEmpty).toList();
 
       ref.read(portfolioProvider.notifier).saveIsin(
-        id: widget.isinToEdit?.id,
-        isinCode: _codeController.text.trim(),
-        name: _nameController.text.trim(),
-        shortName: _shortNameController.text.trim().isEmpty ? null : _shortNameController.text.trim(),
-        tickersData: validTickers,
-      );
+            id: widget.isinToEdit?.id,
+            isinCode: _codeController.text.trim(),
+            name: _nameController.text.trim(),
+            shortName: _shortNameController.text.trim().isEmpty
+                ? null
+                : _shortNameController.text.trim(),
+            tickersData: validTickers,
+          );
       Navigator.pop(context);
     }
   }
@@ -260,7 +275,8 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                   context: context,
                   builder: (context) => AlertDialog(
                     title: const Text('Confirm Delete'),
-                    content: const Text('Are you sure you want to delete this ISIN?'),
+                    content: const Text(
+                        'Are you sure you want to delete this ISIN?'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
@@ -268,11 +284,14 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          ref.read(portfolioProvider.notifier).removeIsin(widget.isinToEdit!.id);
+                          ref
+                              .read(portfolioProvider.notifier)
+                              .removeIsin(widget.isinToEdit!.id);
                           Navigator.pop(context); // Close dialog
                           Navigator.pop(context); // Close form screen
                         },
-                        child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                        child: const Text('Delete',
+                            style: TextStyle(color: Colors.redAccent)),
                       ),
                     ],
                   ),
@@ -289,14 +308,18 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             widget.isinToEdit == null
                 ? TextFormField(
                     controller: _codeController,
-                    decoration: const InputDecoration(labelText: 'ISIN Code (e.g., US0378331005)', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                        labelText: 'ISIN Code (e.g., US0378331005)',
+                        border: OutlineInputBorder()),
                     validator: (v) => v!.trim().isEmpty ? 'Required' : null,
                   )
                 : InkWell(
                     onTap: () {
-                      Clipboard.setData(ClipboardData(text: _codeController.text));
+                      Clipboard.setData(
+                          ClipboardData(text: _codeController.text));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('ISIN copied to clipboard!')),
+                        const SnackBar(
+                            content: Text('ISIN copied to clipboard!')),
                       );
                     },
                     child: IgnorePointer(
@@ -351,26 +374,36 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                           labelText: 'Yahoo Name',
                           border: const OutlineInputBorder(),
                           filled: !_isNameManuallyEnabled,
-                          fillColor: !_isNameManuallyEnabled ? Colors.grey.withAlpha(25) : null,
-                          helperText: _isNameManuallyEnabled ? 'Edición manual habilitada' : null,
+                          fillColor: !_isNameManuallyEnabled
+                              ? Colors.grey.withAlpha(25)
+                              : null,
+                          helperText: _isNameManuallyEnabled
+                              ? 'Edición manual habilitada'
+                              : null,
                         ),
                         validator: (v) => v!.trim().isEmpty ? 'Required' : null,
-                        enabled: true, // We use IgnorePointer to block interaction without greying out completely if we prefer
+                        enabled:
+                            true, // We use IgnorePointer to block interaction without greying out completely if we prefer
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Padding(
-                  padding: const EdgeInsets.only(top: 4.0), // Align with text field
+                  padding:
+                      const EdgeInsets.only(top: 4.0), // Align with text field
                   child: ElevatedButton.icon(
                     onPressed: _isAutoFillingName ? null : _autoFillName,
                     icon: _isAutoFillingName
-                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2))
                         : const Icon(Icons.search),
                     label: const Text('Autofill'),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
                     ),
                   ),
                 ),
@@ -382,14 +415,17 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
               decoration: const InputDecoration(
                 labelText: 'Short Name (Optional)',
                 border: OutlineInputBorder(),
-                helperText: 'Used across the app instead of full name if provided.',
+                helperText:
+                    'Used across the app instead of full name if provided.',
               ),
             ),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Market Data', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Market Data',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 TextButton.icon(
                   icon: const Icon(Icons.add),
                   label: const Text('Add Market'),
@@ -430,11 +466,15 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Market', style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text('Market',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
                 _searchingIndex == tIndex
                     ? const Padding(
                         padding: EdgeInsets.only(right: 8.0),
-                        child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                        child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2)),
                       )
                     : TextButton.icon(
                         icon: const Icon(Icons.search, size: 16),
@@ -451,7 +491,8 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                   child: TextFormField(
                     key: ValueKey('symbol_${tIndex}_${ticker.symbol}'),
                     initialValue: ticker.symbol,
-                    decoration: const InputDecoration(labelText: 'Yahoo Symbol (e.g., AAPL)'),
+                    decoration: const InputDecoration(
+                        labelText: 'Yahoo Symbol (e.g., AAPL)'),
                     onChanged: (v) => ticker.symbol = v,
                     validator: (v) => v!.trim().isEmpty ? 'Required' : null,
                   ),
@@ -461,7 +502,9 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                   child: DropdownButtonFormField<String>(
                     value: ticker.currency.isEmpty ? null : ticker.currency,
                     decoration: const InputDecoration(labelText: 'Currency'),
-                    items: kSupportedCurrencies.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                    items: kSupportedCurrencies
+                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                        .toList(),
                     onChanged: (v) {
                       if (v != null) {
                         setState(() {
@@ -470,7 +513,8 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                       }
                     },
                     validator: (v) {
-                      if (ticker.positions.isNotEmpty && (v == null || v.isEmpty)) {
+                      if (ticker.positions.isNotEmpty &&
+                          (v == null || v.isEmpty)) {
                         return 'Required with positions';
                       }
                       return null;
@@ -491,7 +535,8 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Positions', style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text('Positions',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
                 TextButton.icon(
                   icon: const Icon(Icons.add, size: 16),
                   label: const Text('Add Position'),
@@ -510,19 +555,29 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      initialValue: pos.capitalInvested > 0 ? pos.capitalInvested.toString() : '',
-                      decoration: const InputDecoration(labelText: 'Capital Invested'),
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      onChanged: (v) => pos.capitalInvested = double.tryParse(v) ?? 0.0,
+                      initialValue: pos.capitalInvested > 0
+                          ? pos.capitalInvested.toString()
+                          : '',
+                      decoration:
+                          const InputDecoration(labelText: 'Capital Invested'),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (v) =>
+                          pos.capitalInvested = double.tryParse(v) ?? 0.0,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextFormField(
-                      initialValue: pos.purchasePrice > 0 ? pos.purchasePrice.toString() : '',
-                      decoration: const InputDecoration(labelText: 'Purchase Unit Price'),
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      onChanged: (v) => pos.purchasePrice = double.tryParse(v) ?? 0.0,
+                      initialValue: pos.purchasePrice > 0
+                          ? pos.purchasePrice.toString()
+                          : '',
+                      decoration: const InputDecoration(
+                          labelText: 'Purchase Unit Price'),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (v) =>
+                          pos.purchasePrice = double.tryParse(v) ?? 0.0,
                     ),
                   ),
                   IconButton(
@@ -555,7 +610,8 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
             final exchDisp = q['exchDisp'] ?? exchange;
             final symbol = q['symbol'] ?? 'Unknown';
 
-            String? mappedCurrency = kExchangeToCurrencyMap[exchDisp.toString()];
+            String? mappedCurrency =
+                kExchangeToCurrencyMap[exchDisp.toString()];
             if (mappedCurrency == null) {
               for (final entry in kSymbolSuffixToCurrencyMap.entries) {
                 if (symbol.endsWith(entry.key)) {
@@ -585,4 +641,3 @@ class _IsinFormScreenState extends ConsumerState<IsinFormScreen> {
     );
   }
 }
-

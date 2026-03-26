@@ -123,7 +123,8 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                     items: const [
                       DropdownMenuItem(
                         value: 'openai',
-                        child: Text('OpenAI Compatible (OpenAI, OpenRouter, Ollama)'),
+                        child: Text(
+                            'OpenAI Compatible (OpenAI, OpenRouter, Ollama)'),
                       ),
                       DropdownMenuItem(
                         value: 'openrouter_web',

@@ -1,16 +1,41 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/log/log_service.dart';
 
-/// A Riverpod provider that returns a shared [Dio] instance for the entire application.
-/// Reusing a single [Dio] instance is more efficient as it manages a connection pool
-/// and reduces the overhead of constant instantiation and configuration.
 final dioProvider = Provider<Dio>((ref) {
-  final dio = Dio();
+  final dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+      headers: {
+        'User-Agent': 'yaak',
+        'Accept': '*/*',
+      },
+    ),
+  );
 
-  // Set global defaults if any, but specific headers should be passed per request
-  // via Options to avoid side effects on other parts of the app using this shared instance.
-  dio.options.connectTimeout = const Duration(seconds: 15);
-  dio.options.receiveTimeout = const Duration(seconds: 15);
+  final log = ref.read(logServiceProvider.notifier);
+
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) {
+        log.debug('REQUEST [${options.method}] => PATH: ${options.uri}');
+        return handler.next(options);
+      },
+      onResponse: (response, handler) {
+        log.debug(
+            'RESPONSE [${response.statusCode}] => PATH: ${response.requestOptions.uri}');
+        return handler.next(response);
+      },
+      onError: (DioException e, handler) {
+        log.error(
+            'ERROR [${e.response?.statusCode}] => PATH: ${e.requestOptions.uri}',
+            e,
+            e.stackTrace);
+        return handler.next(e);
+      },
+    ),
+  );
 
   return dio;
 });
