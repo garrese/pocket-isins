@@ -9,6 +9,7 @@ part 'developer_settings_provider.g.dart';
 class DeveloperSettings extends _$DeveloperSettings {
   static const _debugLabelsKey = 'debug_labels_enabled';
   static const _showLogConsoleKey = 'show_log_console';
+  static const _logHttpBodiesKey = 'log_http_bodies';
 
   @override
   DeveloperSettingsState build() {
@@ -16,6 +17,7 @@ class DeveloperSettings extends _$DeveloperSettings {
     return const DeveloperSettingsState(
       debugLabelsEnabled: false,
       showLogConsole: false,
+      logHttpBodies: false,
     );
   }
 
@@ -24,6 +26,7 @@ class DeveloperSettings extends _$DeveloperSettings {
     state = DeveloperSettingsState(
       debugLabelsEnabled: prefs.getBool(_debugLabelsKey) ?? false,
       showLogConsole: prefs.getBool(_showLogConsoleKey) ?? false,
+      logHttpBodies: prefs.getBool(_logHttpBodiesKey) ?? false,
     );
   }
 
@@ -37,5 +40,11 @@ class DeveloperSettings extends _$DeveloperSettings {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_showLogConsoleKey, value);
     state = state.copyWith(showLogConsole: value);
+  }
+
+  Future<void> setLogHttpBodies(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_logHttpBodiesKey, value);
+    state = state.copyWith(logHttpBodies: value);
   }
 }
