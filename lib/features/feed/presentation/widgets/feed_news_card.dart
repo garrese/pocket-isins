@@ -24,7 +24,8 @@ class FeedNewsCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final formattedDate = DateFormat('MMM dd, HH:mm').format(news.pubDate);
-    final debugLabelsEnabled = ref.watch(developerSettingsProvider);
+    final debugLabelsEnabled =
+        ref.watch(developerSettingsProvider).debugLabelsEnabled;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),

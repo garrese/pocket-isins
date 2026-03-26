@@ -64,7 +64,8 @@ class MarketsScreen extends ConsumerWidget {
 
               return Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 16.0),
                   child: Column(
                     children: chunks.map((rowIsins) {
                       return Padding(
@@ -79,7 +80,9 @@ class MarketsScreen extends ConsumerWidget {
                                   right: isin == rowIsins.last ? 0 : 8.0,
                                 ),
                                 child: Container(
-                                  width: availableWidth < 360 ? availableWidth : 360,
+                                  width: availableWidth < 360
+                                      ? availableWidth
+                                      : 360,
                                   decoration: BoxDecoration(
                                     color: Theme.of(context)
                                             .cardTheme
@@ -96,7 +99,8 @@ class MarketsScreen extends ConsumerWidget {
                                       width: 1,
                                     ),
                                   ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 12),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -176,7 +180,8 @@ class MarketsScreen extends ConsumerWidget {
                                                   );
                                                 },
                                                 child: Padding(
-                                                  padding: const EdgeInsets.symmetric(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                     horizontal: 4,
                                                     vertical: 8,
                                                   ),

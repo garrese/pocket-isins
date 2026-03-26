@@ -16,5 +16,6 @@ class Isin {
     this.tickers = const [],
   });
 
-  String get displayName => (shortName != null && shortName!.trim().isNotEmpty) ? shortName! : name;
+  String get displayName =>
+      (shortName != null && shortName!.trim().isNotEmpty) ? shortName! : name;
 }

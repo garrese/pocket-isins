@@ -64,7 +64,8 @@ class FeedRepository {
           final normalizedTitle = title.toLowerCase().trim();
 
           // Prevent duplicates against database and current batch
-          if (existingTitles.contains(normalizedTitle) || existingLinks.contains(link)) {
+          if (existingTitles.contains(normalizedTitle) ||
+              existingLinks.contains(link)) {
             continue;
           }
 

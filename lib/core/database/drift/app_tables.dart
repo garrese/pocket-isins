@@ -31,12 +31,17 @@ class MarketDataCaches extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get symbol => text().unique()();
   DateTimeColumn get lastUpdated => dateTime()();
-  RealColumn get regularMarketPrice => real().withDefault(const Constant(0.0))();
-  RealColumn get chartPreviousClose => real().withDefault(const Constant(0.0))();
+  RealColumn get regularMarketPrice =>
+      real().withDefault(const Constant(0.0))();
+  RealColumn get chartPreviousClose =>
+      real().withDefault(const Constant(0.0))();
 
   // Stored as JSON string to maintain NoSQL-like capability
-  TextColumn get intradayPrices => text().map(const DoubleListConverter()).withDefault(const Constant('[]'))();
-  TextColumn get intradayTimestamps => text().map(const IntListConverter()).withDefault(const Constant('[]'))();
+  TextColumn get intradayPrices => text()
+      .map(const DoubleListConverter())
+      .withDefault(const Constant('[]'))();
+  TextColumn get intradayTimestamps =>
+      text().map(const IntListConverter()).withDefault(const Constant('[]'))();
 
   IntColumn get tickerId => integer().references(Tickers, #id)();
 }

@@ -118,15 +118,20 @@ class FeedService {
       // Process in batches of 10
       const batchSize = 10;
       for (var i = 0; i < unratedNews.length; i += batchSize) {
-        final end = (i + batchSize < unratedNews.length) ? i + batchSize : unratedNews.length;
+        final end = (i + batchSize < unratedNews.length)
+            ? i + batchSize
+            : unratedNews.length;
         final batch = unratedNews.sublist(i, end);
 
-        final newsBatchPayload = batch.map((news) => {
-          'id': news.id,
-          'title': news.title,
-        }).toList();
+        final newsBatchPayload = batch
+            .map((news) => {
+                  'id': news.id,
+                  'title': news.title,
+                })
+            .toList();
 
-        final results = await _aiService.rateNewsRelevanceBatch(newsBatchPayload);
+        final results =
+            await _aiService.rateNewsRelevanceBatch(newsBatchPayload);
 
         if (results.isNotEmpty) {
           await db.batch((batchWriter) {

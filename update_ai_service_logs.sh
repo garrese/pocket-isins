@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > lib/core/services/ai/ai_service.dart
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,31 +33,22 @@ class AiService {
   }) async {
     final settings = await _settingsRepo.getSettings();
 
-    final activeMessages = messages ??
-        (userPrompt != null
-            ? [
-                {'role': 'user', 'content': userPrompt}
-              ]
-            : []);
+    final activeMessages = messages ?? (userPrompt != null ? [{'role': 'user', 'content': userPrompt}] : []);
 
     // LOG: Only log the last message
     if (activeMessages.isNotEmpty) {
       final lastMsg = activeMessages.last;
-      _log.info('AI Request [${settings.apiProvider}]',
-          'Prompt: \${lastMsg["content"]}');
+      _log.info('AI Request [${settings.apiProvider}]', 'Prompt: \${lastMsg["content"]}');
     } else {
       _log.info('AI Request [${settings.apiProvider}]', 'No prompt provided.');
     }
 
     if (settings.apiProvider == 'google_ai_studio') {
-      return _generateGoogleAIStudio(settings, systemPrompt, activeMessages,
-          webSearch: webSearch);
+      return _generateGoogleAIStudio(settings, systemPrompt, activeMessages, webSearch: webSearch);
     } else {
       // By default use open ai compatible syntax (including OpenRouter)
-      final useOpenRouterWeb =
-          webSearch && settings.apiProvider == 'openrouter_web';
-      return _generateOpenAICompatible(settings, systemPrompt, activeMessages,
-          openRouterWeb: useOpenRouterWeb);
+      final useOpenRouterWeb = webSearch && settings.apiProvider == 'openrouter_web';
+      return _generateOpenAICompatible(settings, systemPrompt, activeMessages, openRouterWeb: useOpenRouterWeb);
     }
   }
 
@@ -101,8 +93,7 @@ Example format:
   }
 
   // Feed rating feature (batch)
-  Future<Map<int, int>> rateNewsRelevanceBatch(
-      List<Map<String, dynamic>> newsBatch) async {
+  Future<Map<int, int>> rateNewsRelevanceBatch(List<Map<String, dynamic>> newsBatch) async {
     const systemPrompt = '''
 You are a financial AI assistant. Your task is to rate the relevance of the following news titles for a stock market investor.
 You will be provided with a JSON array of news items, each containing an 'id' and a 'title'.
@@ -140,9 +131,7 @@ Example format:
       final Map<int, int> results = {};
 
       for (final item in jsonList) {
-        if (item is Map &&
-            item.containsKey('id') &&
-            item.containsKey('rating')) {
+        if (item is Map && item.containsKey('id') && item.containsKey('rating')) {
           final id = int.tryParse(item['id'].toString());
           final rating = int.tryParse(item['rating'].toString());
           if (id != null && rating != null) {
@@ -159,8 +148,8 @@ Example format:
     }
   }
 
-  Future<String> _generateGoogleAIStudio(AiSettings settings,
-      String systemPrompt, List<Map<String, String>> messages,
+  Future<String> _generateGoogleAIStudio(
+      AiSettings settings, String systemPrompt, List<Map<String, String>> messages,
       {bool webSearch = false}) async {
     if (settings.apiKey.isEmpty) {
       _log.warning('API Key is missing for Google AI Studio.');
@@ -176,8 +165,7 @@ Example format:
       baseUrl = baseUrl.substring(0, baseUrl.length - 1);
     }
 
-    final endpoint =
-        '\$baseUrl/models/\${settings.modelName}:generateContent?key=\${settings.apiKey}';
+    final endpoint = '\$baseUrl/models/\${settings.modelName}:generateContent?key=\${settings.apiKey}';
 
     final data = {
       'systemInstruction': {
@@ -209,25 +197,21 @@ Example format:
       );
 
       if (response.statusCode == 200) {
-        final reply = response.data['candidates'][0]['content']['parts'][0]
-            ['text'] as String;
-        _log.info('AI Response (Google)',
-            '\${reply.substring(0, reply.length > 100 ? 100 : reply.length)}...');
+        final reply = response.data['candidates'][0]['content']['parts'][0]['text'] as String;
+        _log.info('AI Response (Google)', '\${reply.substring(0, reply.length > 100 ? 100 : reply.length)}...');
         return reply;
       } else {
         _log.error('Failed completion Google', response.data);
-        throw Exception(
-            'Failed completion: \${response.statusCode} - \${response.data}');
+        throw Exception('Failed completion: \${response.statusCode} - \${response.data}');
       }
     } on DioException catch (e, stackTrace) {
       _log.error('Network or API Error in Google AI Studio', e, stackTrace);
-      throw Exception(
-          'Network or API Error: \${e.message}\n\${e.response?.data}');
+      throw Exception('Network or API Error: \${e.message}\n\${e.response?.data}');
     }
   }
 
-  Future<String> _generateOpenAICompatible(AiSettings settings,
-      String systemPrompt, List<Map<String, String>> messages,
+  Future<String> _generateOpenAICompatible(
+      AiSettings settings, String systemPrompt, List<Map<String, String>> messages,
       {bool openRouterWeb = false}) async {
     if (settings.apiKey.isEmpty && settings.baseUrl.contains('openai.com')) {
       _log.warning('API Key is missing for OpenAI.');
@@ -274,20 +258,17 @@ Example format:
       );
 
       if (response.statusCode == 200) {
-        final reply =
-            response.data['choices'][0]['message']['content'] as String;
-        _log.info('AI Response (OpenAI)',
-            '\${reply.substring(0, reply.length > 100 ? 100 : reply.length)}...');
+        final reply = response.data['choices'][0]['message']['content'] as String;
+        _log.info('AI Response (OpenAI)', '\${reply.substring(0, reply.length > 100 ? 100 : reply.length)}...');
         return reply;
       } else {
         _log.error('Failed completion OpenAI', response.data);
-        throw Exception(
-            'Failed completion: \${response.statusCode} - \${response.data}');
+        throw Exception('Failed completion: \${response.statusCode} - \${response.data}');
       }
     } on DioException catch (e, stackTrace) {
       _log.error('Network or API Error in OpenAI Compatible', e, stackTrace);
-      throw Exception(
-          'Network or API Error: \${e.message}\n\${e.response?.data}');
+      throw Exception('Network or API Error: \${e.message}\n\${e.response?.data}');
     }
   }
 }
+INNER_EOF
