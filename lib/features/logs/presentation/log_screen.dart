@@ -13,6 +13,8 @@ class LogScreen extends ConsumerWidget {
     return TalkerScreen(
       talker: talker,
       appBarTitle: 'Logs',
+      isLogsExpanded: false,
+      isLogOrderReversed: true,
       appBarLeading: Builder(
         builder: (context) {
           return IconButton(
