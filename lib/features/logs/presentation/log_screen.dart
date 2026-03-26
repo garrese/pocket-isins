@@ -33,9 +33,10 @@ class LogScreen extends ConsumerWidget {
       body: filteredLogs.isEmpty
           ? const Center(child: Text('No logs to display.'))
           : ListView.builder(
+              reverse: true,
               itemCount: filteredLogs.length,
               itemBuilder: (context, index) {
-                final log = filteredLogs[index];
+                final log = filteredLogs[filteredLogs.length - 1 - index];
                 return _LogEntryTile(log: log);
               },
             ),

@@ -64,9 +64,8 @@ class Markets extends _$Markets {
 
             // Fallback to 1d interval, 1mo range if intraday fetch doesn't have valid close indicators
             // (Some non-US exchanges don't provide 5m intraday data on Yahoo Finance)
-            if (rawData != null && rawData['chart']?['result'] != null) {
-              final result = rawData['chart']['result'][0];
-              final indicators = result['indicators']?['quote']?[0];
+            if (rawData != null) {
+              final indicators = rawData['indicators']?['quote']?[0];
               final closeArray = indicators?['close'] as List<dynamic>? ?? [];
 
               if (closeArray.isEmpty) {
@@ -81,10 +80,9 @@ class Markets extends _$Markets {
               }
             }
 
-            if (rawData != null && rawData['chart']?['result'] != null) {
-              final result = rawData['chart']['result'][0];
-              final meta = result['meta'];
-              final indicators = result['indicators']?['quote']?[0];
+            if (rawData != null) {
+              final meta = rawData['meta'];
+              final indicators = rawData['indicators']?['quote']?[0];
 
               if (meta != null && indicators != null) {
                 final regularMarketPrice = (meta['regularMarketPrice'] as num)
@@ -97,7 +95,7 @@ class Markets extends _$Markets {
                 final List<int> intradayTimestamps = [];
                 final closeArray = indicators['close'] as List<dynamic>? ?? [];
                 final timestampArray =
-                    result['timestamp'] as List<dynamic>? ?? [];
+                    rawData['timestamp'] as List<dynamic>? ?? [];
 
                 for (var i = 0; i < closeArray.length; i++) {
                   final val = closeArray[i];
