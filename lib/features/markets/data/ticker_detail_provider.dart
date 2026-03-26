@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/network/market_data_service.dart';
-import '../../../core/services/log/log_service.dart';
+import '../../../core/services/log/talker_provider.dart';
 
 part 'ticker_detail_provider.g.dart';
 
@@ -86,14 +86,15 @@ class TickerDetail extends _$TickerDetail {
         state = state.copyWith(isLoading: false, data: rawData);
       } else {
         const errorMsg = 'Failed to fetch data or invalid response.';
-        ref.read(logServiceProvider.notifier).error(errorMsg, null, null);
+        ref.read(talkerProvider).handle(Exception(errorMsg), null, errorMsg);
         state = state.copyWith(
           isLoading: false,
           error: errorMsg,
         );
       }
     } catch (e, stack) {
-      ref.read(logServiceProvider.notifier).error('Exception fetching historical data for ${state.symbol}', e, stack);
+      ref.read(talkerProvider).handle(
+          e, stack, 'Exception fetching historical data for ${state.symbol}');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }

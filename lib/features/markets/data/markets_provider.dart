@@ -30,7 +30,8 @@ class Markets extends _$Markets {
       for (var ticker in isin.tickers) {
         final cacheRow = await (db.select(
           db.marketDataCaches,
-        )..where((c) => c.tickerId.equals(ticker.id))).getSingleOrNull();
+        )..where((c) => c.tickerId.equals(ticker.id)))
+            .getSingleOrNull();
 
         if (cacheRow != null) {
           ticker.marketDataCache = MarketDataCache(
@@ -85,11 +86,11 @@ class Markets extends _$Markets {
               final indicators = rawData['indicators']?['quote']?[0];
 
               if (meta != null && indicators != null) {
-                final regularMarketPrice = (meta['regularMarketPrice'] as num)
-                    .toDouble();
+                final regularMarketPrice =
+                    (meta['regularMarketPrice'] as num).toDouble();
                 final chartPreviousClose =
                     (meta['chartPreviousClose'] as num?)?.toDouble() ??
-                    regularMarketPrice;
+                        regularMarketPrice;
 
                 final List<double> intradayPrices = [];
                 final List<int> intradayTimestamps = [];
@@ -114,18 +115,19 @@ class Markets extends _$Markets {
                 // Save to Drift
                 await db.transaction(() async {
                   if (ticker.marketDataCache != null) {
-                    await (db.update(db.marketDataCaches)..where(
-                          (c) => c.id.equals(ticker.marketDataCache!.id),
-                        ))
+                    await (db.update(db.marketDataCaches)
+                          ..where(
+                            (c) => c.id.equals(ticker.marketDataCache!.id),
+                          ))
                         .write(
-                          drift.MarketDataCachesCompanion(
-                            lastUpdated: Value(now),
-                            regularMarketPrice: Value(regularMarketPrice),
-                            chartPreviousClose: Value(chartPreviousClose),
-                            intradayPrices: Value(intradayPrices),
-                            intradayTimestamps: Value(intradayTimestamps),
-                          ),
-                        );
+                      drift.MarketDataCachesCompanion(
+                        lastUpdated: Value(now),
+                        regularMarketPrice: Value(regularMarketPrice),
+                        chartPreviousClose: Value(chartPreviousClose),
+                        intradayPrices: Value(intradayPrices),
+                        intradayTimestamps: Value(intradayTimestamps),
+                      ),
+                    );
                     ticker.marketDataCache!.lastUpdated = now;
                     ticker.marketDataCache!.regularMarketPrice =
                         regularMarketPrice;
@@ -135,9 +137,7 @@ class Markets extends _$Markets {
                     ticker.marketDataCache!.intradayTimestamps =
                         intradayTimestamps;
                   } else {
-                    final newId = await db
-                        .into(db.marketDataCaches)
-                        .insert(
+                    final newId = await db.into(db.marketDataCaches).insert(
                           drift.MarketDataCachesCompanion.insert(
                             symbol: ticker.symbol,
                             lastUpdated: now,
