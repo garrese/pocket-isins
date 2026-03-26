@@ -6,7 +6,6 @@ import 'core/settings/application/developer_settings_provider.dart';
 import 'features/portfolio/presentation/portfolio_screen.dart';
 import 'features/markets/presentation/markets_screen.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:talker_riverpod_logger/talker_riverpod_logger.dart';
 
 import 'features/feed/presentation/feed_screen.dart';
 import 'features/bot/presentation/bot_screen.dart';
@@ -29,24 +28,13 @@ void main() async {
       useConsoleLogs: true,
     ),
     logger: TalkerLogger(
-      settings: TalkerLoggerSettings(
-        level: LogLevel.info,
-      ),
+      settings: TalkerLoggerSettings(level: LogLevel.info),
       formatter: const CustomTalkerFormatter(),
     ),
   );
 
   runApp(
     ProviderScope(
-      observers: [
-        TalkerRiverpodObserver(
-          talker: talker,
-          settings: const TalkerRiverpodLoggerSettings(
-            printProviderDisposed: true,
-            printProviderFailed: true,
-          ),
-        ),
-      ],
       overrides: [
         driftServiceProvider.overrideWithValue(driftServiceInstance),
         talkerProvider.overrideWithValue(talker),
@@ -89,8 +77,9 @@ class MainScreen extends ConsumerWidget {
     ];
 
     // Ensure currentIndex is valid if the Log tab is hidden while selected
-    final activeIndex =
-        currentIndex >= screens.length ? screens.length - 1 : currentIndex;
+    final activeIndex = currentIndex >= screens.length
+        ? screens.length - 1
+        : currentIndex;
 
     // Reset currentTab if it's out of bounds after toggling
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -102,8 +91,8 @@ class MainScreen extends ConsumerWidget {
     return Scaffold(
       drawer:
           activeIndex == screens.length - 1 && developerSettings.showLogConsole
-              ? const AppDrawer()
-              : null,
+          ? const AppDrawer()
+          : null,
       body: screens[activeIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: activeIndex,
@@ -118,10 +107,7 @@ class MainScreen extends ConsumerWidget {
             icon: Icon(Icons.show_chart),
             label: 'Market',
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.feed),
-            label: 'Feed',
-          ),
+          const BottomNavigationBarItem(icon: Icon(Icons.feed), label: 'Feed'),
           const BottomNavigationBarItem(
             icon: Icon(Icons.psychology),
             label: 'Bot',
