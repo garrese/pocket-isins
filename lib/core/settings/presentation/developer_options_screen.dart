@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../application/developer_settings_provider.dart';
+import 'purge_data_screen.dart';
 
 class DeveloperOptionsScreen extends ConsumerWidget {
   const DeveloperOptionsScreen({super.key});
@@ -11,15 +12,14 @@ class DeveloperOptionsScreen extends ConsumerWidget {
     final settings = ref.watch(developerSettingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Developer Options'),
-      ),
+      appBar: AppBar(title: const Text('Developer Options')),
       body: ListView(
         children: [
           CheckboxListTile(
             title: const Text('Debug labels'),
-            subtitle:
-                const Text('Show technical labels like "Round" on Feed cards'),
+            subtitle: const Text(
+              'Show technical labels like "Round" on Feed cards',
+            ),
             value: settings.debugLabelsEnabled,
             onChanged: (value) {
               if (value != null) {
@@ -61,6 +61,22 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                 }
               },
             ),
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Purge Data'),
+            subtitle: const Text('Selectively delete application data'),
+            leading: const Icon(Icons.delete_forever),
+            iconColor: Theme.of(context).colorScheme.error,
+            textColor: Theme.of(context).colorScheme.error,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PurgeDataScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),
