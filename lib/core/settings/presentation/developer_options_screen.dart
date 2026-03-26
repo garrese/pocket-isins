@@ -8,7 +8,7 @@ class DeveloperOptionsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final debugLabelsEnabled = ref.watch(developerSettingsProvider);
+    final settings = ref.watch(developerSettingsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -18,13 +18,49 @@ class DeveloperOptionsScreen extends ConsumerWidget {
         children: [
           CheckboxListTile(
             title: const Text('Debug labels'),
-            subtitle: const Text('Show technical labels like "Round" on Feed cards'),
-            value: debugLabelsEnabled,
+            subtitle:
+                const Text('Show technical labels like "Round" on Feed cards'),
+            value: settings.debugLabelsEnabled,
             onChanged: (value) {
               if (value != null) {
-                ref.read(developerSettingsProvider.notifier).setDebugLabelsEnabled(value);
+                ref
+                    .read(developerSettingsProvider.notifier)
+                    .setDebugLabelsEnabled(value);
               }
             },
+          ),
+          CheckboxListTile(
+            title: const Text('Show Log Console'),
+            subtitle: const Text('Enable the Logs tab in the main navigation'),
+            value: settings.showLogConsole,
+            onChanged: (value) {
+              if (value != null) {
+                ref
+                    .read(developerSettingsProvider.notifier)
+                    .setShowLogConsole(value);
+              }
+            },
+          ),
+          ListTile(
+            title: const Text('Log Level'),
+            subtitle: const Text('Select the minimum level of logs to display'),
+            trailing: DropdownButton<int>(
+              value: settings.logLevel,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('Verbose')),
+                DropdownMenuItem(value: 1, child: Text('Debug')),
+                DropdownMenuItem(value: 2, child: Text('Info')),
+                DropdownMenuItem(value: 3, child: Text('Warning')),
+                DropdownMenuItem(value: 4, child: Text('Error')),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  ref
+                      .read(developerSettingsProvider.notifier)
+                      .setLogLevel(value);
+                }
+              },
+            ),
           ),
         ],
       ),

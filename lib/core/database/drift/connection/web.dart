@@ -11,7 +11,8 @@ DatabaseConnection connect() {
 
     if (result.missingFeatures.isNotEmpty) {
       // Depending on the browser, we may fallback to indexedDb or local storage
-      print('Using ${result.chosenImplementation} due to missing browser features: ${result.missingFeatures}');
+      print(
+          'Using ${result.chosenImplementation} due to missing browser features: ${result.missingFeatures}');
     }
 
     return result.resolvedExecutor;

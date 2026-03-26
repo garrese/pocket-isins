@@ -34,10 +34,13 @@ class PortfolioScreen extends ConsumerWidget {
                 if (result != null && result.files.single.path != null) {
                   final file = File(result.files.single.path!);
                   final jsonString = await file.readAsString();
-                  await ref.read(portfolioProvider.notifier).importPortfolio(jsonString);
+                  await ref
+                      .read(portfolioProvider.notifier)
+                      .importPortfolio(jsonString);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Portfolio imported successfully')),
+                      const SnackBar(
+                          content: Text('Portfolio imported successfully')),
                     );
                   }
                 }
@@ -56,9 +59,14 @@ class PortfolioScreen extends ConsumerWidget {
             tooltip: 'Export Portfolio',
             onPressed: () async {
               try {
-                final jsonString = await ref.read(portfolioProvider.notifier).exportPortfolio();
+                final jsonString = await ref
+                    .read(portfolioProvider.notifier)
+                    .exportPortfolio();
 
-                if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+                if (!kIsWeb &&
+                    (Platform.isWindows ||
+                        Platform.isLinux ||
+                        Platform.isMacOS)) {
                   // Guardar en PC
                   final String? outputFile = await FilePicker.platform.saveFile(
                     dialogTitle: 'Please select an output file:',
@@ -72,7 +80,8 @@ class PortfolioScreen extends ConsumerWidget {
                     await file.writeAsString(jsonString);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Portfolio exported successfully')),
+                        const SnackBar(
+                            content: Text('Portfolio exported successfully')),
                       );
                     }
                   }
@@ -100,29 +109,31 @@ class PortfolioScreen extends ConsumerWidget {
       body: portfolioAsync.when(
         data: (isins) {
           if (isins.isEmpty) {
-            return const Center(child: Text('Your portfolio is empty. Add some ISINs!'));
+            return const Center(
+                child: Text('Your portfolio is empty. Add some ISINs!'));
           }
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             itemCount: isins.length,
             itemBuilder: (context, index) {
               final isin = isins[index];
-              
+
               // Helper to calculate total position metrics across all nested instances
               double totalCapital = 0.0;
               double numShares = 0.0;
               // String primaryCurrency = 'USD';
 
               if (isin.tickers.isNotEmpty) {
-                 // primaryCurrency = isin.tickers.first.currency;
-                 for (var t in isin.tickers) {
-                    for (var p in t.positions) {
-                       totalCapital += p.capitalInvested;
-                       numShares += p.shares;
-                    }
-                 }
+                // primaryCurrency = isin.tickers.first.currency;
+                for (var t in isin.tickers) {
+                  for (var p in t.positions) {
+                    totalCapital += p.capitalInvested;
+                    numShares += p.shares;
+                  }
+                }
               }
-              String tickersList = isin.tickers.map((t) => t.symbol).join(', '); // Although we change UI to Yahoo Symbol, we keep variable names internal as isin.tickers.map((t) => t.symbol)
+              String tickersList = isin.tickers.map((t) => t.symbol).join(
+                  ', '); // Although we change UI to Yahoo Symbol, we keep variable names internal as isin.tickers.map((t) => t.symbol)
 
               // bool hasPositions = numShares > 0 || totalCapital > 0;
 
@@ -132,7 +143,8 @@ class PortfolioScreen extends ConsumerWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => IsinFormScreen(isinToEdit: isin)),
+                      MaterialPageRoute(
+                          builder: (_) => IsinFormScreen(isinToEdit: isin)),
                     );
                   },
                   title: Text(
@@ -163,8 +175,8 @@ class PortfolioScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-             context,
-             MaterialPageRoute(builder: (_) => const IsinFormScreen()),
+            context,
+            MaterialPageRoute(builder: (_) => const IsinFormScreen()),
           );
         },
         child: const Icon(Icons.add),

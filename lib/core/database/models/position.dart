@@ -14,5 +14,6 @@ class Position {
     this.ticker,
   });
 
-  double get shares => purchasePrice > 0 ? capitalInvested / purchasePrice : 0.0;
+  double get shares =>
+      purchasePrice > 0 ? capitalInvested / purchasePrice : 0.0;
 }

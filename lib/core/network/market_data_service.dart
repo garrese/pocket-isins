@@ -1,49 +1,82 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'market_data_service.g.dart';
+import 'dio_provider.dart';
+import '../services/log/log_service.dart';
+
+final marketDataServiceProvider = Provider<MarketDataService>((ref) {
+  return MarketDataService(
+    ref.watch(dioProvider),
+    ref.watch(logServiceProvider.notifier),
+  );
+});
 
 class MarketDataService {
   final Dio _dio;
+  final LogService _log;
 
-  MarketDataService() : _dio = Dio() {
-    _dio.options.baseUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/';
-    _dio.options.headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    };
-    // Allow 404 and other status codes without throwing exception to avoid crashing the state
-    _dio.options.validateStatus = (status) => status != null && status < 500;
-  }
+  MarketDataService(this._dio, this._log);
 
-  /// Fetches Level 1 Quote and Level 2 Intraday data (5m interval, 1d range).
-  Future<Map<String, dynamic>?> fetchIntradayData(String symbol) async {
-    return _fetch(symbol, '5m', '1d');
-  }
-
-  /// Fetches Level 3 Historical data with configurable interval and range.
-  Future<Map<String, dynamic>?> fetchHistoricalData(String symbol, String interval, String range) async {
-    return _fetch(symbol, interval, range);
-  }
-
-  Future<Map<String, dynamic>?> _fetch(String symbol, String interval, String range) async {
+  Future<Map<String, dynamic>?> fetchTickerData(String symbol) async {
     try {
-      final response = await _dio.get(symbol, queryParameters: {
-        'interval': interval,
-        'range': range,
-      });
-      if (response.statusCode == 200) return response.data;
-    } catch (e, stack) {
-      // ignore: avoid_print
-      print('MarketDataService Error fetching $symbol: $e\n$stack');
-      rethrow; // Rethrow to let the UI know about the error
+      final url = 'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=1d&range=1d';
+      _log.info('Fetching ticker data for $symbol');
+      final response = await _dio.get(url);
+
+      if (response.statusCode == 200) {
+        final result = response.data['chart']['result']?[0];
+        if (result != null) {
+          _log.debug('Data received for $symbol');
+          return result;
+        }
+      }
+      _log.warning('No data found for $symbol', 'Status code: \${response.statusCode}');
+      return null;
+    } catch (e, stackTrace) {
+      _log.error('Failed to fetch data for $symbol', e, stackTrace);
+      return null;
     }
-    return null;
   }
-}
 
+  Future<Map<String, dynamic>?> fetchHistoricalData(String symbol, String interval, String range) async {
+    try {
+      final url = 'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=$interval&range=$range';
+      _log.info('Fetching historical data for $symbol (range $range)');
+      final response = await _dio.get(url);
 
-@riverpod
-MarketDataService marketDataService(Ref ref) {
-  return MarketDataService();
+      if (response.statusCode == 200) {
+        final result = response.data['chart']['result']?[0];
+        if (result != null) {
+           _log.debug('Historical data received for $symbol');
+          return result;
+        }
+      }
+      _log.warning('No historical data found for $symbol', 'Status code: \${response.statusCode}');
+      return null;
+    } catch (e, stackTrace) {
+      _log.error('Failed to fetch historical data for $symbol', e, stackTrace);
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchIntradayData(String symbol) async {
+    try {
+      final url = 'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=5m&range=1d';
+      _log.info('Fetching intraday data for $symbol');
+      final response = await _dio.get(url);
+
+      if (response.statusCode == 200) {
+        final result = response.data['chart']['result']?[0];
+        if (result != null) {
+          _log.debug('Intraday data received for $symbol');
+          return result;
+        }
+      }
+      _log.warning('No intraday data found for $symbol', 'Status code: \${response.statusCode}');
+      return null;
+    } catch (e, stackTrace) {
+      _log.error('Failed to fetch intraday data for $symbol', e, stackTrace);
+      return null;
+    }
+  }
 }
