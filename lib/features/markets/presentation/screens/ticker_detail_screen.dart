@@ -103,7 +103,7 @@ class TickerDetailScreen extends ConsumerWidget {
     }
 
     try {
-      final result = state.data!['chart']['result'][0];
+      final result = state.data!;
       final meta = result['meta'];
       final indicators = result['indicators']?['quote']?[0];
       final List<dynamic> timestampsDynamic =
