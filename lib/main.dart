@@ -11,6 +11,7 @@ import 'package:talker_riverpod_logger/talker_riverpod_logger.dart';
 import 'features/feed/presentation/feed_screen.dart';
 import 'features/bot/presentation/bot_screen.dart';
 import 'features/logs/presentation/log_screen.dart';
+import 'core/services/log/custom_talker_formatter.dart';
 import 'core/services/log/talker_provider.dart';
 import 'core/theme/app_drawer.dart';
 
@@ -26,6 +27,12 @@ void main() async {
       useHistory: true,
       maxHistoryItems: 1000,
       useConsoleLogs: true,
+    ),
+    logger: TalkerLogger(
+      settings: TalkerLoggerSettings(
+        level: LogLevel.info,
+      ),
+      formatter: const CustomTalkerFormatter(),
     ),
   );
 
