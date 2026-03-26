@@ -21,4 +21,9 @@ class MarketDataCache {
     this.intradayTimestamps = const [],
     this.ticker,
   });
+
+  @override
+  String toString() {
+    return 'MarketDataCache{id: $id, symbol: $symbol, lastUpdated: $lastUpdated, regularMarketPrice: $regularMarketPrice, chartPreviousClose: $chartPreviousClose, points: ${intradayPrices.length}}';
+  }
 }

@@ -18,7 +18,8 @@ final dioProvider = Provider<Dio>((ref) {
   );
 
   final talker = ref.read(talkerProvider);
-  final initialLogHttpBodies = ref.read(developerSettingsProvider).logHttpBodies;
+  final initialLogHttpBodies =
+      ref.read(developerSettingsProvider).logHttpBodies;
 
   dio.interceptors.add(
     TalkerDioLogger(

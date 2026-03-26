@@ -16,4 +16,9 @@ class Position {
 
   double get shares =>
       purchasePrice > 0 ? capitalInvested / purchasePrice : 0.0;
+
+  @override
+  String toString() {
+    return 'Position{id: $id, capitalInvested: $capitalInvested, purchasePrice: $purchasePrice, ticker: ${ticker?.symbol}}';
+  }
 }
