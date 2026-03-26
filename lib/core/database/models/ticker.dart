@@ -21,4 +21,9 @@ class Ticker {
     this.positions = const [],
     this.marketDataCache,
   });
+
+  @override
+  String toString() {
+    return 'Ticker{id: $id, symbol: $symbol, exchange: $exchange, currency: $currency, isinId: ${isin?.id}, positions: ${positions.length}}';
+  }
 }
