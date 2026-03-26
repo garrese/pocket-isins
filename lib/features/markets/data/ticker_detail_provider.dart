@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/network/market_data_service.dart';
+import '../../../core/services/log/log_service.dart';
 
 part 'ticker_detail_provider.g.dart';
 
@@ -81,15 +82,18 @@ class TickerDetail extends _$TickerDetail {
         timeRange.range,
       );
 
-      if (rawData != null && rawData['chart']?['result'] != null) {
+      if (rawData != null && rawData['meta'] != null) {
         state = state.copyWith(isLoading: false, data: rawData);
       } else {
+        const errorMsg = 'Failed to fetch data or invalid response.';
+        ref.read(logServiceProvider.notifier).error(errorMsg, null, null);
         state = state.copyWith(
           isLoading: false,
-          error: 'Failed to fetch data or invalid response.',
+          error: errorMsg,
         );
       }
-    } catch (e) {
+    } catch (e, stack) {
+      ref.read(logServiceProvider.notifier).error('Exception fetching historical data for ${state.symbol}', e, stack);
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
