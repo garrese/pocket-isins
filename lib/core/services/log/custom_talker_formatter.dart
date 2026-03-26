@@ -12,7 +12,8 @@ class CustomTalkerFormatter implements LoggerFormatter {
       final parts = msg.split('\nData:');
       if (parts.length > 1) {
         // Find the next section (like Headers: or Redirects:) to append it back
-        final afterData = parts[1].split(RegExp(r'\n(?=(Headers:|Redirects:))'));
+        final afterData =
+            parts[1].split(RegExp(r'\n(?=(Headers:|Redirects:))'));
         if (afterData.length > 1) {
           return '${parts[0]}\nData: [Hidden in console]\n${afterData.sublist(1).join('\n')}';
         }

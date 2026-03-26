@@ -18,4 +18,9 @@ class Isin {
 
   String get displayName =>
       (shortName != null && shortName!.trim().isNotEmpty) ? shortName! : name;
+
+  @override
+  String toString() {
+    return 'Isin{id: $id, isinCode: $isinCode, name: $name, shortName: $shortName, tickers: ${tickers.length}}';
+  }
 }
