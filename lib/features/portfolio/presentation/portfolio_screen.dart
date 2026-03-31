@@ -22,7 +22,7 @@ class PortfolioScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Portfolio'),
+        title: const Text('ISINs'),
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download),
@@ -114,7 +114,7 @@ class PortfolioScreen extends ConsumerWidget {
         data: (isins) {
           if (isins.isEmpty) {
             return const Center(
-              child: Text('Your portfolio is empty. Add some ISINs!'),
+              child: Text('You have no ISINs yet. Add some!'),
             );
           }
           return ListView.builder(
@@ -123,25 +123,7 @@ class PortfolioScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final isin = isins[index];
 
-              // Helper to calculate total position metrics across all nested instances
-              double totalCapital = 0.0;
-              double numShares = 0.0;
-              // String primaryCurrency = 'USD';
-
-              if (isin.tickers.isNotEmpty) {
-                // primaryCurrency = isin.tickers.first.currency;
-                for (var t in isin.tickers) {
-                  for (var p in t.positions) {
-                    totalCapital += p.capitalInvested;
-                    numShares += p.shares;
-                  }
-                }
-              }
-              String tickersList = isin.tickers.map((t) => t.symbol).join(
-                    ', ',
-                  ); // Although we change UI to Yahoo Symbol, we keep variable names internal as isin.tickers.map((t) => t.symbol)
-
-              // bool hasPositions = numShares > 0 || totalCapital > 0;
+              String tickersList = isin.tickers.map((t) => t.symbol).join(', ');
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 4.0),

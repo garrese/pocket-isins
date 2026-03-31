@@ -6,7 +6,6 @@ import '../../../core/database/drift_service.dart';
 import '../../../core/database/drift/app_database.dart' as drift;
 import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/ticker.dart';
-import '../../../core/database/models/position.dart';
 import '../domain/portfolio_form_data.dart';
 
 part 'portfolio_provider.g.dart';
@@ -25,19 +24,21 @@ class Portfolio extends _$Portfolio {
     for (var isin in isins) {
       final isinMap = {
         'isinCode': isin.isinCode,
-        'name': isin.name,
+        'altName': isin.altName,
+        'registeredNames': isin.registeredNames,
         'shortName': isin.shortName,
         'tickers': isin.tickers.map((t) {
           return {
             'symbol': t.symbol,
             'exchange': t.exchange,
             'currency': t.currency,
-            'positions': t.positions.map((p) {
-              return {
-                'capitalInvested': p.capitalInvested,
-                'purchasePrice': p.purchasePrice,
-              };
-            }).toList(),
+            'quoteType': t.quoteType,
+            'regularMarketStart': t.regularMarketStart,
+            'regularMarketEnd': t.regularMarketEnd,
+            'preMarketStart': t.preMarketStart,
+            'preMarketEnd': t.preMarketEnd,
+            'postMarketStart': t.postMarketStart,
+            'postMarketEnd': t.postMarketEnd,
           };
         }).toList(),
       };
@@ -61,22 +62,30 @@ class Portfolio extends _$Portfolio {
         if (isinData is! Map<String, dynamic>) continue;
 
         final isinCode = isinData['isinCode'] as String?;
-        if (isinCode == null) continue;
+        final altName = isinData['altName'] as String?;
+
+        if (isinCode == null && altName == null) continue;
 
         // Check if an ISIN with this code already exists
-        final existingIsin = await (db.select(
-          db.isins,
-        )..where((t) => t.isinCode.equals(isinCode)))
-            .getSingleOrNull();
-        if (existingIsin != null) continue;
+        if (isinCode != null) {
+          final existingIsin = await (db.select(
+            db.isins,
+          )..where((t) => t.isinCode.equals(isinCode)))
+              .getSingleOrNull();
+          if (existingIsin != null) continue;
+        }
 
-        final name = isinData['name'] as String? ?? 'Unknown';
+        final registeredNames = (isinData['registeredNames'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [];
         final shortName = isinData['shortName'] as String?;
 
         final newIsinId = await db.into(db.isins).insert(
               drift.IsinsCompanion.insert(
-                isinCode: isinCode,
-                name: name,
+                isinCode: Value(isinCode),
+                altName: Value(altName),
+                registeredNames: Value(registeredNames),
                 shortName: Value(shortName),
               ),
             );
@@ -95,34 +104,30 @@ class Portfolio extends _$Portfolio {
           if (existingTicker != null) continue;
 
           final exchange = tData['exchange'] as String? ?? '';
-          final currency = tData['currency'] as String? ?? 'USD';
+          final currency = tData['currency'] as String?;
+          final quoteType = tData['quoteType'] as String?;
+          final regularMarketStart = tData['regularMarketStart'] as int?;
+          final regularMarketEnd = tData['regularMarketEnd'] as int?;
+          final preMarketStart = tData['preMarketStart'] as int?;
+          final preMarketEnd = tData['preMarketEnd'] as int?;
+          final postMarketStart = tData['postMarketStart'] as int?;
+          final postMarketEnd = tData['postMarketEnd'] as int?;
 
-          final newTickerId = await db.into(db.tickers).insert(
+          await db.into(db.tickers).insert(
                 drift.TickersCompanion.insert(
                   symbol: symbol,
                   exchange: exchange,
-                  currency: currency,
+                  currency: Value(currency),
+                  quoteType: Value(quoteType),
+                  regularMarketStart: Value(regularMarketStart),
+                  regularMarketEnd: Value(regularMarketEnd),
+                  preMarketStart: Value(preMarketStart),
+                  preMarketEnd: Value(preMarketEnd),
+                  postMarketStart: Value(postMarketStart),
+                  postMarketEnd: Value(postMarketEnd),
                   isinId: newIsinId,
                 ),
               );
-
-          final positionsData = tData['positions'] as List<dynamic>? ?? [];
-          for (var pData in positionsData) {
-            if (pData is! Map<String, dynamic>) continue;
-
-            final capitalInvested =
-                (pData['capitalInvested'] as num?)?.toDouble() ?? 0.0;
-            final purchasePrice =
-                (pData['purchasePrice'] as num?)?.toDouble() ?? 0.0;
-
-            await db.into(db.positions).insert(
-                  drift.PositionsCompanion.insert(
-                    capitalInvested: Value(capitalInvested),
-                    purchasePrice: Value(purchasePrice),
-                    tickerId: newTickerId,
-                  ),
-                );
-          }
         }
       }
     });
@@ -136,14 +141,14 @@ class Portfolio extends _$Portfolio {
 
     final isinsData = await db.select(db.isins).get();
     final allTickersData = await db.select(db.tickers).get();
-    final allPositionsData = await db.select(db.positions).get();
 
     final List<Isin> isins = [];
     for (final isinRow in isinsData) {
       final isinModel = Isin(
         id: isinRow.id,
         isinCode: isinRow.isinCode,
-        name: isinRow.name,
+        altName: isinRow.altName,
+        registeredNames: isinRow.registeredNames,
         shortName: isinRow.shortName,
         tickers: [],
       );
@@ -156,22 +161,16 @@ class Portfolio extends _$Portfolio {
           symbol: tickerRow.symbol,
           exchange: tickerRow.exchange,
           currency: tickerRow.currency,
+          quoteType: tickerRow.quoteType,
+          regularMarketStart: tickerRow.regularMarketStart,
+          regularMarketEnd: tickerRow.regularMarketEnd,
+          preMarketStart: tickerRow.preMarketStart,
+          preMarketEnd: tickerRow.preMarketEnd,
+          postMarketStart: tickerRow.postMarketStart,
+          postMarketEnd: tickerRow.postMarketEnd,
           isin: isinModel,
-          positions: [],
         );
 
-        final tickerPositions =
-            allPositionsData.where((p) => p.tickerId == tickerRow.id).toList();
-        for (final posRow in tickerPositions) {
-          tickerModel.positions.add(
-            Position(
-              id: posRow.id,
-              capitalInvested: posRow.capitalInvested,
-              purchasePrice: posRow.purchasePrice,
-              ticker: tickerModel,
-            ),
-          );
-        }
         isinModel.tickers.add(tickerModel);
       }
       isins.add(isinModel);
@@ -181,8 +180,9 @@ class Portfolio extends _$Portfolio {
 
   Future<void> saveIsin({
     int? id,
-    required String isinCode,
-    required String name,
+    String? isinCode,
+    String? altName,
+    List<String> registeredNames = const [],
     String? shortName,
     required List<TickerFormData> tickersData,
   }) async {
@@ -195,8 +195,9 @@ class Portfolio extends _$Portfolio {
         currentIsinId = id;
         await (db.update(db.isins)..where((t) => t.id.equals(id))).write(
           drift.IsinsCompanion(
-            isinCode: Value(isinCode),
-            name: Value(name),
+            isinCode: Value(isinCode != null && isinCode.trim().isNotEmpty ? isinCode : null),
+            altName: Value(altName != null && altName.trim().isNotEmpty ? altName : null),
+            registeredNames: Value(registeredNames),
             shortName: Value(shortName),
           ),
         );
@@ -212,23 +213,20 @@ class Portfolio extends _$Portfolio {
             .toList();
 
         for (final t in toRemove) {
-          await (db.delete(
-            db.positions,
-          )..where((p) => p.tickerId.equals(t.id)))
-              .go();
           await (db.delete(db.tickers)..where((t2) => t2.id.equals(t.id))).go();
         }
       } else {
         currentIsinId = await db.into(db.isins).insert(
               drift.IsinsCompanion.insert(
-                isinCode: isinCode,
-                name: name,
+                isinCode: Value(isinCode != null && isinCode.trim().isNotEmpty ? isinCode : null),
+                altName: Value(altName != null && altName.trim().isNotEmpty ? altName : null),
+                registeredNames: Value(registeredNames),
                 shortName: Value(shortName),
               ),
             );
       }
 
-      // Upsert current tickers and positions
+      // Upsert current tickers
       for (final tData in tickersData) {
         drift.TickerData? tickerRow;
 
@@ -242,18 +240,24 @@ class Portfolio extends _$Portfolio {
               .getSingleOrNull();
         }
 
-        int currentTickerId;
         if (tickerRow == null) {
-          currentTickerId = await db.into(db.tickers).insert(
+          await db.into(db.tickers).insert(
                 drift.TickersCompanion.insert(
                   symbol: tData.symbol,
                   exchange: tData.exchange,
-                  currency: tData.currency,
+                  currency: Value(tData.currency),
+                  quoteType: Value(tData.quoteType),
+                  regularMarketStart: Value(tData.regularMarketStart),
+                  regularMarketEnd: Value(tData.regularMarketEnd),
+                  preMarketStart: Value(tData.preMarketStart),
+                  preMarketEnd: Value(tData.preMarketEnd),
+                  postMarketStart: Value(tData.postMarketStart),
+                  postMarketEnd: Value(tData.postMarketEnd),
                   isinId: currentIsinId,
                 ),
               );
         } else {
-          currentTickerId = tickerRow.id;
+          int currentTickerId = tickerRow.id;
           await (db.update(
             db.tickers,
           )..where((t) => t.id.equals(currentTickerId)))
@@ -261,25 +265,15 @@ class Portfolio extends _$Portfolio {
             drift.TickersCompanion(
               exchange: Value(tData.exchange),
               currency: Value(tData.currency),
+              quoteType: Value(tData.quoteType),
+              regularMarketStart: Value(tData.regularMarketStart),
+              regularMarketEnd: Value(tData.regularMarketEnd),
+              preMarketStart: Value(tData.preMarketStart),
+              preMarketEnd: Value(tData.preMarketEnd),
+              postMarketStart: Value(tData.postMarketStart),
+              postMarketEnd: Value(tData.postMarketEnd),
             ),
           );
-        }
-
-        // For simplicity in the dynamic form without position IDs, we replace all nested positions on save
-        await (db.delete(
-          db.positions,
-        )..where((p) => p.tickerId.equals(currentTickerId)))
-            .go();
-
-        // Add positions
-        for (final pData in tData.positions) {
-          await db.into(db.positions).insert(
-                drift.PositionsCompanion.insert(
-                  capitalInvested: Value(pData.capitalInvested),
-                  purchasePrice: Value(pData.purchasePrice),
-                  tickerId: currentTickerId,
-                ),
-              );
         }
       }
     });
@@ -297,10 +291,6 @@ class Portfolio extends _$Portfolio {
       )..where((t) => t.isinId.equals(id)))
           .get();
       for (final tickerRow in tickers) {
-        await (db.delete(
-          db.positions,
-        )..where((p) => p.tickerId.equals(tickerRow.id)))
-            .go();
         await (db.delete(
           db.marketDataCaches,
         )..where((c) => c.tickerId.equals(tickerRow.id)))
