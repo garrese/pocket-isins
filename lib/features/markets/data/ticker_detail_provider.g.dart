@@ -33,9 +33,7 @@ abstract class _$TickerDetail
     extends BuildlessAutoDisposeNotifier<TickerDetailState> {
   late final String symbol;
 
-  TickerDetailState build(
-    String symbol,
-  );
+  TickerDetailState build(String symbol);
 }
 
 /// See also [TickerDetail].
@@ -48,21 +46,15 @@ class TickerDetailFamily extends Family<TickerDetailState> {
   const TickerDetailFamily();
 
   /// See also [TickerDetail].
-  TickerDetailProvider call(
-    String symbol,
-  ) {
-    return TickerDetailProvider(
-      symbol,
-    );
+  TickerDetailProvider call(String symbol) {
+    return TickerDetailProvider(symbol);
   }
 
   @override
   TickerDetailProvider getProviderOverride(
     covariant TickerDetailProvider provider,
   ) {
-    return call(
-      provider.symbol,
-    );
+    return call(provider.symbol);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -84,9 +76,8 @@ class TickerDetailFamily extends Family<TickerDetailState> {
 class TickerDetailProvider
     extends AutoDisposeNotifierProviderImpl<TickerDetail, TickerDetailState> {
   /// See also [TickerDetail].
-  TickerDetailProvider(
-    String symbol,
-  ) : this._internal(
+  TickerDetailProvider(String symbol)
+      : this._internal(
           () => TickerDetail()..symbol = symbol,
           from: tickerDetailProvider,
           name: r'tickerDetailProvider',
@@ -113,12 +104,8 @@ class TickerDetailProvider
   final String symbol;
 
   @override
-  TickerDetailState runNotifierBuild(
-    covariant TickerDetail notifier,
-  ) {
-    return notifier.build(
-      symbol,
-    );
+  TickerDetailState runNotifierBuild(covariant TickerDetail notifier) {
+    return notifier.build(symbol);
   }
 
   @override
@@ -172,5 +159,6 @@ class _TickerDetailProviderElement
   @override
   String get symbol => (origin as TickerDetailProvider).symbol;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

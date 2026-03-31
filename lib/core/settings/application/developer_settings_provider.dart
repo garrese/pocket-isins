@@ -30,8 +30,10 @@ class DeveloperSettings extends _$DeveloperSettings {
     final prefs = await SharedPreferences.getInstance();
     final logLevelIndex = prefs.getInt(_logLevelKey);
     final logLevel = logLevelIndex != null
-        ? LogLevel.values.firstWhere((e) => e.index == logLevelIndex,
-            orElse: () => LogLevel.info)
+        ? LogLevel.values.firstWhere(
+            (e) => e.index == logLevelIndex,
+            orElse: () => LogLevel.info,
+          )
         : LogLevel.info;
 
     // Apply log level to talker instance immediately if possible

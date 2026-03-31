@@ -10,10 +10,7 @@ final dioProvider = Provider<Dio>((ref) {
     BaseOptions(
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
-      headers: {
-        'User-Agent': 'yaak',
-        'Accept': '*/*',
-      },
+      headers: {'User-Agent': 'yaak', 'Accept': '*/*'},
     ),
   );
 

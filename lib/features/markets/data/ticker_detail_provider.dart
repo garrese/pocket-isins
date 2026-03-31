@@ -87,14 +87,14 @@ class TickerDetail extends _$TickerDetail {
       } else {
         const errorMsg = 'Failed to fetch data or invalid response.';
         ref.read(talkerProvider).handle(Exception(errorMsg), null, errorMsg);
-        state = state.copyWith(
-          isLoading: false,
-          error: errorMsg,
-        );
+        state = state.copyWith(isLoading: false, error: errorMsg);
       }
     } catch (e, stack) {
       ref.read(talkerProvider).handle(
-          e, stack, 'Exception fetching historical data for ${state.symbol}');
+            e,
+            stack,
+            'Exception fetching historical data for ${state.symbol}',
+          );
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }

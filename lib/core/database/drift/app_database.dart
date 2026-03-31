@@ -5,14 +5,9 @@ import 'connection/connection.dart' as impl;
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [
-  Isins,
-  Tickers,
-  Positions,
-  MarketDataCaches,
-  FeedNews,
-  ChatMessages
-])
+@DriftDatabase(
+  tables: [Isins, Tickers, Positions, MarketDataCaches, FeedNews, ChatMessages],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(impl.connect());
 
