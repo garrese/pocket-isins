@@ -90,87 +90,96 @@ class IsinSummaryScreen extends ConsumerWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildSection(
-              context,
-              title: 'ISIN',
-              content: Text(
-                currentIsin.isinCode,
-                style: const TextStyle(fontSize: 16),
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildSection(
+                context,
+                title: 'ISIN',
+                content: Text(
+                  currentIsin.isinCode,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                onEdit: () {
+                  final formData = _createFormData();
+                  _navigateToEdit(context, IsinStepScreen(formData: formData));
+                },
               ),
-              onEdit: () {
-                final formData = _createFormData();
-                _navigateToEdit(context, IsinStepScreen(formData: formData));
-              },
-            ),
-            _buildSection(
-              context,
-              title: 'Registered Name',
-              content: Text(
-                currentIsin.name,
-                style: const TextStyle(fontSize: 16),
+              const Divider(height: 1),
+              _buildSection(
+                context,
+                title: 'Registered Name',
+                content: Text(
+                  currentIsin.name,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                onEdit: () {
+                  final formData = _createFormData();
+                  _navigateToEdit(
+                    context,
+                    RegisteredNameStepScreen(
+                        formData: formData, isEditing: true),
+                  );
+                },
               ),
-              onEdit: () {
-                final formData = _createFormData();
-                _navigateToEdit(
-                  context,
-                  RegisteredNameStepScreen(formData: formData, isEditing: true),
-                );
-              },
-            ),
-            _buildSection(
-              context,
-              title: 'Markets',
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: currentIsin.tickers.isEmpty
-                    ? [
-                        const Text(
-                          'No markets configured.',
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ]
-                    : currentIsin.tickers
-                        .map(
-                          (t) => Padding(
-                            padding: const EdgeInsets.only(bottom: 4.0),
-                            child: Text('${t.symbol} (${t.currency})'),
+              const Divider(height: 1),
+              _buildSection(
+                context,
+                title: 'Markets',
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: currentIsin.tickers.isEmpty
+                      ? [
+                          const Text(
+                            'No markets configured.',
+                            style: TextStyle(fontStyle: FontStyle.italic),
                           ),
-                        )
-                        .toList(),
+                        ]
+                      : currentIsin.tickers
+                          .map(
+                            (t) => Padding(
+                              padding: const EdgeInsets.only(bottom: 2.0),
+                              child: Text('${t.symbol} (${t.currency})'),
+                            ),
+                          )
+                          .toList(),
+                ),
+                onEdit: () {
+                  final formData = _createFormData();
+                  _navigateToEdit(context,
+                      MarketsStepScreen(formData: formData, isEditing: true));
+                },
               ),
-              onEdit: () {
-                final formData = _createFormData();
-                _navigateToEdit(context, MarketsStepScreen(formData: formData, isEditing: true));
-              },
-            ),
-            _buildSection(
-              context,
-              title: 'Additional Data',
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Short Name:'),
-                  Text(
-                    currentIsin.shortName?.isNotEmpty == true
-                        ? currentIsin.shortName!
-                        : 'Not set',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
+              const Divider(height: 1),
+              _buildSection(
+                context,
+                title: 'Additional Data',
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Short Name:',
+                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    Text(
+                      currentIsin.shortName?.isNotEmpty == true
+                          ? currentIsin.shortName!
+                          : 'Not set',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+                onEdit: () {
+                  final formData = _createFormData();
+                  _navigateToEdit(
+                    context,
+                    AdditionalDataStepScreen(
+                        formData: formData, isEditing: true),
+                  );
+                },
               ),
-              onEdit: () {
-                final formData = _createFormData();
-                _navigateToEdit(
-                  context,
-                  AdditionalDataStepScreen(formData: formData, isEditing: true),
-                );
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -182,34 +191,31 @@ class IsinSummaryScreen extends ConsumerWidget {
     required Widget content,
     required VoidCallback onEdit,
   }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16.0),
+    return InkWell(
+      onTap: onEdit,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 20),
-                  onPressed: onEdit,
-                  tooltip: 'Edit $title',
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  content,
+                ],
+              ),
             ),
-            const Divider(),
-            const SizedBox(height: 8),
-            content,
+            const Icon(Icons.chevron_right, color: Colors.grey),
           ],
         ),
       ),

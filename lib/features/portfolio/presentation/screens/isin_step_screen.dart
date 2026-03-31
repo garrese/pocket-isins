@@ -7,7 +7,8 @@ class IsinStepScreen extends StatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
 
-  const IsinStepScreen({super.key, required this.formData, this.isEditing = false});
+  const IsinStepScreen(
+      {super.key, required this.formData, this.isEditing = false});
 
   @override
   State<IsinStepScreen> createState() => _IsinStepScreenState();
@@ -87,10 +88,10 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Add ISIN - Step 1'),
+          title: const Text('Add ISIN'),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
           child: Form(
             key: _formKey,
             child: Column(
