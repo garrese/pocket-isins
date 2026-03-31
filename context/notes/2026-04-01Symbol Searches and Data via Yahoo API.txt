@@ -1,0 +1,201 @@
+Symbol searches and data via the Yahoo API
+
+Yahoo is the only free and public market data API found.
+It provides data by its internal "symbol", which is usually (but not always) a combination of Ticker and country (for example ABEA.DE for Alphabet on Xetra).
+In the app, the term Market is used in a general way, but specifically with the Yahoo API, Market = Symbol (although this probably should be changed).
+
+Symbol search is done in the app through the search API, for example:
+curl -X GET '[https://query2.finance.yahoo.com/v1/finance/search?quotesCount=10&q=Tesla](https://query2.finance.yahoo.com/v1/finance/search?quotesCount=10&q=Tesla)' \
+  --header 'User-Agent: yaak' \
+  --header 'Accept: */*'
+Where q is the search term. It can be an ISIN, a Ticker, or any name.
+
+Each "quote" returned by the search has this structure:
+    {
+      "exchange": "NMS",
+      "shortname": "Alphabet Inc.",
+      "quoteType": "EQUITY",
+      "symbol": "GOOGL",
+      "index": "quotes",
+      "score": 21110.0,
+      "typeDisp": "equity",
+      "longname": "Alphabet Inc.",
+      "exchDisp": "NASDAQ",
+      "sector": "Communication Services",
+      "sectorDisp": "Communication Services",
+      "industry": "Internet Content & Information",
+      "industryDisp": "Internet Content & Information",
+      "isYahooFinance": true
+    } 
+
+How to reach the symbol through an ISIN? Initially, I had this flow:
+Search by ISIN > Registered Name (With Symbol) > Market
+That is, launch a search with q=ISIN, from there take the longName/shortName (internally called "Registered Name" or "Yahoo Name"), launch another query with q=registeredName, and from there take all the resulting quotes, and extract their symbol (Market).
+
+But after some testing, I've noticed a few things.
+If you search directly by name (e.g., "Tesla"), many dirty results (Markets) appear. Does the search get cleaned up and expanded with the Registered Name from the intermediate search? It seems that's not the case. For example, with the Registered Name "Tesla, Inc." irrelevant Markets are cleaned up, but some valid Markets are lost.
+Therefore, the initial flow is called into question.
+
+Does the Yahoo Name add anything? That is, are there cases where the Yahoo Name expands Markets that the ISIN/AltName doesn't reach? Yes, for sure, because sometimes the AltName doesn't resemble the one Yahoo uses internally, and through the ISIN you can get a name that yields more results.
+
+Keep in mind that the same ISIN can have several Symbols (for example, for Alphabet: GOOG, GOOGLCO.CL, ABEA.DE...).
+
+Perhaps the most expanded way to do it would be:
+	Offer to fill in an initial ISIN and an "Alternative Name".
+	Perform an intermediate search of all Registered Names associated with the ISIN.
+	Then search by both AltName and Registered Names.
+Although an incorrect Registered Name can result in many irrelevant Markets.
+So, can the Registered Names selection screen be kept, but instead of being a radio button (just one), allow selecting several? As a filter (for example, if searching by the gold ETC ISIN IE00B579F325, one of the Yahoo names is "INVESCO PHYSICAL MARKETS PUBLIC", which, if searched, yields a ton of ETC results for other materials).
+The final grouping will be done by symbol (it is the unique identifier for the quotes).
+
+The Symbols that appear when searching by ISIN can be highlighted in the Symbol search assistant (direct ISIN, not Yahoo names).
+
+Previously, the idea was to add positions to each Market, but that has been abandoned. The Positions entities must be deleted.
+Because of this, previously it was mandatory to enter a currency with each Market, it was required data, and there was a system to guess currencies based on the exchange. That must be deleted.
+The main section currently called "Portfolio" can be renamed to "ISINs" (and change the icon, which is currently a wallet).
+
+What useful data can be extracted from these searches (according to the curl json above, from each "quote")?
+"symbol": The symbol itself 
+"exchDisp": The exchange name ("NASDAQ", "London", "Swiss", "XETRA", etc).
+"quoteType": Asset type ("EQUITY","ETF","MUTUALFUND","INDEX"...)
+
+But additionally, if the basic search of ?interval=1d&range=1d is performed for a symbol, additional data is obtained. For example:
+https://query1.finance.yahoo.com/v8/finance/chart/GOOG?interval=1d&range=1d
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "USD",
+          "symbol": "GOOG",
+          "exchangeName": "NMS",
+          "fullExchangeName": "NasdaqGS",
+          "instrumentType": "EQUITY",
+          "firstTradeDate": 1092922200,
+          "regularMarketTime": 1775065609,
+          "hasPrePostMarketData": true,
+          "gmtoffset": -14400,
+          "timezone": "EDT",
+          "exchangeTimezoneName": "America/New_York",
+          "regularMarketPrice": 297.39,
+          "fiftyTwoWeekHigh": 350.15,
+          "fiftyTwoWeekLow": 142.66,
+          "regularMarketDayHigh": 297.985,
+          "regularMarketDayLow": 289.47,
+          "regularMarketVolume": 14646011,
+          "longName": "Alphabet Inc.",
+          "shortName": "Alphabet Inc.",
+          "chartPreviousClose": 286.9,
+          "priceHint": 2,
+          "currentTradingPeriod": {
+            "pre": {
+              "timezone": "EDT",
+              "start": 1775030400,
+              "end": 1775050200,
+              "gmtoffset": -14400
+            },
+            "regular": {
+              "timezone": "EDT",
+              "start": 1775050200,
+              "end": 1775073600,
+              "gmtoffset": -14400
+            },
+            "post": {
+              "timezone": "EDT",
+              "start": 1775073600,
+              "end": 1775088000,
+              "gmtoffset": -14400
+            }
+          },
+          "dataGranularity": "1d",
+          "range": "1d",
+          "validRanges": [
+            "1d",
+            "5d",
+            "1mo",
+            "3mo",
+            "6mo",
+            "1y",
+            "2y",
+            "5y",
+            "10y",
+            "ytd",
+            "max"
+          ]
+        },
+        "timestamp": [
+          1775065609
+        ],
+        "indicators": {
+          "quote": [
+            {
+              "high": [
+                297.9849853515625
+              ],
+              "low": [
+                289.4700012207031
+              ],
+              "volume": [
+                14646011
+              ],
+              "close": [
+                297.3900146484375
+              ],
+              "open": [
+                289.9800109863281
+              ]
+            }
+          ],
+          "adjclose": [
+            {
+              "adjclose": [
+                297.3900146484375
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "error": null
+  }
+}
+Notes:
+"hasPrePostMarketData": true does not mean it includes pre/post market chart points/indicators. The points always seem to be from market hours ("regular"). 
+
+From here, regarding general market information, the following can be extracted: 
+"currency": The currency it is traded in ("USD","EUR"...)
+"timezone": The time zone ("EDT","CEST","CET"...). Careful, because these time zones are not fixed, they have the daylight saving "adjective". For example, Spain is CET in winter and CEST in summer. 
+"gmtoffset": It is the mathematical indicator of the timezone that applies at that time of the year. It is added directly to the unix timestamps to get the local time. It can have a negative (time behind) or positive value. 
+"currentTradingPeriod": {
+	"pre": {
+	  "timezone": "EDT",
+	  "start": 1775030400,
+	  "end": 1775050200,
+	  "gmtoffset": -14400
+	},
+	"regular": {
+	  "timezone": "EDT",
+	  "start": 1775050200,
+	  "end": 1775073600,
+	  "gmtoffset": -14400
+	},
+	"post": {
+	  "timezone": "EDT",
+	  "start": 1775073600,
+	  "end": 1775088000,
+	  "gmtoffset": -14400
+	}
+}
+These are the pre-market, market, and post-market hours. 
+How to interpret it: the "start" and "end" times come in UNIX format, which is always UTC+0. To adjust it to the local time zone (the one indicated in "timezone"), the gmtoffset must be applied. 
+
+What data is interesting to save in the DB alongside the Symbol entity? I would say:
+The 3 that come in the search:
+"symbol"
+"exchDisp"
+"quoteType"
+And from the chart, the currency and opening hours:
+"currency"
+And from "currentTradingPeriod" only the "start" and "end"
+
+And what shouldn't be saved in the DB Entity, but perhaps might be very useful to grab temporarily, if needed to show their local times, is the "gmtoffset"
