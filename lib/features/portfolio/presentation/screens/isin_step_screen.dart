@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../domain/portfolio_form_data.dart';
 import 'registered_name_step_screen.dart';
+import 'wizard_bottom_actions.dart';
 
 class IsinStepScreen extends StatefulWidget {
   final IsinFormData formData;
+  final bool isEditing;
 
-  const IsinStepScreen({super.key, required this.formData});
+  const IsinStepScreen({super.key, required this.formData, this.isEditing = false});
 
   @override
   State<IsinStepScreen> createState() => _IsinStepScreenState();
@@ -30,17 +32,23 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
   void _onContinue() {
     if (_formKey.currentState!.validate()) {
       widget.formData.isinCode = _isinController.text.trim();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              RegisteredNameStepScreen(formData: widget.formData),
+      final route = MaterialPageRoute(
+        builder: (context) => RegisteredNameStepScreen(
+          formData: widget.formData,
+          isEditing: widget.isEditing,
         ),
       );
+      if (widget.isEditing) {
+        Navigator.pushReplacement(context, route);
+      } else {
+        Navigator.push(context, route);
+      }
     }
   }
 
-  Future<bool> _onWillPop() async {
+  Future<void> _handleBackNavigation(bool didPop) async {
+    if (didPop) return;
+
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -63,34 +71,23 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
 
     if (shouldCancel == true) {
       if (context.mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        if (widget.isEditing) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
       }
     }
-    return false; // Let the popUntil handle it
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Add ISIN - Step 1'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () async {
-              // If we are at step 1 and pressing back, ask to cancel
-              await _onWillPop();
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () async {
-                await _onWillPop();
-              },
-            ),
-          ],
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -118,12 +115,12 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                   },
                 ),
                 const Spacer(),
-                ElevatedButton(
-                  onPressed: _onContinue,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text('Continue'),
+                WizardBottomActions(
+                  isFirstStep: true,
+                  onCancel: () async {
+                    await _handleBackNavigation(false);
+                  },
+                  onContinue: _onContinue,
                 ),
               ],
             ),
