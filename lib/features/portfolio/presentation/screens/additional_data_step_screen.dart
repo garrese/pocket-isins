@@ -95,7 +95,8 @@ class _AdditionalDataStepScreenState
       await ref.read(portfolioProvider.notifier).saveIsin(
             id: widget.formData.id,
             isinCode: widget.formData.isinCode,
-            name: widget.formData.registeredName,
+            altName: widget.formData.altName,
+            registeredNames: widget.formData.registeredNames,
             shortName: widget.formData.shortName,
             tickersData: widget.formData.tickers,
           );

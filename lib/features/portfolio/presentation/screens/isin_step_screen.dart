@@ -22,22 +22,26 @@ class IsinStepScreen extends StatefulWidget {
 class _IsinStepScreenState extends State<IsinStepScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _isinController;
+  late TextEditingController _altNameController;
 
   @override
   void initState() {
     super.initState();
     _isinController = TextEditingController(text: widget.formData.isinCode);
+    _altNameController = TextEditingController(text: widget.formData.altName);
   }
 
   @override
   void dispose() {
     _isinController.dispose();
+    _altNameController.dispose();
     super.dispose();
   }
 
   Future<void> _onContinue() async {
     if (_formKey.currentState!.validate()) {
       widget.formData.isinCode = _isinController.text.trim();
+      widget.formData.altName = _altNameController.text.trim();
       final route = MaterialPageRoute(
         builder: (context) => RegisteredNameStepScreen(
           formData: widget.formData,
@@ -104,7 +108,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Add ISIN'),
+          title: const Text('Add ISIN / Alternative Name'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -114,8 +118,13 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
-                  'Enter the ISIN code',
+                  'Enter ISIN and/or Alternative Name',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'At least one of them must be provided to continue.',
+                  style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -125,8 +134,24 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter an ISIN code';
+                    if ((value == null || value.trim().isEmpty) &&
+                        _altNameController.text.trim().isEmpty) {
+                      return 'Please enter either an ISIN or an Alternative Name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _altNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Alternative Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if ((value == null || value.trim().isEmpty) &&
+                        _isinController.text.trim().isEmpty) {
+                      return 'Please enter either an ISIN or an Alternative Name';
                     }
                     return null;
                   },

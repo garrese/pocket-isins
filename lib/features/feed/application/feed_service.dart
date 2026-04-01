@@ -58,7 +58,15 @@ class FeedService {
         // Fetch news for this ISIN, passing the global sets to filter duplicates efficiently
         final newsList = await _repository.fetchNewsForIsin(
           isinId: isin.id,
-          isinName: isin.name,
+          isinName: (isin.shortName != null && isin.shortName!.trim().isNotEmpty)
+              ? isin.shortName!
+              : (isin.registeredNames.isNotEmpty)
+                  ? isin.registeredNames.first
+                  : (isin.altName != null && isin.altName!.trim().isNotEmpty)
+                      ? isin.altName!
+                      : (isin.isinCode != null && isin.isinCode!.trim().isNotEmpty)
+                          ? isin.isinCode!
+                          : 'Unknown ISIN',
           round: newRound,
           subround: subround,
           existingLinks: globalExistingLinks,
