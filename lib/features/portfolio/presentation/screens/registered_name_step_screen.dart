@@ -5,7 +5,6 @@ import '../../../../core/network/market_data_service.dart';
 import '../../../../core/services/log/talker_provider.dart';
 import 'markets_step_screen.dart';
 import 'wizard_bottom_actions.dart';
-import 'isin_step_screen.dart';
 
 class RegisteredNameStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -32,7 +31,6 @@ class _RegisteredNameStepScreenState
   final Set<String> _selectedNames = {};
 
   // Custom manual entry
-  bool _isManualEditEnabled = false;
   late TextEditingController _nameController;
 
   @override
@@ -112,7 +110,8 @@ class _RegisteredNameStepScreenState
       }
 
       if (widget.formData.altName.isNotEmpty) {
-        altNameQuotes = await marketService.searchSymbol(widget.formData.altName);
+        altNameQuotes =
+            await marketService.searchSymbol(widget.formData.altName);
       }
 
       final Set<String> foundNames = {};
@@ -143,7 +142,6 @@ class _RegisteredNameStepScreenState
               ),
             ),
           );
-          _isManualEditEnabled = true;
         }
       }
     } catch (e, stack) {
@@ -154,9 +152,6 @@ class _RegisteredNameStepScreenState
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error searching: $e')));
-        setState(() {
-          _isManualEditEnabled = true;
-        });
       }
     } finally {
       if (mounted) {
@@ -191,15 +186,41 @@ class _RegisteredNameStepScreenState
     Navigator.pop(context);
   }
 
-  void _addManualName() {
-    final newName = _nameController.text.trim();
-    if (newName.isNotEmpty) {
+  Future<void> _addManualName() async {
+    _nameController.clear();
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add Manually'),
+          content: TextField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              labelText: 'Name',
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, _nameController.text),
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null && result.trim().isNotEmpty) {
+      final newName = result.trim();
       setState(() {
         if (!_uniqueNames.contains(newName)) {
           _uniqueNames.add(newName);
         }
         _selectedNames.add(newName);
-        _nameController.clear();
       });
     }
   }
@@ -218,9 +239,20 @@ class _RegisteredNameStepScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Select Registered Names:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  const Text(
+                    'Select Registered Names:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton.icon(
+                    onPressed: _addManualName,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Manually'),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               if (_isLoading)
@@ -260,48 +292,28 @@ class _RegisteredNameStepScreenState
               const SizedBox(height: 16),
               Form(
                 key: _formKey,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _nameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Add Custom Name',
-                              border: OutlineInputBorder(),
-                            ),
+                child: FormField<bool>(
+                  validator: (_) {
+                    if (_selectedNames.isEmpty) {
+                      return 'Please select at least one registered name, or skip if you really want to.';
+                    }
+                    return null;
+                  },
+                  builder: (state) {
+                    if (state.hasError) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          state.errorText!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontSize: 12,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle, color: Colors.blue, size: 36),
-                          onPressed: _addManualName,
-                        ),
-                      ],
-                    ),
-                    // Hidden field just for validation purposes
-                    FormField<bool>(
-                      validator: (_) {
-                        if (_selectedNames.isEmpty) {
-                          return 'Please select at least one registered name, or skip if you really want to.';
-                        }
-                        return null;
-                      },
-                      builder: (state) {
-                        if (state.hasError) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              state.errorText!,
-                              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
-                            ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
               ),
               const SizedBox(height: 24),
@@ -310,7 +322,7 @@ class _RegisteredNameStepScreenState
                 onPrevious: _onPrevious,
                 onContinue: () {
                   if (_selectedNames.isEmpty) {
-                     showDialog(
+                    showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('No Names Selected'),

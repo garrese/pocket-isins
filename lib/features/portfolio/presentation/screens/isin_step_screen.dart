@@ -108,7 +108,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Add ISIN / Alternative Name'),
+          title: const Text('Add ISIN / Name'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -118,7 +118,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
-                  'Enter ISIN and/or Alternative Name',
+                  'Enter ISIN and/or Name',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
@@ -136,7 +136,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                   validator: (value) {
                     if ((value == null || value.trim().isEmpty) &&
                         _altNameController.text.trim().isEmpty) {
-                      return 'Please enter either an ISIN or an Alternative Name';
+                      return 'Please enter either an ISIN or a Name';
                     }
                     return null;
                   },
@@ -145,13 +145,13 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                 TextFormField(
                   controller: _altNameController,
                   decoration: const InputDecoration(
-                    labelText: 'Alternative Name',
+                    labelText: 'Name',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if ((value == null || value.trim().isEmpty) &&
                         _isinController.text.trim().isEmpty) {
-                      return 'Please enter either an ISIN or an Alternative Name';
+                      return 'Please enter either an ISIN or a Name';
                     }
                     return null;
                   },
