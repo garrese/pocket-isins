@@ -76,7 +76,15 @@ Stream<List<FeedNewsModel>> feedNewsStream(FeedNewsStreamRef ref) {
         round: newsData.round,
         subround: newsData.subround,
         relevanceScore: newsData.relevanceScore,
-        isinName: isinData.name,
+        isinName: (isinData.shortName != null && isinData.shortName!.trim().isNotEmpty)
+              ? isinData.shortName!
+              : (isinData.registeredNames.isNotEmpty)
+                  ? isinData.registeredNames.first
+                  : (isinData.altName != null && isinData.altName!.trim().isNotEmpty)
+                      ? isinData.altName!
+                      : (isinData.isinCode != null && isinData.isinCode!.trim().isNotEmpty)
+                          ? isinData.isinCode!
+                          : 'Unknown ISIN',
       );
     }).toList();
   });

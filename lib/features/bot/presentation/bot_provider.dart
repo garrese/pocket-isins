@@ -62,7 +62,7 @@ class BotController extends StateNotifier<BotState> {
       // Fetch ISINs and generate system prompt
       final isins = await _repository.getAllIsins();
       final isinsJson =
-          isins.map((i) => {'isinCode': i.isinCode, 'name': i.name}).toList();
+          isins.map((i) => {'isinCode': i.isinCode, 'name': i.registeredNames.isNotEmpty ? i.registeredNames.first : i.altName}).toList();
 
       final systemPrompt = '''
 You are a helpful financial AI assistant.

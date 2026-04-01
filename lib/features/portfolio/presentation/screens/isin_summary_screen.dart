@@ -17,20 +17,22 @@ class IsinSummaryScreen extends ConsumerWidget {
   IsinFormData _createFormData() {
     return IsinFormData(
       id: isin.id,
-      isinCode: isin.isinCode,
-      registeredName: isin.name,
+      isinCode: isin.isinCode ?? '',
+      altName: isin.altName ?? '',
+      registeredNames: List.from(isin.registeredNames),
       shortName: isin.shortName,
       tickers: isin.tickers.map((t) {
         return TickerFormData(
           symbol: t.symbol,
           exchange: t.exchange,
           currency: t.currency,
-          positions: t.positions.map((p) {
-            return PositionFormData(
-              capitalInvested: p.capitalInvested,
-              purchasePrice: p.purchasePrice,
-            );
-          }).toList(),
+          quoteType: t.quoteType,
+          regularMarketStart: t.regularMarketStart,
+          regularMarketEnd: t.regularMarketEnd,
+          preMarketStart: t.preMarketStart,
+          preMarketEnd: t.preMarketEnd,
+          postMarketStart: t.postMarketStart,
+          postMarketEnd: t.postMarketEnd,
         );
       }).toList(),
     );
@@ -97,10 +99,15 @@ class IsinSummaryScreen extends ConsumerWidget {
             children: [
               _buildSection(
                 context,
-                title: 'ISIN',
-                content: Text(
-                  currentIsin.isinCode,
-                  style: const TextStyle(fontSize: 16),
+                title: 'ISIN / Alternative Name',
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (currentIsin.isinCode?.isNotEmpty == true)
+                      Text('ISIN: ${currentIsin.isinCode}', style: const TextStyle(fontSize: 16)),
+                    if (currentIsin.altName?.isNotEmpty == true)
+                      Text('Alt Name: ${currentIsin.altName}', style: const TextStyle(fontSize: 16)),
+                  ],
                 ),
                 onEdit: () {
                   final formData = _createFormData();
@@ -117,10 +124,12 @@ class IsinSummaryScreen extends ConsumerWidget {
               const Divider(height: 1),
               _buildSection(
                 context,
-                title: 'Registered Name',
-                content: Text(
-                  currentIsin.name,
-                  style: const TextStyle(fontSize: 16),
+                title: 'Registered Names',
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: currentIsin.registeredNames.isEmpty
+                      ? [const Text('No registered names selected', style: TextStyle(fontStyle: FontStyle.italic))]
+                      : currentIsin.registeredNames.map((name) => Text(name, style: const TextStyle(fontSize: 16))).toList(),
                 ),
                 onEdit: () {
                   final formData = _createFormData();
@@ -151,7 +160,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                           .map(
                             (t) => Padding(
                               padding: const EdgeInsets.only(bottom: 2.0),
-                              child: Text('${t.symbol} (${t.currency})'),
+                              child: Text('${t.symbol} (${t.currency ?? "N/A"})'),
                             ),
                           )
                           .toList(),
