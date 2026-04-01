@@ -13,7 +13,8 @@ class MarketsStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
 
-  const MarketsStepScreen({super.key, required this.formData, this.isEditing = false});
+  const MarketsStepScreen(
+      {super.key, required this.formData, this.isEditing = false});
 
   @override
   ConsumerState<MarketsStepScreen> createState() => _MarketsStepScreenState();
@@ -22,6 +23,7 @@ class MarketsStepScreen extends ConsumerStatefulWidget {
 class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
   bool _isLoading = false;
   List<dynamic> _searchResults = [];
+  bool _isFoundExpanded = true;
 
   @override
   void initState() {
@@ -331,109 +333,145 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Markets - Step 3'),
+          title: const Text('Markets'),
         ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Registered Name: ${widget.formData.registeredName}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Found Markets:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (_searchResults.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  'No results found automatically.',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              )
-            else
-              SizedBox(
-                height: 200, // Constrain height for top list
-                child: ListView.builder(
-                  itemCount: _searchResults.length,
-                  itemBuilder: (context, index) {
-                    final q = _searchResults[index];
-                    final name = q['longname'] ?? q['shortname'] ?? 'Unknown';
-                    final symbol = q['symbol'] ?? 'Unknown';
-
-                    return ListTile(
-                      title: Text(name),
-                      subtitle: Text('${q['exchange']} - $symbol'),
-                      trailing: IconButton(
-                        icon: const Icon(
-                          Icons.add_circle,
-                          color: Colors.blue,
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _isFoundExpanded = !_isFoundExpanded;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: const Text(
+                          'Found Markets:',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                        onPressed: () => _addMarketFromSearch(q),
                       ),
-                    );
-                  },
+                      Icon(_isFoundExpanded
+                          ? Icons.expand_less
+                          : Icons.expand_more),
+                    ],
+                  ),
                 ),
               ),
-            const Divider(thickness: 2),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Added Markets:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                TextButton.icon(
-                  onPressed: () => _showEditMarketDialog(),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Manually'),
-                ),
-              ],
-            ),
-            Expanded(
-              child: widget.formData.tickers.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No markets added yet.',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: widget.formData.tickers.length,
+              if (_isFoundExpanded) ...[
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (_searchResults.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'No results found automatically.',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _searchResults.length,
                       itemBuilder: (context, index) {
-                        final ticker = widget.formData.tickers[index];
-                        return Card(
-                          child: ListTile(
-                            title: Text(ticker.symbol),
-                            subtitle: Text('Currency: ${ticker.currency}'),
-                            trailing: const Icon(Icons.edit, size: 20),
-                            onTap: () => _showEditMarketDialog(
-                              existingTicker: ticker,
-                              index: index,
+                        final q = _searchResults[index];
+                        final name =
+                            q['longname'] ?? q['shortname'] ?? 'Unknown';
+                        final symbol = q['symbol'] ?? 'Unknown';
+
+                        return ListTile(
+                          title: Text(name),
+                          subtitle: Text('${q['exchange']} - $symbol'),
+                          trailing: IconButton(
+                            icon: const Icon(
+                              Icons.add_circle,
+                              color: Colors.blue,
                             ),
+                            onPressed: () => _addMarketFromSearch(q),
                           ),
                         );
                       },
                     ),
-            ),
-            const SizedBox(height: 16),
-            WizardBottomActions(
-              onCancel: _cancelWizard,
-              onPrevious: _onPrevious,
-              onContinue: _onAdditionalData,
-              onSave: _saveTransaction,
-            ),
-          ],
+                  ),
+              ],
+              const Divider(thickness: 2),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _isFoundExpanded = !_isFoundExpanded;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Added Markets:',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            onPressed: () => _showEditMarketDialog(),
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add Manually'),
+                          ),
+                          Icon(!_isFoundExpanded
+                              ? Icons.expand_less
+                              : Icons.expand_more),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (!_isFoundExpanded) ...[
+                Expanded(
+                  child: widget.formData.tickers.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No markets added yet.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: widget.formData.tickers.length,
+                          itemBuilder: (context, index) {
+                            final ticker = widget.formData.tickers[index];
+                            return Card(
+                              child: ListTile(
+                                title: Text(ticker.symbol),
+                                subtitle: Text('Currency: ${ticker.currency}'),
+                                trailing: const Icon(Icons.edit, size: 20),
+                                onTap: () => _showEditMarketDialog(
+                                  existingTicker: ticker,
+                                  index: index,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              WizardBottomActions(
+                onCancel: _cancelWizard,
+                onPrevious: _onPrevious,
+                onContinue: _onAdditionalData,
+                onSave: _saveTransaction,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }

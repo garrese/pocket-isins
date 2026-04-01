@@ -10,7 +10,8 @@ class AdditionalDataStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
 
-  const AdditionalDataStepScreen({super.key, required this.formData, this.isEditing = false});
+  const AdditionalDataStepScreen(
+      {super.key, required this.formData, this.isEditing = false});
 
   @override
   ConsumerState<AdditionalDataStepScreen> createState() =>
@@ -133,32 +134,32 @@ class _AdditionalDataStepScreenState
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Additional Data - Step 4'),
+          title: const Text('Additional Data'),
         ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextFormField(
-              controller: _shortNameController,
-              decoration: const InputDecoration(
-                labelText: 'Short Name (Optional)',
-                border: OutlineInputBorder(),
-                helperText:
-                    'Used across the app instead of full name if provided.',
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                controller: _shortNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Short Name (Optional)',
+                  border: OutlineInputBorder(),
+                  helperText:
+                      'Used across the app instead of full name if provided.',
+                ),
               ),
-            ),
-            const Spacer(),
-            WizardBottomActions(
-              onCancel: _cancelWizard,
-              onPrevious: _onPrevious,
-              onSave: _saveTransaction,
-            ),
-          ],
+              const Spacer(),
+              WizardBottomActions(
+                onCancel: _cancelWizard,
+                onPrevious: _onPrevious,
+                onSave: _saveTransaction,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }

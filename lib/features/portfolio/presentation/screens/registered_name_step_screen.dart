@@ -11,7 +11,8 @@ class RegisteredNameStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
 
-  const RegisteredNameStepScreen({super.key, required this.formData, this.isEditing = false});
+  const RegisteredNameStepScreen(
+      {super.key, required this.formData, this.isEditing = false});
 
   @override
   ConsumerState<RegisteredNameStepScreen> createState() =>
@@ -206,98 +207,96 @@ class _RegisteredNameStepScreenState
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Registered Name - Step 2'),
+          title: const Text('Registered Name'),
         ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'ISIN: ${widget.formData.isinCode}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Found Registered Names:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (_searchResults.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  'No results found.',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              )
-            else
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _searchResults.length,
-                  itemBuilder: (context, index) {
-                    final q = _searchResults[index];
-                    final name = q['longname'] ?? q['shortname'] ?? 'Unknown';
-
-                    return RadioListTile<int>(
-                      title: Text(name),
-                      subtitle: Text('${q['exchange']} - ${q['symbol']}'),
-                      value: index,
-                      groupValue: _selectedIndex,
-                      onChanged: (int? value) {
-                        setState(() {
-                          _selectedIndex = value;
-                          _nameController.text = name;
-                        });
-                      },
-                    );
-                  },
-                ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Select Registered Name:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-            const SizedBox(height: 16),
-            Form(
-              key: _formKey,
-              child: GestureDetector(
-                onTap: _showManualEditWarning,
-                child: AbsorbPointer(
-                  absorbing: !_isManualEditEnabled,
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Registered Name',
-                      border: const OutlineInputBorder(),
-                      filled: !_isManualEditEnabled,
-                      fillColor: !_isManualEditEnabled
-                          ? Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                          : null,
-                    ),
-                    style: TextStyle(
-                      color: !_isManualEditEnabled
-                          ? Theme.of(context).disabledColor
-                          : null,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please select or enter a registered name';
-                      }
-                      return null;
+              const SizedBox(height: 8),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (_searchResults.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    'No results found.',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final q = _searchResults[index];
+                      final name = q['longname'] ?? q['shortname'] ?? 'Unknown';
+
+                      return RadioListTile<int>(
+                        title: Text(name),
+                        subtitle: Text('${q['exchange']} - ${q['symbol']}'),
+                        value: index,
+                        groupValue: _selectedIndex,
+                        onChanged: (int? value) {
+                          setState(() {
+                            _selectedIndex = value;
+                            _nameController.text = name;
+                          });
+                        },
+                      );
                     },
                   ),
                 ),
+              const SizedBox(height: 16),
+              Form(
+                key: _formKey,
+                child: GestureDetector(
+                  onTap: _showManualEditWarning,
+                  child: AbsorbPointer(
+                    absorbing: !_isManualEditEnabled,
+                    child: TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Registered Name',
+                        border: const OutlineInputBorder(),
+                        filled: !_isManualEditEnabled,
+                        fillColor: !_isManualEditEnabled
+                            ? Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest
+                                .withValues(alpha: 0.5)
+                            : null,
+                      ),
+                      style: TextStyle(
+                        color: !_isManualEditEnabled
+                            ? Theme.of(context).disabledColor
+                            : null,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please select or enter a registered name';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            WizardBottomActions(
-              onCancel: _cancelWizard,
-              onPrevious: _onPrevious,
-              onContinue: _onContinue,
-            ),
-          ],
+              const SizedBox(height: 24),
+              WizardBottomActions(
+                onCancel: _cancelWizard,
+                onPrevious: _onPrevious,
+                onContinue: _onContinue,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }
