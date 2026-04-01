@@ -60,12 +60,10 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
 
   Future<void> _handleBackNavigation(bool didPop) async {
     if (didPop) return;
+    await _cancelWizard();
+  }
 
-    if (!widget.isEntryPoint) {
-      Navigator.of(context).pop();
-      return;
-    }
-
+  Future<void> _cancelWizard() async {
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -95,10 +93,6 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
         }
       }
     }
-  }
-
-  Future<void> _cancelWizard() async {
-    await _handleBackNavigation(false);
   }
 
   @override
