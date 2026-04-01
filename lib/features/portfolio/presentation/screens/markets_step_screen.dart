@@ -32,9 +32,12 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
   // Track which symbols came from ISIN search directly
   final Set<String> _isinDirectSymbols = {};
 
+  late IsinFormData _originalFormData;
+
   @override
   void initState() {
     super.initState();
+    _originalFormData = widget.formData.clone();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchMarkets();
     });
@@ -45,7 +48,17 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     await _cancelWizard();
   }
 
+  bool _hasChanges() {
+    final currentFormData = widget.formData.clone();
+    return currentFormData != _originalFormData;
+  }
+
   Future<void> _cancelWizard() async {
+    if (!_hasChanges()) {
+      _performCancel();
+      return;
+    }
+
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -67,12 +80,16 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     );
 
     if (shouldCancel == true) {
-      if (context.mounted) {
-        if (widget.isEditing) {
-          Navigator.of(context).pop('CANCEL');
-        } else {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        }
+      _performCancel();
+    }
+  }
+
+  void _performCancel() {
+    if (context.mounted) {
+      if (widget.isEditing) {
+        Navigator.of(context).pop('CANCEL');
+      } else {
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     }
   }
