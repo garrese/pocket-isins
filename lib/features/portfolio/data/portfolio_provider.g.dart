@@ -6,7 +6,7 @@ part of 'portfolio_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$portfolioHash() => r'68e7a4e1057372ce5da0d12743faab9a7aa58cde';
+String _$portfolioHash() => r'8cc40143e733f35e5902b6913620e519753af46c';
 
 /// See also [Portfolio].
 @ProviderFor(Portfolio)
