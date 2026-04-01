@@ -4,11 +4,14 @@ import '../../domain/portfolio_form_data.dart';
 import '../../../../core/network/market_data_service.dart';
 import '../../../../core/services/log/talker_provider.dart';
 import 'markets_step_screen.dart';
+import 'wizard_bottom_actions.dart';
+import 'isin_step_screen.dart';
 
 class RegisteredNameStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
+  final bool isEditing;
 
-  const RegisteredNameStepScreen({super.key, required this.formData});
+  const RegisteredNameStepScreen({super.key, required this.formData, this.isEditing = false});
 
   @override
   ConsumerState<RegisteredNameStepScreen> createState() =>
@@ -31,18 +34,60 @@ class _RegisteredNameStepScreenState
       text: widget.formData.registeredName,
     );
 
-    // Automatically search if registered name is empty
-    if (widget.formData.registeredName.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _searchRegisteredName();
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _searchRegisteredName();
+    });
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleBackNavigation(bool didPop) async {
+    if (didPop) return;
+
+    if (!widget.isEditing) {
+      // In creation flow, just go back to the previous step without warning.
+      Navigator.of(context).pop();
+      return;
+    }
+
+    // In edit flow, going back means cancelling the edit operation.
+    await _cancelWizard();
+  }
+
+  Future<void> _cancelWizard() async {
+    final shouldCancel = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel Operation?'),
+        content: const Text(
+          'Are you sure you want to cancel? All progress will be lost.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldCancel == true) {
+      if (context.mounted) {
+        if (widget.isEditing) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      }
+    }
   }
 
   Future<void> _searchRegisteredName() async {
@@ -95,42 +140,34 @@ class _RegisteredNameStepScreenState
   void _onContinue() {
     if (_formKey.currentState!.validate()) {
       widget.formData.registeredName = _nameController.text.trim();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MarketsStepScreen(formData: widget.formData),
+      final route = MaterialPageRoute(
+        builder: (context) => MarketsStepScreen(
+          formData: widget.formData,
+          isEditing: widget.isEditing,
         ),
       );
+      if (widget.isEditing) {
+        Navigator.pushReplacement(context, route);
+      } else {
+        Navigator.push(context, route);
+      }
     }
   }
 
-  Future<bool> _onWillPop() async {
-    final shouldCancel = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cancel Operation?'),
-        content: const Text(
-          'Are you sure you want to cancel? All progress will be lost.',
+  void _onPrevious() {
+    if (widget.isEditing) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => IsinStepScreen(
+            formData: widget.formData,
+            isEditing: true,
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('No'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Yes'),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldCancel == true) {
-      if (context.mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      }
+      );
+    } else {
+      Navigator.pop(context);
     }
-    return false;
   }
 
   void _showManualEditWarning() {
@@ -164,120 +201,103 @@ class _RegisteredNameStepScreenState
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context);
-        return false;
-      },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Registered Name - Step 2'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () async {
-                await _onWillPop();
-              },
-            ),
-          ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'ISIN: ${widget.formData.isinCode}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Found Registered Names:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator())
-              else if (_searchResults.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    'No results found.',
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                )
-              else
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _searchResults.length,
-                    itemBuilder: (context, index) {
-                      final q = _searchResults[index];
-                      final name = q['longname'] ?? q['shortname'] ?? 'Unknown';
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'ISIN: ${widget.formData.isinCode}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Found Registered Names:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (_searchResults.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  'No results found.',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _searchResults.length,
+                  itemBuilder: (context, index) {
+                    final q = _searchResults[index];
+                    final name = q['longname'] ?? q['shortname'] ?? 'Unknown';
 
-                      return RadioListTile<int>(
-                        title: Text(name),
-                        subtitle: Text('${q['exchange']} - ${q['symbol']}'),
-                        value: index,
-                        groupValue: _selectedIndex,
-                        onChanged: (int? value) {
-                          setState(() {
-                            _selectedIndex = value;
-                            _nameController.text = name;
-                          });
-                        },
-                      );
+                    return RadioListTile<int>(
+                      title: Text(name),
+                      subtitle: Text('${q['exchange']} - ${q['symbol']}'),
+                      value: index,
+                      groupValue: _selectedIndex,
+                      onChanged: (int? value) {
+                        setState(() {
+                          _selectedIndex = value;
+                          _nameController.text = name;
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+            const SizedBox(height: 16),
+            Form(
+              key: _formKey,
+              child: GestureDetector(
+                onTap: _showManualEditWarning,
+                child: AbsorbPointer(
+                  absorbing: !_isManualEditEnabled,
+                  child: TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Registered Name',
+                      border: const OutlineInputBorder(),
+                      filled: !_isManualEditEnabled,
+                      fillColor: !_isManualEditEnabled
+                          ? Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                          : null,
+                    ),
+                    style: TextStyle(
+                      color: !_isManualEditEnabled
+                          ? Theme.of(context).disabledColor
+                          : null,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please select or enter a registered name';
+                      }
+                      return null;
                     },
                   ),
                 ),
-              const SizedBox(height: 16),
-              const Text(
-                'Registered Name:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8),
-              Form(
-                key: _formKey,
-                child: GestureDetector(
-                  onTap: _showManualEditWarning,
-                  child: AbsorbPointer(
-                    absorbing: !_isManualEditEnabled,
-                    child: TextFormField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Registered Name',
-                        border: const OutlineInputBorder(),
-                        filled: !_isManualEditEnabled,
-                        fillColor:
-                            !_isManualEditEnabled ? Colors.grey.shade200 : null,
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please select or enter a registered name';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Back'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _onContinue,
-                    child: const Text('Continue'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 24),
+            WizardBottomActions(
+              onCancel: _cancelWizard,
+              onPrevious: _onPrevious,
+              onContinue: _onContinue,
+            ),
+          ],
         ),
       ),
+    ),
     );
   }
 }
