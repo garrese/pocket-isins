@@ -68,9 +68,9 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving settings: \$e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving settings: \$e')));
       }
     } finally {
       if (mounted) {
@@ -86,9 +86,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
     final settingsAsyncValue = ref.watch(aiSettingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('BYOK AI Configuration'),
-      ),
+      appBar: AppBar(title: const Text('BYOK AI Configuration')),
       body: settingsAsyncValue.when(
         data: (settings) {
           // Initialize controllers with current values
@@ -124,7 +122,8 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                       DropdownMenuItem(
                         value: 'openai',
                         child: Text(
-                            'OpenAI Compatible (OpenAI, OpenRouter, Ollama)'),
+                          'OpenAI Compatible (OpenAI, OpenRouter, Ollama)',
+                        ),
                       ),
                       DropdownMenuItem(
                         value: 'openrouter_web',
@@ -196,8 +195,10 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                     ),
                     child: _isSaving
                         ? const CircularProgressIndicator()
-                        : const Text('Save Configuration',
-                            style: TextStyle(fontSize: 16)),
+                        : const Text(
+                            'Save Configuration',
+                            style: TextStyle(fontSize: 16),
+                          ),
                   ),
                 ],
               ),

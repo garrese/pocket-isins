@@ -44,8 +44,9 @@ class DeveloperOptionsScreen extends ConsumerWidget {
           ),
           CheckboxListTile(
             title: const Text('Log HTTP Bodies'),
-            subtitle:
-                const Text('Include large request/response bodies in logs'),
+            subtitle: const Text(
+              'Include large request/response bodies in logs',
+            ),
             value: settings.logHttpBodies,
             onChanged: (value) {
               if (value != null) {
@@ -67,8 +68,9 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                       .setLogLevel(newValue);
                 }
               },
-              items: LogLevel.values
-                  .map<DropdownMenuItem<LogLevel>>((LogLevel level) {
+              items: LogLevel.values.map<DropdownMenuItem<LogLevel>>((
+                LogLevel level,
+              ) {
                 return DropdownMenuItem<LogLevel>(
                   value: level,
                   child: Text(level.name.toUpperCase()),

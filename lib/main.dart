@@ -77,9 +77,8 @@ class MainScreen extends ConsumerWidget {
     ];
 
     // Ensure currentIndex is valid if the Log tab is hidden while selected
-    final activeIndex = currentIndex >= screens.length
-        ? screens.length - 1
-        : currentIndex;
+    final activeIndex =
+        currentIndex >= screens.length ? screens.length - 1 : currentIndex;
 
     // Reset currentTab if it's out of bounds after toggling
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -91,8 +90,8 @@ class MainScreen extends ConsumerWidget {
     return Scaffold(
       drawer:
           activeIndex == screens.length - 1 && developerSettings.showLogConsole
-          ? const AppDrawer()
-          : null,
+              ? const AppDrawer()
+              : null,
       body: screens[activeIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: activeIndex,

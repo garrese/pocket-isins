@@ -22,17 +22,15 @@ class FeedRepository {
     required Set<String> existingTitles,
   }) async {
     try {
-      final encodedQuery =
-          Uri.encodeComponent('$isinName financial news when:24h');
+      final encodedQuery = Uri.encodeComponent(
+        '$isinName financial news when:24h',
+      );
       final url = 'https://news.google.com/rss/search?q=$encodedQuery&hl=en-US';
 
       final response = await _dio.get(
         url,
         options: Options(
-          headers: {
-            'User-Agent': 'yaak',
-            'Accept': '*/*',
-          },
+          headers: {'User-Agent': 'yaak', 'Accept': '*/*'},
           responseType: ResponseType.plain,
         ),
       );
@@ -83,17 +81,19 @@ class FeedRepository {
             pubDate = DateTime.now();
           }
 
-          newsList.add(FeedNewsModel(
-            isinId: isinId,
-            isinName: isinName,
-            title: title,
-            link: link,
-            sourceUrl: sourceUrl,
-            sourceName: sourceName,
-            pubDate: pubDate,
-            round: round,
-            subround: subround,
-          ));
+          newsList.add(
+            FeedNewsModel(
+              isinId: isinId,
+              isinName: isinName,
+              title: title,
+              link: link,
+              sourceUrl: sourceUrl,
+              sourceName: sourceName,
+              pubDate: pubDate,
+              round: round,
+              subround: subround,
+            ),
+          );
         }
 
         return newsList;
@@ -142,7 +142,8 @@ class HttpDate {
     // Google News sends "Thu, 15 Feb 2024 12:34:56 GMT".
     // Let's implement a robust manual parser for this specific format.
     final regex = RegExp(
-        r'\w+,\s+(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+([A-Z]+|\+\d+)');
+      r'\w+,\s+(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+([A-Z]+|\+\d+)',
+    );
     final match = regex.firstMatch(dateStr);
 
     if (match != null) {
@@ -174,7 +175,7 @@ class HttpDate {
     'Sep': 9,
     'Oct': 10,
     'Nov': 11,
-    'Dec': 12
+    'Dec': 12,
   };
 }
 

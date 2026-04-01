@@ -69,13 +69,14 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                     decoration: BoxDecoration(
                       color: isUser
                           ? Theme.of(context).colorScheme.primaryContainer
-                          : Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
+                          : Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.75),
+                      maxWidth: MediaQuery.of(context).size.width * 0.75,
+                    ),
                     child: Text(
                       message.content,
                       style: TextStyle(
@@ -125,7 +126,9 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                           borderRadius: BorderRadius.all(Radius.circular(24.0)),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 12.0),
+                          horizontal: 16.0,
+                          vertical: 12.0,
+                        ),
                       ),
                       onSubmitted: _handleSubmitted,
                       textInputAction: TextInputAction.send,

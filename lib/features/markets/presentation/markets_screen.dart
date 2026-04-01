@@ -65,7 +65,9 @@ class MarketsScreen extends ConsumerWidget {
               return Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 16.0),
+                    horizontal: 8.0,
+                    vertical: 16.0,
+                  ),
                   child: Column(
                     children: chunks.map((rowIsins) {
                       return Padding(
@@ -100,7 +102,9 @@ class MarketsScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 12),
+                                    horizontal: 8,
+                                    vertical: 12,
+                                  ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
