@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../../../core/network/market_data_service.dart';
 import '../../../../core/services/log/talker_provider.dart';
@@ -29,6 +30,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
   bool _isLoading = false;
   List<dynamic> _searchResults = [];
   bool _isFoundExpanded = true;
+
+  // Track which symbols came from ISIN search directly
+  final Set<String> _isinDirectSymbols = {};
 
   @override
   void initState() {
@@ -85,22 +89,57 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     setState(() {
       _isLoading = true;
       _searchResults = [];
+      _isinDirectSymbols.clear();
     });
 
     try {
       final marketService = ref.read(marketDataServiceProvider);
-      // We can use the registered name or the ISIN to search for markets.
-      // The previous flow used the name for the autofill symbol search.
-      final searchTerm = widget.formData.registeredName.isNotEmpty
-          ? widget.formData.registeredName
-          : widget.formData.isinCode;
-      final quotes = await marketService.searchSymbol(searchTerm);
-      if (mounted) {
-        setState(() {
-          _searchResults = quotes;
-        });
 
-        if (quotes.isEmpty) {
+      // 1) Search by ISIN directly
+      List<dynamic> isinQuotes = [];
+      if (widget.formData.isinCode.isNotEmpty) {
+        isinQuotes = await marketService.searchSymbol(widget.formData.isinCode);
+        for (final q in isinQuotes) {
+          if (q['symbol'] != null) {
+            _isinDirectSymbols.add(q['symbol'].toString());
+          }
+        }
+      }
+
+      // 2) Search by Alternative Name
+      List<dynamic> altNameQuotes = [];
+      if (widget.formData.altName.isNotEmpty) {
+        altNameQuotes = await marketService.searchSymbol(widget.formData.altName);
+      }
+
+      // 3) Search by each selected Registered Name
+      List<dynamic> registeredNamesQuotes = [];
+      for (final rn in widget.formData.registeredNames) {
+        if (rn.isNotEmpty) {
+          final res = await marketService.searchSymbol(rn);
+          registeredNamesQuotes.addAll(res);
+        }
+      }
+
+      // Merge and deduplicate by symbol
+      final Map<String, dynamic> mergedResultsMap = {};
+      final allQuotes = [
+        ...isinQuotes,
+        ...altNameQuotes,
+        ...registeredNamesQuotes,
+      ];
+
+      for (final q in allQuotes) {
+        final symbol = q['symbol'];
+        if (symbol != null && !mergedResultsMap.containsKey(symbol)) {
+          mergedResultsMap[symbol.toString()] = q;
+        }
+      }
+
+      final List<dynamic> mergedResults = mergedResultsMap.values.toList();
+
+      if (mergedResults.isEmpty) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
@@ -108,8 +147,16 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
               ),
             ),
           );
+          setState(() {
+            _isLoading = false;
+          });
         }
+        return;
       }
+
+      // Asynchronously fetch chart data to populate additional properties BEFORE updating state
+      await _fetchChartDataForResults(mergedResults);
+
     } catch (e, stack) {
       if (mounted) {
         ref.read(talkerProvider).handle(e, stack, 'Error searching markets');
@@ -126,20 +173,69 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     }
   }
 
+  Future<void> _fetchChartDataForResults(List<dynamic> results) async {
+    final marketService = ref.read(marketDataServiceProvider);
+
+    // Create a copy to update safely
+    final List<dynamic> updatedResults = List.from(results);
+
+    for (int i = 0; i < updatedResults.length; i++) {
+      final q = updatedResults[i];
+      final symbol = q['symbol'];
+
+      if (symbol != null) {
+        try {
+          // Fetch 1d interval, 1d range for basic metadata
+          final chartData = await marketService.fetchHistoricalData(symbol.toString(), '1d', '1d');
+
+          if (chartData != null) {
+             final meta = chartData['meta'];
+             if (meta != null) {
+                // We create a mutable map for the UI state
+                final Map<String, dynamic> mutableQ = Map<String, dynamic>.from(q);
+
+                mutableQ['currency'] = meta['currency'];
+
+                final tradingPeriods = meta['currentTradingPeriod'];
+                if (tradingPeriods != null) {
+                  mutableQ['preMarketStart'] = tradingPeriods['pre']?['start'];
+                  mutableQ['preMarketEnd'] = tradingPeriods['pre']?['end'];
+                  mutableQ['regularMarketStart'] = tradingPeriods['regular']?['start'];
+                  mutableQ['regularMarketEnd'] = tradingPeriods['regular']?['end'];
+                  mutableQ['postMarketStart'] = tradingPeriods['post']?['start'];
+                  mutableQ['postMarketEnd'] = tradingPeriods['post']?['end'];
+                  mutableQ['gmtoffset'] = meta['gmtoffset'];
+                }
+
+                updatedResults[i] = mutableQ;
+             }
+          }
+        } catch (e) {
+          // It's common for some obscure symbols to fail chart data fetch. We just ignore and move on.
+        }
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _searchResults = updatedResults;
+        _isLoading = false;
+      });
+    }
+  }
+
   void _addMarketFromSearch(dynamic q) {
     final exchange = q['exchange'] ?? 'Unknown';
     final exchDisp = q['exchDisp'] ?? exchange;
     final symbol = q['symbol'] ?? 'Unknown';
-
-    String? mappedCurrency = kExchangeToCurrencyMap[exchDisp.toString()];
-    if (mappedCurrency == null) {
-      for (final entry in kSymbolSuffixToCurrencyMap.entries) {
-        if (symbol.endsWith(entry.key)) {
-          mappedCurrency = entry.value;
-          break;
-        }
-      }
-    }
+    final quoteType = q['quoteType'];
+    final currency = q['currency'];
+    final regularMarketStart = q['regularMarketStart'];
+    final regularMarketEnd = q['regularMarketEnd'];
+    final preMarketStart = q['preMarketStart'];
+    final preMarketEnd = q['preMarketEnd'];
+    final postMarketStart = q['postMarketStart'];
+    final postMarketEnd = q['postMarketEnd'];
 
     setState(() {
       // Avoid duplicates if possible
@@ -148,7 +244,14 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           TickerFormData(
             symbol: symbol,
             exchange: exchDisp,
-            currency: mappedCurrency ?? '',
+            currency: currency,
+            quoteType: quoteType,
+            regularMarketStart: regularMarketStart is int ? regularMarketStart : null,
+            regularMarketEnd: regularMarketEnd is int ? regularMarketEnd : null,
+            preMarketStart: preMarketStart is int ? preMarketStart : null,
+            preMarketEnd: preMarketEnd is int ? preMarketEnd : null,
+            postMarketStart: postMarketStart is int ? postMarketStart : null,
+            postMarketEnd: postMarketEnd is int ? postMarketEnd : null,
           ),
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -176,7 +279,6 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     final ticker = isNew ? TickerFormData() : existingTicker;
 
     final symbolController = TextEditingController(text: ticker.symbol);
-    String selectedCurrency = ticker.currency;
 
     final result = await showDialog<bool>(
       context: context,
@@ -193,21 +295,6 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                     decoration: const InputDecoration(
                       labelText: 'Symbol (e.g., AAPL)',
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: selectedCurrency.isEmpty ? null : selectedCurrency,
-                    decoration: const InputDecoration(labelText: 'Currency'),
-                    items: kSupportedCurrencies
-                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) {
-                        setStateDialog(() {
-                          selectedCurrency = v;
-                        });
-                      }
-                    },
                   ),
                 ],
               ),
@@ -238,7 +325,6 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                       return;
                     }
                     ticker.symbol = symbolController.text.trim();
-                    ticker.currency = selectedCurrency;
 
                     if (isNew) {
                       setState(() {
@@ -275,7 +361,8 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       await ref.read(portfolioProvider.notifier).saveIsin(
             id: widget.formData.id,
             isinCode: widget.formData.isinCode,
-            name: widget.formData.registeredName,
+            altName: widget.formData.altName,
+            registeredNames: widget.formData.registeredNames,
             shortName: widget.formData.shortName,
             tickersData: widget.formData.tickers,
           );
@@ -320,6 +407,20 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
   void _onPrevious() {
     Navigator.pop(context);
+  }
+
+  String _formatTime(int? unixStart, int? unixEnd, int? gmtOffset) {
+    if (unixStart == null || unixEnd == null || gmtOffset == null) {
+      return '';
+    }
+
+    // gmtOffset is in seconds. We adjust the unix timestamp to represent local time
+    // in UTC format, so we can format it easily.
+    final startLocal = DateTime.fromMillisecondsSinceEpoch((unixStart + gmtOffset) * 1000, isUtc: true);
+    final endLocal = DateTime.fromMillisecondsSinceEpoch((unixEnd + gmtOffset) * 1000, isUtc: true);
+
+    final formatter = DateFormat('HH:mm');
+    return '${formatter.format(startLocal)} - ${formatter.format(endLocal)}';
   }
 
   @override
@@ -368,7 +469,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                 ),
               ),
               if (showFound) ...[
-                if (_isLoading)
+                if (_isLoading && _searchResults.isEmpty)
                   const Center(child: CircularProgressIndicator())
                 else if (_searchResults.isEmpty)
                   const Padding(
@@ -380,32 +481,71 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                   )
                 else
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final q = _searchResults[index];
-                        final name =
-                            q['longname'] ?? q['shortname'] ?? 'Unknown';
-                        final symbol = q['symbol'] ?? 'Unknown';
+                    child: Stack(
+                      children: [
+                        ListView.builder(
+                          itemCount: _searchResults.length,
+                          itemBuilder: (context, index) {
+                            final q = _searchResults[index];
+                            final name =
+                                q['longname'] ?? q['shortname'] ?? 'Unknown';
+                            final symbol = q['symbol'] ?? 'Unknown';
 
-                        final isAlreadyAdded = widget.formData.tickers
-                            .any((t) => t.symbol == symbol);
+                            final isDirect = _isinDirectSymbols.contains(symbol.toString());
 
-                        return ListTile(
-                          title: Text(name),
-                          subtitle: Text('${q['exchange']} - $symbol'),
-                          trailing: IconButton(
-                            icon: Icon(
-                              isAlreadyAdded
-                                  ? Icons.check_circle
-                                  : Icons.add_circle,
-                              color:
-                                  isAlreadyAdded ? Colors.green : Colors.blue,
-                            ),
-                            onPressed: () => _addMarketFromSearch(q),
+                            final currency = q['currency'];
+                            final gmtOffset = q['gmtoffset'] as int?;
+                            final regStart = q['regularMarketStart'] as int?;
+                            final regEnd = q['regularMarketEnd'] as int?;
+                            final timeStr = _formatTime(regStart, regEnd, gmtOffset);
+
+                            final isAlreadyAdded = widget.formData.tickers
+                                .any((t) => t.symbol == symbol);
+
+                            return ListTile(
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      name,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (isDirect)
+                                    const Icon(Icons.star, color: Colors.amber, size: 16),
+                                ],
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('${q['exchange']} - $symbol'),
+                                  if (currency != null || timeStr.isNotEmpty)
+                                    Text(
+                                      '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
+                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                    ),
+                                ],
+                              ),
+                              trailing: IconButton(
+                                icon: Icon(
+                                  isAlreadyAdded
+                                      ? Icons.check_circle
+                                      : Icons.add_circle,
+                                  color:
+                                      isAlreadyAdded ? Colors.green : Colors.blue,
+                                ),
+                                onPressed: () => _addMarketFromSearch(q),
+                              ),
+                            );
+                          },
+                        ),
+                        if (_isLoading)
+                          const Positioned(
+                            bottom: 16,
+                            right: 16,
+                            child: CircularProgressIndicator(),
                           ),
-                        );
-                      },
+                      ],
                     ),
                   ),
               ],
@@ -461,7 +601,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                             return Card(
                               child: ListTile(
                                 title: Text(ticker.symbol),
-                                subtitle: Text('Currency: ${ticker.currency}'),
+                                subtitle: Text('Currency: ${ticker.currency ?? 'N/A'}'),
                                 trailing: const Icon(Icons.edit, size: 20),
                                 onTap: () => _showEditMarketDialog(
                                   existingTicker: ticker,

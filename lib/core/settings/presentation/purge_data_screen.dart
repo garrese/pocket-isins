@@ -54,7 +54,6 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
       await db.transaction(() async {
         if (_purgeIsins) {
           // If purging ISINs, we must delete child elements first to respect foreign keys
-          await db.delete(db.positions).go();
           await db.delete(db.marketDataCaches).go();
           await db.delete(db.feedNews).go();
           await db.delete(db.tickers).go();

@@ -99,8 +99,8 @@ class MainScreen extends ConsumerWidget {
         onTap: (index) => ref.read(currentTabProvider.notifier).state = index,
         items: [
           const BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Portfolio',
+            icon: Icon(Icons.list_alt),
+            label: 'ISINs',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.show_chart),

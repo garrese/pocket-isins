@@ -4,8 +4,11 @@ import 'package:drift/drift.dart';
 @DataClassName('IsinData')
 class Isins extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get isinCode => text().unique()();
-  TextColumn get name => text()();
+  TextColumn get isinCode => text().nullable().unique()();
+  TextColumn get altName => text().nullable()();
+  TextColumn get registeredNames => text()
+      .map(const StringListConverter())
+      .withDefault(const Constant('[]'))();
   TextColumn get shortName => text().nullable()();
 }
 
@@ -14,17 +17,17 @@ class Tickers extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get symbol => text().unique()();
   TextColumn get exchange => text()();
-  TextColumn get currency => text()();
+  TextColumn get currency => text().nullable()();
+  TextColumn get quoteType => text().nullable()();
+  IntColumn get regularMarketStart => integer().nullable()();
+  IntColumn get regularMarketEnd => integer().nullable()();
+  IntColumn get preMarketStart => integer().nullable()();
+  IntColumn get preMarketEnd => integer().nullable()();
+  IntColumn get postMarketStart => integer().nullable()();
+  IntColumn get postMarketEnd => integer().nullable()();
   IntColumn get isinId => integer().references(Isins, #id)();
 }
 
-@DataClassName('PositionData')
-class Positions extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  RealColumn get capitalInvested => real().withDefault(const Constant(0.0))();
-  RealColumn get purchasePrice => real().withDefault(const Constant(0.0))();
-  IntColumn get tickerId => integer().references(Tickers, #id)();
-}
 
 @DataClassName('MarketDataCacheData')
 class MarketDataCaches extends Table {
@@ -97,6 +100,22 @@ class IntListConverter extends TypeConverter<List<int>, String> {
 
   @override
   String toSql(List<int> value) {
+    return jsonEncode(value);
+  }
+}
+
+class StringListConverter extends TypeConverter<List<String>, String> {
+  const StringListConverter();
+
+  @override
+  List<String> fromSql(String fromDb) {
+    if (fromDb.isEmpty) return [];
+    final List<dynamic> decoded = jsonDecode(fromDb);
+    return decoded.map((e) => e.toString()).toList();
+  }
+
+  @override
+  String toSql(List<String> value) {
     return jsonEncode(value);
   }
 }

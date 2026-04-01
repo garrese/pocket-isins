@@ -27,21 +27,22 @@ class RegisteredNameStepScreen extends ConsumerStatefulWidget {
 class _RegisteredNameStepScreenState
     extends ConsumerState<RegisteredNameStepScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
   bool _isLoading = false;
+  List<String> _uniqueNames = [];
+  final Set<String> _selectedNames = {};
+
+  // Custom manual entry
   bool _isManualEditEnabled = false;
-  List<dynamic> _searchResults = [];
-  int? _selectedIndex;
+  late TextEditingController _nameController;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(
-      text: widget.formData.registeredName,
-    );
+    _selectedNames.addAll(widget.formData.registeredNames);
+    _nameController = TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _searchRegisteredName();
+      _searchRegisteredNames();
     });
   }
 
@@ -94,26 +95,51 @@ class _RegisteredNameStepScreenState
     }
   }
 
-  Future<void> _searchRegisteredName() async {
+  Future<void> _searchRegisteredNames() async {
     setState(() {
       _isLoading = true;
-      _searchResults = [];
-      _selectedIndex = null;
+      _uniqueNames = [];
     });
 
     try {
       final marketService = ref.read(marketDataServiceProvider);
-      final quotes = await marketService.searchSymbol(widget.formData.isinCode);
+
+      List<dynamic> isinQuotes = [];
+      List<dynamic> altNameQuotes = [];
+
+      if (widget.formData.isinCode.isNotEmpty) {
+        isinQuotes = await marketService.searchSymbol(widget.formData.isinCode);
+      }
+
+      if (widget.formData.altName.isNotEmpty) {
+        altNameQuotes = await marketService.searchSymbol(widget.formData.altName);
+      }
+
+      final Set<String> foundNames = {};
+
+      for (final q in [...isinQuotes, ...altNameQuotes]) {
+        final name = q['longname'] ?? q['shortname'];
+        if (name != null && name.toString().trim().isNotEmpty) {
+          foundNames.add(name.toString().trim());
+        }
+      }
+
       if (mounted) {
         setState(() {
-          _searchResults = quotes;
+          _uniqueNames = foundNames.toList();
+          // Also add previously saved names that might not be in the search results anymore
+          for (final n in widget.formData.registeredNames) {
+            if (!_uniqueNames.contains(n)) {
+              _uniqueNames.add(n);
+            }
+          }
         });
 
-        if (quotes.isEmpty) {
+        if (_uniqueNames.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'No registered names found. You can enter it manually.',
+                'No registered names found. You can enter them manually.',
               ),
             ),
           );
@@ -124,7 +150,7 @@ class _RegisteredNameStepScreenState
       if (mounted) {
         ref
             .read(talkerProvider)
-            .handle(e, stack, 'Error searching registered name');
+            .handle(e, stack, 'Error searching registered names');
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error searching: $e')));
@@ -143,7 +169,8 @@ class _RegisteredNameStepScreenState
 
   Future<void> _onContinue() async {
     if (_formKey.currentState!.validate()) {
-      widget.formData.registeredName = _nameController.text.trim();
+      widget.formData.registeredNames = _selectedNames.toList();
+
       final route = MaterialPageRoute(
         builder: (context) => MarketsStepScreen(
           formData: widget.formData,
@@ -164,33 +191,17 @@ class _RegisteredNameStepScreenState
     Navigator.pop(context);
   }
 
-  void _showManualEditWarning() {
-    if (_isManualEditEnabled) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Manual Entry'),
-        content: const Text(
-          'It is recommended to use the automatic search to fill the Registered Name. Are you sure you want to enter it manually?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _isManualEditEnabled = true;
-              });
-            },
-            child: const Text('Proceed Manually'),
-          ),
-        ],
-      ),
-    );
+  void _addManualName() {
+    final newName = _nameController.text.trim();
+    if (newName.isNotEmpty) {
+      setState(() {
+        if (!_uniqueNames.contains(newName)) {
+          _uniqueNames.add(newName);
+        }
+        _selectedNames.add(newName);
+        _nameController.clear();
+      });
+    }
   }
 
   @override
@@ -200,7 +211,7 @@ class _RegisteredNameStepScreenState
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Registered Name'),
+          title: const Text('Registered Names'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -208,13 +219,13 @@ class _RegisteredNameStepScreenState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                'Select Registered Name:',
+                'Select Registered Names:',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               if (_isLoading)
                 const Center(child: CircularProgressIndicator())
-              else if (_searchResults.isEmpty)
+              else if (_uniqueNames.isEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
@@ -225,20 +236,21 @@ class _RegisteredNameStepScreenState
               else
                 Expanded(
                   child: ListView.builder(
-                    itemCount: _searchResults.length,
+                    itemCount: _uniqueNames.length,
                     itemBuilder: (context, index) {
-                      final q = _searchResults[index];
-                      final name = q['longname'] ?? q['shortname'] ?? 'Unknown';
+                      final name = _uniqueNames[index];
+                      final isSelected = _selectedNames.contains(name);
 
-                      return RadioListTile<int>(
+                      return CheckboxListTile(
                         title: Text(name),
-                        subtitle: Text('${q['exchange']} - ${q['symbol']}'),
-                        value: index,
-                        groupValue: _selectedIndex,
-                        onChanged: (int? value) {
+                        value: isSelected,
+                        onChanged: (bool? value) {
                           setState(() {
-                            _selectedIndex = value;
-                            _nameController.text = name;
+                            if (value == true) {
+                              _selectedNames.add(name);
+                            } else {
+                              _selectedNames.remove(name);
+                            }
                           });
                         },
                       );
@@ -248,43 +260,97 @@ class _RegisteredNameStepScreenState
               const SizedBox(height: 16),
               Form(
                 key: _formKey,
-                child: GestureDetector(
-                  onTap: _showManualEditWarning,
-                  child: AbsorbPointer(
-                    absorbing: !_isManualEditEnabled,
-                    child: TextFormField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Registered Name',
-                        border: const OutlineInputBorder(),
-                        filled: !_isManualEditEnabled,
-                        fillColor: !_isManualEditEnabled
-                            ? Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerHighest
-                                .withValues(alpha: 0.5)
-                            : null,
-                      ),
-                      style: TextStyle(
-                        color: !_isManualEditEnabled
-                            ? Theme.of(context).disabledColor
-                            : null,
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please select or enter a registered name';
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _nameController,
+                            decoration: const InputDecoration(
+                              labelText: 'Add Custom Name',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle, color: Colors.blue, size: 36),
+                          onPressed: _addManualName,
+                        ),
+                      ],
+                    ),
+                    // Hidden field just for validation purposes
+                    FormField<bool>(
+                      validator: (_) {
+                        if (_selectedNames.isEmpty) {
+                          return 'Please select at least one registered name, or skip if you really want to.';
                         }
                         return null;
                       },
+                      builder: (state) {
+                        if (state.hasError) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              state.errorText!,
+                              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
-                  ),
+                  ],
                 ),
               ),
               const SizedBox(height: 24),
               WizardBottomActions(
                 onCancel: _cancelWizard,
                 onPrevious: _onPrevious,
-                onContinue: _onContinue,
+                onContinue: () {
+                  if (_selectedNames.isEmpty) {
+                     showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('No Names Selected'),
+                        content: const Text(
+                          'You have not selected any registered names. Do you want to proceed anyway?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              // Bypass validation
+                              widget.formData.registeredNames = [];
+                              final route = MaterialPageRoute(
+                                builder: (context) => MarketsStepScreen(
+                                  formData: widget.formData,
+                                  isEditing: widget.isEditing,
+                                  isEntryPoint: false,
+                                ),
+                              );
+                              Navigator.push(context, route).then((result) {
+                                if (result == 'CANCEL' || result == 'SAVED') {
+                                  if (mounted) {
+                                    Navigator.pop(context, result);
+                                  }
+                                }
+                              });
+                            },
+                            child: const Text('Proceed'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    _onContinue();
+                  }
+                },
               ),
             ],
           ),
