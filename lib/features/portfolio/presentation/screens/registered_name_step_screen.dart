@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../../../core/network/market_data_service.dart';
 import '../../../../core/services/log/talker_provider.dart';
+import 'isin_step_screen.dart';
 import 'markets_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 
@@ -177,6 +178,9 @@ class _RegisteredNameStepScreenState
   }
 
   void _onPrevious() {
+    // Save current state before going back
+    widget.formData.registeredNames = _selectedNames.toList();
+
     if (widget.isEntryPoint) {
       Navigator.pushReplacement(
         context,
