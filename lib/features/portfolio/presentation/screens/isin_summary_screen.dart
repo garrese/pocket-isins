@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/database/models/isin.dart';
 import '../../domain/portfolio_form_data.dart';
@@ -42,9 +44,45 @@ class IsinSummaryScreen extends ConsumerWidget {
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
+  String _formatTimeUtc(int? timestamp) {
+    if (timestamp == null) return 'N/A';
+    final dt =
+        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
+    return DateFormat('HH:mm').format(dt);
+  }
+
+  Widget _buildCopyableText(BuildContext context, String text,
+      {TextStyle? style}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(child: Text(text, style: style)),
+        const SizedBox(width: 4),
+        InkWell(
+          borderRadius: BorderRadius.circular(4),
+          onTap: () async {
+            await Clipboard.setData(ClipboardData(text: text));
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Copied "$text" to clipboard'),
+                  duration: const Duration(seconds: 1),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Icon(Icons.copy, size: 16, color: Colors.grey),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // We want to fetch the updated ISIN from the state if available, so it updates correctly after editing.
     final isinsAsync = ref.watch(portfolioProvider);
     final currentIsin = isinsAsync.whenOrNull(
           data: (isins) =>
@@ -104,10 +142,15 @@ class IsinSummaryScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (currentIsin.isinCode?.isNotEmpty == true)
-                      Text('ISIN: ${currentIsin.isinCode}',
-                          style: const TextStyle(fontSize: 16)),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: _buildCopyableText(
+                            context, currentIsin.isinCode!,
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
                     if (currentIsin.altName?.isNotEmpty == true)
-                      Text('Name: ${currentIsin.altName}',
+                      _buildCopyableText(context, currentIsin.altName!,
                           style: const TextStyle(fontSize: 16)),
                   ],
                 ),
@@ -135,8 +178,11 @@ class IsinSummaryScreen extends ConsumerWidget {
                               style: TextStyle(fontStyle: FontStyle.italic))
                         ]
                       : currentIsin.registeredNames
-                          .map((name) =>
-                              Text(name, style: const TextStyle(fontSize: 16)))
+                          .map((name) => Padding(
+                                padding: const EdgeInsets.only(bottom: 4.0),
+                                child: _buildCopyableText(context, name,
+                                    style: const TextStyle(fontSize: 16)),
+                              ))
                           .toList(),
                 ),
                 onEdit: () {
@@ -167,9 +213,36 @@ class IsinSummaryScreen extends ConsumerWidget {
                       : currentIsin.tickers
                           .map(
                             (t) => Padding(
-                              padding: const EdgeInsets.only(bottom: 2.0),
-                              child:
-                                  Text('${t.symbol} (${t.currency ?? "N/A"})'),
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: _buildCopyableText(
+                                            context, t.symbol,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16)),
+                                      ),
+                                      Text(' (${t.currency ?? "N/A"})',
+                                          style: const TextStyle(fontSize: 16)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text('Exchange: ${t.exchange}',
+                                      style: const TextStyle(fontSize: 14)),
+                                  if (t.quoteType?.isNotEmpty == true)
+                                    Text('Type: ${t.quoteType}',
+                                        style: const TextStyle(fontSize: 14)),
+                                  if (t.regularMarketStart != null &&
+                                      t.regularMarketEnd != null)
+                                    Text(
+                                        'Hours: ${_formatTimeUtc(t.regularMarketStart)} - ${_formatTimeUtc(t.regularMarketEnd)} (UTC)',
+                                        style: const TextStyle(fontSize: 14)),
+                                ],
+                              ),
                             ),
                           )
                           .toList(),
@@ -195,6 +268,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                   children: [
                     const Text('Short Name:',
                         style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    const SizedBox(height: 2),
                     Text(
                       currentIsin.shortName?.isNotEmpty == true
                           ? currentIsin.shortName!
@@ -228,33 +302,34 @@ class IsinSummaryScreen extends ConsumerWidget {
     required Widget content,
     required VoidCallback onEdit,
   }) {
-    return InkWell(
-      onTap: onEdit,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  content,
-                ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
               ),
-            ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
-          ],
-        ),
+              IconButton(
+                icon: const Icon(Icons.edit, size: 20, color: Colors.blue),
+                onPressed: onEdit,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                tooltip: 'Edit $title',
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          content,
+        ],
       ),
     );
   }
