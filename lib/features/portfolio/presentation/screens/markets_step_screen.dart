@@ -478,6 +478,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
   }
 
   void _onPrevious() {
+    // Tickers are implicitly saved when toggled in the UI list, so no explicit
+    // property assignment is strictly required here for backward state preservation.
+
     if (widget.isEntryPoint) {
       Navigator.pushReplacement(
         context,

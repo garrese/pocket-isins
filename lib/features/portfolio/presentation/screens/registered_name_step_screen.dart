@@ -178,6 +178,9 @@ class _RegisteredNameStepScreenState
   }
 
   void _onPrevious() {
+    // Save current state before going back
+    widget.formData.registeredNames = _selectedNames.toList();
+
     if (widget.isEntryPoint) {
       Navigator.pushReplacement(
         context,
