@@ -195,8 +195,11 @@ class Portfolio extends _$Portfolio {
         currentIsinId = id;
         await (db.update(db.isins)..where((t) => t.id.equals(id))).write(
           drift.IsinsCompanion(
-            isinCode: Value(isinCode != null && isinCode.trim().isNotEmpty ? isinCode : null),
-            altName: Value(altName != null && altName.trim().isNotEmpty ? altName : null),
+            isinCode: Value(isinCode != null && isinCode.trim().isNotEmpty
+                ? isinCode
+                : null),
+            altName: Value(
+                altName != null && altName.trim().isNotEmpty ? altName : null),
             registeredNames: Value(registeredNames),
             shortName: Value(shortName),
           ),
@@ -218,8 +221,12 @@ class Portfolio extends _$Portfolio {
       } else {
         currentIsinId = await db.into(db.isins).insert(
               drift.IsinsCompanion.insert(
-                isinCode: Value(isinCode != null && isinCode.trim().isNotEmpty ? isinCode : null),
-                altName: Value(altName != null && altName.trim().isNotEmpty ? altName : null),
+                isinCode: Value(isinCode != null && isinCode.trim().isNotEmpty
+                    ? isinCode
+                    : null),
+                altName: Value(altName != null && altName.trim().isNotEmpty
+                    ? altName
+                    : null),
                 registeredNames: Value(registeredNames),
                 shortName: Value(shortName),
               ),

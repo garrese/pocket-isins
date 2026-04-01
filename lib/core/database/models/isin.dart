@@ -19,11 +19,10 @@ class Isin {
   });
 
   String get displayName {
-    if (shortName != null && shortName!.trim().isNotEmpty) return shortName!;
-    if (registeredNames.isNotEmpty) return registeredNames.first;
     if (altName != null && altName!.trim().isNotEmpty) return altName!;
-    if (isinCode != null && isinCode!.trim().isNotEmpty) return isinCode!;
-    return 'Unknown ISIN';
+    if (registeredNames.isNotEmpty) return registeredNames.first;
+    if (shortName != null && shortName!.trim().isNotEmpty) return shortName!;
+    return 'Unknown';
   }
 
   @override
