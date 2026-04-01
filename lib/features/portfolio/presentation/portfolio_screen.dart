@@ -136,19 +136,61 @@ class PortfolioScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  title: Text(
-                    isin.displayName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(tickersList),
-                      // if (hasPositions)
-                      //   Text('$totalCapital $primaryCurrency • $numShares Shares'),
+                      Expanded(
+                        child: Text(
+                          isin.displayName,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isin.shortName != null &&
+                          isin.shortName!.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          isin.shortName!,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
-                  isThreeLine: false, // hasPositions
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (isin.isinCode != null && isin.isinCode!.isNotEmpty)
+                          Expanded(
+                            child: Text(
+                              isin.isinCode!,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.blueGrey,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        else
+                          const Expanded(child: SizedBox.shrink()),
+                        if (tickersList.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Text(
+                            tickersList,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
