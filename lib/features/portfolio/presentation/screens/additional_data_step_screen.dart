@@ -9,9 +9,14 @@ import 'markets_step_screen.dart';
 class AdditionalDataStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
+  final bool isEntryPoint;
 
-  const AdditionalDataStepScreen(
-      {super.key, required this.formData, this.isEditing = false});
+  const AdditionalDataStepScreen({
+    super.key,
+    required this.formData,
+    this.isEditing = false,
+    this.isEntryPoint = false,
+  });
 
   @override
   ConsumerState<AdditionalDataStepScreen> createState() =>
@@ -39,13 +44,11 @@ class _AdditionalDataStepScreenState
   Future<void> _handleBackNavigation(bool didPop) async {
     if (didPop) return;
 
-    if (!widget.isEditing) {
-      // In creation flow, just go back to the previous step without warning.
+    if (!widget.isEntryPoint) {
       Navigator.of(context).pop();
       return;
     }
 
-    // In edit flow, going back means cancelling the edit operation.
     await _cancelWizard();
   }
 
@@ -73,7 +76,7 @@ class _AdditionalDataStepScreenState
     if (shouldCancel == true) {
       if (context.mounted) {
         if (widget.isEditing) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop('CANCEL');
         } else {
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
@@ -82,19 +85,7 @@ class _AdditionalDataStepScreenState
   }
 
   void _onPrevious() {
-    if (widget.isEditing) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MarketsStepScreen(
-            formData: widget.formData,
-            isEditing: true,
-          ),
-        ),
-      );
-    } else {
-      Navigator.pop(context);
-    }
+    Navigator.pop(context);
   }
 
   Future<void> _saveTransaction() async {
@@ -113,7 +104,11 @@ class _AdditionalDataStepScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ISIN saved successfully!')),
         );
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        if (widget.isEditing) {
+          Navigator.of(context).pop('SAVED');
+        } else {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
       }
     } catch (e, stack) {
       if (mounted) {

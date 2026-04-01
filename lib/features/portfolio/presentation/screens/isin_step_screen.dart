@@ -6,9 +6,14 @@ import 'wizard_bottom_actions.dart';
 class IsinStepScreen extends StatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
+  final bool isEntryPoint;
 
-  const IsinStepScreen(
-      {super.key, required this.formData, this.isEditing = false});
+  const IsinStepScreen({
+    super.key,
+    required this.formData,
+    this.isEditing = false,
+    this.isEntryPoint = true,
+  });
 
   @override
   State<IsinStepScreen> createState() => _IsinStepScreenState();
@@ -30,25 +35,32 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
     super.dispose();
   }
 
-  void _onContinue() {
+  Future<void> _onContinue() async {
     if (_formKey.currentState!.validate()) {
       widget.formData.isinCode = _isinController.text.trim();
       final route = MaterialPageRoute(
         builder: (context) => RegisteredNameStepScreen(
           formData: widget.formData,
           isEditing: widget.isEditing,
+          isEntryPoint: false,
         ),
       );
-      if (widget.isEditing) {
-        Navigator.pushReplacement(context, route);
-      } else {
-        Navigator.push(context, route);
+      final result = await Navigator.push(context, route);
+      if (result == 'CANCEL' || result == 'SAVED') {
+        if (mounted) {
+          Navigator.pop(context, result);
+        }
       }
     }
   }
 
   Future<void> _handleBackNavigation(bool didPop) async {
     if (didPop) return;
+
+    if (!widget.isEntryPoint) {
+      Navigator.of(context).pop();
+      return;
+    }
 
     final shouldCancel = await showDialog<bool>(
       context: context,
@@ -73,12 +85,16 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
     if (shouldCancel == true) {
       if (context.mounted) {
         if (widget.isEditing) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop('CANCEL');
         } else {
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
       }
     }
+  }
+
+  Future<void> _cancelWizard() async {
+    await _handleBackNavigation(false);
   }
 
   @override
@@ -118,9 +134,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                 const Spacer(),
                 WizardBottomActions(
                   isFirstStep: true,
-                  onCancel: () async {
-                    await _handleBackNavigation(false);
-                  },
+                  onCancel: _cancelWizard,
                   onContinue: _onContinue,
                 ),
               ],

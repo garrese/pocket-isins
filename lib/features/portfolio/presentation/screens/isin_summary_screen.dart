@@ -104,7 +104,14 @@ class IsinSummaryScreen extends ConsumerWidget {
                 ),
                 onEdit: () {
                   final formData = _createFormData();
-                  _navigateToEdit(context, IsinStepScreen(formData: formData));
+                  _navigateToEdit(
+                    context,
+                    IsinStepScreen(
+                      formData: formData,
+                      isEditing: true,
+                      isEntryPoint: true,
+                    ),
+                  );
                 },
               ),
               const Divider(height: 1),
@@ -120,7 +127,10 @@ class IsinSummaryScreen extends ConsumerWidget {
                   _navigateToEdit(
                     context,
                     RegisteredNameStepScreen(
-                        formData: formData, isEditing: true),
+                      formData: formData,
+                      isEditing: true,
+                      isEntryPoint: true,
+                    ),
                   );
                 },
               ),
@@ -148,8 +158,14 @@ class IsinSummaryScreen extends ConsumerWidget {
                 ),
                 onEdit: () {
                   final formData = _createFormData();
-                  _navigateToEdit(context,
-                      MarketsStepScreen(formData: formData, isEditing: true));
+                  _navigateToEdit(
+                    context,
+                    MarketsStepScreen(
+                      formData: formData,
+                      isEditing: true,
+                      isEntryPoint: true,
+                    ),
+                  );
                 },
               ),
               const Divider(height: 1),
@@ -174,7 +190,10 @@ class IsinSummaryScreen extends ConsumerWidget {
                   _navigateToEdit(
                     context,
                     AdditionalDataStepScreen(
-                        formData: formData, isEditing: true),
+                      formData: formData,
+                      isEditing: true,
+                      isEntryPoint: true,
+                    ),
                   );
                 },
               ),
