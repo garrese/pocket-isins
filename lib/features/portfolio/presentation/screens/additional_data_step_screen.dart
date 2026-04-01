@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../data/portfolio_provider.dart';
 import '../../../../core/services/log/talker_provider.dart';
+import 'wizard_bottom_actions.dart';
+import 'markets_step_screen.dart';
 
 class AdditionalDataStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
+  final bool isEditing;
 
-  const AdditionalDataStepScreen({super.key, required this.formData});
+  const AdditionalDataStepScreen({super.key, required this.formData, this.isEditing = false});
 
   @override
   ConsumerState<AdditionalDataStepScreen> createState() =>
@@ -30,6 +33,67 @@ class _AdditionalDataStepScreenState
   void dispose() {
     _shortNameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleBackNavigation(bool didPop) async {
+    if (didPop) return;
+
+    if (!widget.isEditing) {
+      // In creation flow, just go back to the previous step without warning.
+      Navigator.of(context).pop();
+      return;
+    }
+
+    // In edit flow, going back means cancelling the edit operation.
+    await _cancelWizard();
+  }
+
+  Future<void> _cancelWizard() async {
+    final shouldCancel = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel Operation?'),
+        content: const Text(
+          'Are you sure you want to cancel? All progress will be lost.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldCancel == true) {
+      if (context.mounted) {
+        if (widget.isEditing) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      }
+    }
+  }
+
+  void _onPrevious() {
+    if (widget.isEditing) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MarketsStepScreen(
+            formData: widget.formData,
+            isEditing: true,
+          ),
+        ),
+      );
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   Future<void> _saveTransaction() async {
@@ -62,86 +126,39 @@ class _AdditionalDataStepScreenState
     }
   }
 
-  Future<bool> _onWillPop() async {
-    final shouldCancel = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cancel Operation?'),
-        content: const Text(
-          'Are you sure you want to cancel? All progress will be lost.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('No'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Yes'),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldCancel == true) {
-      if (context.mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      }
-    }
-    return false;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context);
-        return false;
-      },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Additional Data - Step 4'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () async {
-                await _onWillPop();
-              },
+        ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              controller: _shortNameController,
+              decoration: const InputDecoration(
+                labelText: 'Short Name (Optional)',
+                border: OutlineInputBorder(),
+                helperText:
+                    'Used across the app instead of full name if provided.',
+              ),
+            ),
+            const Spacer(),
+            WizardBottomActions(
+              onCancel: _cancelWizard,
+              onPrevious: _onPrevious,
+              onSave: _saveTransaction,
             ),
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _shortNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Short Name (Optional)',
-                  border: OutlineInputBorder(),
-                  helperText:
-                      'Used across the app instead of full name if provided.',
-                ),
-              ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Back'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _saveTransaction,
-                    child: const Text('Save ISIN'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
       ),
+    ),
     );
   }
 }

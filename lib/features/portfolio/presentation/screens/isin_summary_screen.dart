@@ -117,7 +117,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                 final formData = _createFormData();
                 _navigateToEdit(
                   context,
-                  RegisteredNameStepScreen(formData: formData),
+                  RegisteredNameStepScreen(formData: formData, isEditing: true),
                 );
               },
             ),
@@ -144,7 +144,7 @@ class IsinSummaryScreen extends ConsumerWidget {
               ),
               onEdit: () {
                 final formData = _createFormData();
-                _navigateToEdit(context, MarketsStepScreen(formData: formData));
+                _navigateToEdit(context, MarketsStepScreen(formData: formData, isEditing: true));
               },
             ),
             _buildSection(
@@ -166,7 +166,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                 final formData = _createFormData();
                 _navigateToEdit(
                   context,
-                  AdditionalDataStepScreen(formData: formData),
+                  AdditionalDataStepScreen(formData: formData, isEditing: true),
                 );
               },
             ),
