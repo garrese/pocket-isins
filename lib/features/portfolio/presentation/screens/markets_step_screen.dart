@@ -4,11 +4,9 @@ import 'package:intl/intl.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../../../core/network/market_data_service.dart';
 import '../../../../core/services/log/talker_provider.dart';
-import '../../../../core/constants/market_constants.dart';
 import '../../data/portfolio_provider.dart';
 import 'additional_data_step_screen.dart';
 import 'wizard_bottom_actions.dart';
-import 'registered_name_step_screen.dart';
 
 class MarketsStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -29,7 +27,6 @@ class MarketsStepScreen extends ConsumerStatefulWidget {
 class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
   bool _isLoading = false;
   List<dynamic> _searchResults = [];
-  bool _isFoundExpanded = true;
 
   // Track which symbols came from ISIN search directly
   final Set<String> _isinDirectSymbols = {};
@@ -103,7 +100,8 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       // 2) Search by Alternative Name
       List<dynamic> altNameQuotes = [];
       if (widget.formData.altName.isNotEmpty) {
-        altNameQuotes = await marketService.searchSymbol(widget.formData.altName);
+        altNameQuotes =
+            await marketService.searchSymbol(widget.formData.altName);
       }
 
       // 3) Search by each selected Registered Name
@@ -130,6 +128,26 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         }
       }
 
+      // Include any previously added tickers that might not have been found by the search
+      for (final ticker in widget.formData.tickers) {
+        if (!mergedResultsMap.containsKey(ticker.symbol)) {
+          mergedResultsMap[ticker.symbol] = {
+            'symbol': ticker.symbol,
+            'shortname': ticker.symbol,
+            'exchange': ticker.exchange,
+            'exchDisp': ticker.exchange,
+            'currency': ticker.currency,
+            'quoteType': ticker.quoteType,
+            'regularMarketStart': ticker.regularMarketStart,
+            'regularMarketEnd': ticker.regularMarketEnd,
+            'preMarketStart': ticker.preMarketStart,
+            'preMarketEnd': ticker.preMarketEnd,
+            'postMarketStart': ticker.postMarketStart,
+            'postMarketEnd': ticker.postMarketEnd,
+          };
+        }
+      }
+
       final List<dynamic> mergedResults = mergedResultsMap.values.toList();
 
       if (mergedResults.isEmpty) {
@@ -150,7 +168,6 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
       // Asynchronously fetch chart data to populate additional properties BEFORE updating state
       await _fetchChartDataForResults(mergedResults);
-
     } catch (e, stack) {
       if (mounted) {
         ref.read(talkerProvider).handle(e, stack, 'Error searching markets');
@@ -180,29 +197,33 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       if (symbol != null) {
         try {
           // Fetch 1d interval, 1d range for basic metadata
-          final chartData = await marketService.fetchHistoricalData(symbol.toString(), '1d', '1d');
+          final chartData = await marketService.fetchHistoricalData(
+              symbol.toString(), '1d', '1d');
 
           if (chartData != null) {
-             final meta = chartData['meta'];
-             if (meta != null) {
-                // We create a mutable map for the UI state
-                final Map<String, dynamic> mutableQ = Map<String, dynamic>.from(q);
+            final meta = chartData['meta'];
+            if (meta != null) {
+              // We create a mutable map for the UI state
+              final Map<String, dynamic> mutableQ =
+                  Map<String, dynamic>.from(q);
 
-                mutableQ['currency'] = meta['currency'];
+              mutableQ['currency'] = meta['currency'];
 
-                final tradingPeriods = meta['currentTradingPeriod'];
-                if (tradingPeriods != null) {
-                  mutableQ['preMarketStart'] = tradingPeriods['pre']?['start'];
-                  mutableQ['preMarketEnd'] = tradingPeriods['pre']?['end'];
-                  mutableQ['regularMarketStart'] = tradingPeriods['regular']?['start'];
-                  mutableQ['regularMarketEnd'] = tradingPeriods['regular']?['end'];
-                  mutableQ['postMarketStart'] = tradingPeriods['post']?['start'];
-                  mutableQ['postMarketEnd'] = tradingPeriods['post']?['end'];
-                  mutableQ['gmtoffset'] = meta['gmtoffset'];
-                }
+              final tradingPeriods = meta['currentTradingPeriod'];
+              if (tradingPeriods != null) {
+                mutableQ['preMarketStart'] = tradingPeriods['pre']?['start'];
+                mutableQ['preMarketEnd'] = tradingPeriods['pre']?['end'];
+                mutableQ['regularMarketStart'] =
+                    tradingPeriods['regular']?['start'];
+                mutableQ['regularMarketEnd'] =
+                    tradingPeriods['regular']?['end'];
+                mutableQ['postMarketStart'] = tradingPeriods['post']?['start'];
+                mutableQ['postMarketEnd'] = tradingPeriods['post']?['end'];
+                mutableQ['gmtoffset'] = meta['gmtoffset'];
+              }
 
-                updatedResults[i] = mutableQ;
-             }
+              updatedResults[i] = mutableQ;
+            }
           }
         } catch (e) {
           // It's common for some obscure symbols to fail chart data fetch. We just ignore and move on.
@@ -218,9 +239,21 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     }
   }
 
-  void _addMarketFromSearch(dynamic q) {
-    final exchange = q['exchange'] ?? 'Unknown';
-    final exchDisp = q['exchDisp'] ?? exchange;
+  void _toggleMarketSelection(dynamic q, bool? isSelected) {
+    if (isSelected == true) {
+      _addMarketFromSearch(q, showSnackbar: false);
+    } else {
+      final symbol = q['symbol'];
+      if (symbol != null) {
+        setState(() {
+          widget.formData.tickers.removeWhere((t) => t.symbol == symbol);
+        });
+      }
+    }
+  }
+
+  void _addMarketFromSearch(dynamic q, {bool showSnackbar = true}) {
+    final exchange = q['exchDisp'] ?? q['exchange'] ?? 'Unknown';
     final symbol = q['symbol'] ?? 'Unknown';
     final quoteType = q['quoteType'];
     final currency = q['currency'];
@@ -237,10 +270,11 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         widget.formData.tickers.add(
           TickerFormData(
             symbol: symbol,
-            exchange: exchDisp,
+            exchange: exchange,
             currency: currency,
             quoteType: quoteType,
-            regularMarketStart: regularMarketStart is int ? regularMarketStart : null,
+            regularMarketStart:
+                regularMarketStart is int ? regularMarketStart : null,
             regularMarketEnd: regularMarketEnd is int ? regularMarketEnd : null,
             preMarketStart: preMarketStart is int ? preMarketStart : null,
             preMarketEnd: preMarketEnd is int ? preMarketEnd : null,
@@ -248,13 +282,15 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
             postMarketEnd: postMarketEnd is int ? postMarketEnd : null,
           ),
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Added market: $symbol'),
-            duration: const Duration(seconds: 1),
-          ),
-        );
-      } else {
+        if (showSnackbar) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Added market: $symbol'),
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        }
+      } else if (showSnackbar) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Market $symbol is already in the list.'),
@@ -265,80 +301,121 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     });
   }
 
-  Future<void> _showEditMarketDialog({
-    TickerFormData? existingTicker,
-    int? index,
-  }) async {
-    final isNew = existingTicker == null;
-    final ticker = isNew ? TickerFormData() : existingTicker;
+  Future<void> _showAddMarketDialog() async {
+    final symbolController = TextEditingController();
 
-    final symbolController = TextEditingController(text: ticker.symbol);
-
-    final result = await showDialog<bool>(
+    final result = await showDialog<String>(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            return AlertDialog(
-              title: Text(isNew ? 'Add Market Manually' : 'Edit Market'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: symbolController,
-                    decoration: const InputDecoration(
-                      labelText: 'Symbol (e.g., AAPL)',
-                    ),
-                  ),
-                ],
+        return AlertDialog(
+          title: const Text('Add Market Manually'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: symbolController,
+                decoration: const InputDecoration(
+                  labelText: 'Symbol (e.g., AAPL)',
+                ),
+                autofocus: true,
               ),
-              actions: [
-                if (!isNew)
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        widget.formData.tickers.removeAt(index!);
-                      });
-                      Navigator.pop(context, false);
-                    },
-                    style: TextButton.styleFrom(foregroundColor: Colors.red),
-                    child: const Text('Delete'),
-                  ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (symbolController.text.trim().isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Symbol cannot be empty.'),
-                        ),
-                      );
-                      return;
-                    }
-                    ticker.symbol = symbolController.text.trim();
-
-                    if (isNew) {
-                      setState(() {
-                        widget.formData.tickers.add(ticker);
-                      });
-                    } else {
-                      setState(() {
-                        widget.formData.tickers[index!] = ticker;
-                      });
-                    }
-                    Navigator.pop(context, true);
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
-            );
-          },
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, symbolController.text),
+              child: const Text('Add'),
+            ),
+          ],
         );
       },
     );
+
+    if (result != null && result.trim().isNotEmpty) {
+      final symbol = result.trim();
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final marketService = ref.read(marketDataServiceProvider);
+        final searchResults = await marketService.searchSymbol(symbol);
+
+        dynamic foundQuote;
+        for (final q in searchResults) {
+          if (q['symbol'] == symbol) {
+            foundQuote = q;
+            break;
+          }
+        }
+
+        if (foundQuote == null && searchResults.isNotEmpty) {
+          foundQuote = searchResults.first;
+        }
+
+        if (foundQuote != null) {
+          final chartData = await marketService.fetchHistoricalData(
+              foundQuote['symbol'].toString(), '1d', '1d');
+
+          if (chartData != null) {
+            final meta = chartData['meta'];
+            if (meta != null) {
+              foundQuote['currency'] = meta['currency'];
+
+              final tradingPeriods = meta['currentTradingPeriod'];
+              if (tradingPeriods != null) {
+                foundQuote['preMarketStart'] = tradingPeriods['pre']?['start'];
+                foundQuote['preMarketEnd'] = tradingPeriods['pre']?['end'];
+                foundQuote['regularMarketStart'] =
+                    tradingPeriods['regular']?['start'];
+                foundQuote['regularMarketEnd'] =
+                    tradingPeriods['regular']?['end'];
+                foundQuote['postMarketStart'] =
+                    tradingPeriods['post']?['start'];
+                foundQuote['postMarketEnd'] = tradingPeriods['post']?['end'];
+                foundQuote['gmtoffset'] = meta['gmtoffset'];
+              }
+            }
+          }
+
+          setState(() {
+            if (!_searchResults
+                .any((element) => element['symbol'] == foundQuote['symbol'])) {
+              _searchResults.add(foundQuote);
+            }
+          });
+          _addMarketFromSearch(foundQuote);
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content:
+                      Text('Could not find market data for symbol: $symbol')),
+            );
+          }
+        }
+      } catch (e, stack) {
+        if (mounted) {
+          ref
+              .read(talkerProvider)
+              .handle(e, stack, 'Error manually adding market');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error finding market: $e')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
   }
 
   Future<void> _saveTransaction() async {
@@ -423,8 +500,12 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
     // gmtOffset is in seconds. We adjust the unix timestamp to represent local time
     // in UTC format, so we can format it easily.
-    final startLocal = DateTime.fromMillisecondsSinceEpoch((unixStart + gmtOffset) * 1000, isUtc: true);
-    final endLocal = DateTime.fromMillisecondsSinceEpoch((unixEnd + gmtOffset) * 1000, isUtc: true);
+    final startLocal = DateTime.fromMillisecondsSinceEpoch(
+        (unixStart + gmtOffset) * 1000,
+        isUtc: true);
+    final endLocal = DateTime.fromMillisecondsSinceEpoch(
+        (unixEnd + gmtOffset) * 1000,
+        isUtc: true);
 
     final formatter = DateFormat('HH:mm');
     return '${formatter.format(startLocal)} - ${formatter.format(endLocal)}';
@@ -432,10 +513,6 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isTallScreen = MediaQuery.of(context).size.height > 800;
-    final showFound = isTallScreen || _isFoundExpanded;
-    final showAdded = isTallScreen || !_isFoundExpanded;
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
@@ -449,178 +526,99 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              InkWell(
-                onTap: isTallScreen
-                    ? null
-                    : () {
-                        setState(() {
-                          _isFoundExpanded = !_isFoundExpanded;
-                        });
-                      },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'Found Markets:',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      if (!isTallScreen)
-                        Icon(_isFoundExpanded
-                            ? Icons.expand_less
-                            : Icons.expand_more),
-                    ],
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  const Text(
+                    'Select Markets:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ),
+                  TextButton.icon(
+                    onPressed: _showAddMarketDialog,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Manually'),
+                  ),
+                ],
               ),
-              if (showFound) ...[
-                if (_isLoading && _searchResults.isEmpty)
-                  const Center(child: CircularProgressIndicator())
-                else if (_searchResults.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'No results found automatically.',
-                      style: TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        ListView.builder(
-                          itemCount: _searchResults.length,
-                          itemBuilder: (context, index) {
-                            final q = _searchResults[index];
-                            final name =
-                                q['longname'] ?? q['shortname'] ?? 'Unknown';
-                            final symbol = q['symbol'] ?? 'Unknown';
-
-                            final isDirect = _isinDirectSymbols.contains(symbol.toString());
-
-                            final currency = q['currency'];
-                            final gmtOffset = q['gmtoffset'] as int?;
-                            final regStart = q['regularMarketStart'] as int?;
-                            final regEnd = q['regularMarketEnd'] as int?;
-                            final timeStr = _formatTime(regStart, regEnd, gmtOffset);
-
-                            final isAlreadyAdded = widget.formData.tickers
-                                .any((t) => t.symbol == symbol);
-
-                            return ListTile(
-                              title: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      name,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  if (isDirect)
-                                    const Icon(Icons.star, color: Colors.amber, size: 16),
-                                ],
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('${q['exchange']} - $symbol'),
-                                  if (currency != null || timeStr.isNotEmpty)
-                                    Text(
-                                      '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
-                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                                    ),
-                                ],
-                              ),
-                              trailing: IconButton(
-                                icon: Icon(
-                                  isAlreadyAdded
-                                      ? Icons.check_circle
-                                      : Icons.add_circle,
-                                  color:
-                                      isAlreadyAdded ? Colors.green : Colors.blue,
-                                ),
-                                onPressed: () => _addMarketFromSearch(q),
-                              ),
-                            );
-                          },
-                        ),
-                        if (_isLoading)
-                          const Positioned(
-                            bottom: 16,
-                            right: 16,
-                            child: CircularProgressIndicator(),
-                          ),
-                      ],
-                    ),
+              const SizedBox(height: 8),
+              if (_isLoading && _searchResults.isEmpty)
+                const Center(child: CircularProgressIndicator())
+              else if (_searchResults.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    'No results found automatically.',
+                    style: TextStyle(fontStyle: FontStyle.italic),
                   ),
-              ],
-              const Divider(thickness: 2),
-              InkWell(
-                onTap: isTallScreen
-                    ? null
-                    : () {
-                        setState(() {
-                          _isFoundExpanded = !_isFoundExpanded;
-                        });
-                      },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Added Markets:',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Row(
-                        children: [
-                          TextButton.icon(
-                            onPressed: () => _showEditMarketDialog(),
-                            icon: const Icon(Icons.add),
-                            label: const Text('Add Manually'),
-                          ),
-                          if (!isTallScreen)
-                            Icon(!_isFoundExpanded
-                                ? Icons.expand_less
-                                : Icons.expand_more),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (showAdded) ...[
+                )
+              else
                 Expanded(
-                  child: widget.formData.tickers.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'No markets added yet.',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: widget.formData.tickers.length,
-                          itemBuilder: (context, index) {
-                            final ticker = widget.formData.tickers[index];
-                            return Card(
-                              child: ListTile(
-                                title: Text(ticker.symbol),
-                                subtitle: Text('Currency: ${ticker.currency ?? 'N/A'}'),
-                                trailing: const Icon(Icons.edit, size: 20),
-                                onTap: () => _showEditMarketDialog(
-                                  existingTicker: ticker,
-                                  index: index,
+                  child: Stack(
+                    children: [
+                      ListView.builder(
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          final q = _searchResults[index];
+                          final name =
+                              q['longname'] ?? q['shortname'] ?? 'Unknown';
+                          final symbol = q['symbol'] ?? 'Unknown';
+
+                          final isDirect =
+                              _isinDirectSymbols.contains(symbol.toString());
+
+                          final currency = q['currency'];
+                          final gmtOffset = q['gmtoffset'] as int?;
+                          final regStart = q['regularMarketStart'] as int?;
+                          final regEnd = q['regularMarketEnd'] as int?;
+                          final timeStr =
+                              _formatTime(regStart, regEnd, gmtOffset);
+
+                          final isAlreadyAdded = widget.formData.tickers
+                              .any((t) => t.symbol == symbol);
+
+                          return CheckboxListTile(
+                            title: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    name,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                                if (isDirect)
+                                  const Icon(Icons.star,
+                                      color: Colors.amber, size: 16),
+                              ],
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    '${q['exchDisp'] ?? q['exchange'] ?? 'Unknown'} - $symbol'),
+                                if (currency != null || timeStr.isNotEmpty)
+                                  Text(
+                                    '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
+                                    style: const TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
+                              ],
+                            ),
+                            value: isAlreadyAdded,
+                            onChanged: (bool? value) =>
+                                _toggleMarketSelection(q, value),
+                          );
+                        },
+                      ),
+                      if (_isLoading)
+                        const Positioned(
+                          bottom: 16,
+                          right: 16,
+                          child: CircularProgressIndicator(),
                         ),
+                    ],
+                  ),
                 ),
-              ],
               const SizedBox(height: 16),
               WizardBottomActions(
                 onCancel: _cancelWizard,
