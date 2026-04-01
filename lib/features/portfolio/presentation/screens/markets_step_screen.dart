@@ -12,9 +12,14 @@ import 'registered_name_step_screen.dart';
 class MarketsStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
+  final bool isEntryPoint;
 
-  const MarketsStepScreen(
-      {super.key, required this.formData, this.isEditing = false});
+  const MarketsStepScreen({
+    super.key,
+    required this.formData,
+    this.isEditing = false,
+    this.isEntryPoint = false,
+  });
 
   @override
   ConsumerState<MarketsStepScreen> createState() => _MarketsStepScreenState();
@@ -36,13 +41,11 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
   Future<void> _handleBackNavigation(bool didPop) async {
     if (didPop) return;
 
-    if (!widget.isEditing) {
-      // In creation flow, just go back to the previous step without warning.
+    if (!widget.isEntryPoint) {
       Navigator.of(context).pop();
       return;
     }
 
-    // In edit flow, going back means cancelling the edit operation.
     await _cancelWizard();
   }
 
@@ -70,7 +73,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     if (shouldCancel == true) {
       if (context.mounted) {
         if (widget.isEditing) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop('CANCEL');
         } else {
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
@@ -281,8 +284,11 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ISIN saved successfully!')),
         );
-        // Pop all step screens
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        if (widget.isEditing) {
+          Navigator.of(context).pop('SAVED');
+        } else {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
       }
     } catch (e, stack) {
       if (mounted) {
@@ -296,34 +302,24 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     }
   }
 
-  void _onAdditionalData() {
+  Future<void> _onAdditionalData() async {
     final route = MaterialPageRoute(
       builder: (context) => AdditionalDataStepScreen(
         formData: widget.formData,
         isEditing: widget.isEditing,
+        isEntryPoint: false,
       ),
     );
-    if (widget.isEditing) {
-      Navigator.pushReplacement(context, route);
-    } else {
-      Navigator.push(context, route);
+    final result = await Navigator.push(context, route);
+    if (result == 'CANCEL' || result == 'SAVED') {
+      if (mounted) {
+        Navigator.pop(context, result);
+      }
     }
   }
 
   void _onPrevious() {
-    if (widget.isEditing) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => RegisteredNameStepScreen(
-            formData: widget.formData,
-            isEditing: true,
-          ),
-        ),
-      );
-    } else {
-      Navigator.pop(context);
-    }
+    Navigator.pop(context);
   }
 
   @override
