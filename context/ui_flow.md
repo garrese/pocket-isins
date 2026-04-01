@@ -6,7 +6,7 @@ The application is structured around a bottom navigation bar with three main tab
 *   **Behavior**: Users list their investments (ISINs), specifying `position` (shares), `purchasePrice`, `currency`, and the specific `Ticker`s related to that ISIN.
 *   **Data Source**: Completely local (Reads and Writes from `Isar`). No external API fetching happens automatically here.
 
-## Tab 2: Markets
+## Tab 2: Tickers
 *   **Purpose**: A dashboard presenting the live/recent market status of the user's portfolio.
 *   **Behavior**: For each ISIN, displays its assigned Tickers. Shows the current session value, previous closing price (Level 1 Data), and a miniature 1-day evolution chart (Level 2 Intraday Data).
 *   **Flow**: Tapping a Ticker row navigates to the **Detail Screen**.

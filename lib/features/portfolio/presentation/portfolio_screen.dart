@@ -136,37 +136,32 @@ class PortfolioScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          isin.displayName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (isin.shortName != null &&
-                          isin.shortName!.isNotEmpty) ...[
-                        const SizedBox(width: 8),
-                        Text(
-                          isin.shortName!,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
-                    ],
+                  title: Text(
+                    isin.displayName,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 4.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (isin.shortName != null &&
+                            isin.shortName!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2.0),
+                            child: Text(
+                              isin.shortName!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
                         if (isin.isinCode != null && isin.isinCode!.isNotEmpty)
-                          Expanded(
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.isinCode!,
                               style: const TextStyle(
@@ -175,11 +170,8 @@ class PortfolioScreen extends ConsumerWidget {
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
-                          )
-                        else
-                          const Expanded(child: SizedBox.shrink()),
-                        if (tickersList.isNotEmpty) ...[
-                          const SizedBox(width: 8),
+                          ),
+                        if (tickersList.isNotEmpty)
                           Text(
                             tickersList,
                             style: const TextStyle(
@@ -187,7 +179,6 @@ class PortfolioScreen extends ConsumerWidget {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ],
                       ],
                     ),
                   ),
