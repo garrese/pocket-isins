@@ -79,6 +79,9 @@ class _AdditionalDataStepScreenState
   }
 
   void _onPrevious() {
+    // Save current state before going back
+    widget.formData.shortName = _shortNameController.text.trim();
+
     if (widget.isEntryPoint) {
       Navigator.pushReplacement(
         context,

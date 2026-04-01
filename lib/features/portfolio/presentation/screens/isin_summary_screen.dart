@@ -14,14 +14,14 @@ class IsinSummaryScreen extends ConsumerWidget {
 
   const IsinSummaryScreen({super.key, required this.isin});
 
-  IsinFormData _createFormData() {
+  IsinFormData _createFormData(Isin currentIsin) {
     return IsinFormData(
-      id: isin.id,
-      isinCode: isin.isinCode ?? '',
-      altName: isin.altName ?? '',
-      registeredNames: List.from(isin.registeredNames),
-      shortName: isin.shortName,
-      tickers: isin.tickers.map((t) {
+      id: currentIsin.id,
+      isinCode: currentIsin.isinCode ?? '',
+      altName: currentIsin.altName ?? '',
+      registeredNames: List.from(currentIsin.registeredNames),
+      shortName: currentIsin.shortName,
+      tickers: currentIsin.tickers.map((t) {
         return TickerFormData(
           symbol: t.symbol,
           exchange: t.exchange,
@@ -112,7 +112,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                   ],
                 ),
                 onEdit: () {
-                  final formData = _createFormData();
+                  final formData = _createFormData(currentIsin);
                   _navigateToEdit(
                     context,
                     IsinStepScreen(
@@ -140,7 +140,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                           .toList(),
                 ),
                 onEdit: () {
-                  final formData = _createFormData();
+                  final formData = _createFormData(currentIsin);
                   _navigateToEdit(
                     context,
                     RegisteredNameStepScreen(
@@ -175,7 +175,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                           .toList(),
                 ),
                 onEdit: () {
-                  final formData = _createFormData();
+                  final formData = _createFormData(currentIsin);
                   _navigateToEdit(
                     context,
                     MarketsStepScreen(
@@ -204,7 +204,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                   ],
                 ),
                 onEdit: () {
-                  final formData = _createFormData();
+                  final formData = _createFormData(currentIsin);
                   _navigateToEdit(
                     context,
                     AdditionalDataStepScreen(
