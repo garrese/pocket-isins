@@ -10,11 +10,7 @@ class BotState {
   final bool isTyping;
   final String? error;
 
-  BotState({
-    required this.messages,
-    this.isTyping = false,
-    this.error,
-  });
+  BotState({required this.messages, this.isTyping = false, this.error});
 
   BotState copyWith({
     List<ChatMessageData>? messages,
@@ -57,17 +53,16 @@ class BotController extends StateNotifier<BotState> {
     // Update local state immediately for fast feedback
     final currentUserMessages = await _repository.getChatHistory();
     state = state.copyWith(
-        messages: currentUserMessages, isTyping: true, error: null);
+      messages: currentUserMessages,
+      isTyping: true,
+      error: null,
+    );
 
     try {
       // Fetch ISINs and generate system prompt
       final isins = await _repository.getAllIsins();
-      final isinsJson = isins
-          .map((i) => {
-                'isinCode': i.isinCode,
-                'name': i.name,
-              })
-          .toList();
+      final isinsJson =
+          isins.map((i) => {'isinCode': i.isinCode, 'name': i.name}).toList();
 
       final systemPrompt = '''
 You are a helpful financial AI assistant.
@@ -79,10 +74,7 @@ Respond to the user's queries accurately. You can search the web if needed.
 
       // Prepare conversation history for the AI
       final historyMaps = state.messages
-          .map((m) => {
-                'role': m.role,
-                'content': m.content,
-              })
+          .map((m) => {'role': m.role, 'content': m.content})
           .toList();
 
       final response = await _aiService.getGenericCompletion(
@@ -102,8 +94,9 @@ Respond to the user's queries accurately. You can search the web if needed.
   }
 }
 
-final botControllerProvider =
-    StateNotifierProvider<BotController, BotState>((ref) {
+final botControllerProvider = StateNotifierProvider<BotController, BotState>((
+  ref,
+) {
   return BotController(
     ref.watch(botRepositoryProvider),
     ref.watch(aiServiceProvider),

@@ -230,8 +230,11 @@ Example format:
         );
         return reply;
       } else {
-        _log.handle(Exception('Failed completion Google'), null,
-            response.data.toString());
+        _log.handle(
+          Exception('Failed completion Google'),
+          null,
+          response.data.toString(),
+        );
         throw Exception(
           'Failed completion: ${response.statusCode} - ${response.data}',
         );
@@ -300,8 +303,11 @@ Example format:
         );
         return reply;
       } else {
-        _log.handle(Exception('Failed completion OpenAI'), null,
-            response.data.toString());
+        _log.handle(
+          Exception('Failed completion OpenAI'),
+          null,
+          response.data.toString(),
+        );
         throw Exception(
           'Failed completion: ${response.statusCode} - ${response.data}',
         );

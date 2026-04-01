@@ -41,7 +41,11 @@ class TickerDetailScreen extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.only(
-            left: 4.0, right: 12.0, top: 16.0, bottom: 16.0),
+          left: 4.0,
+          right: 12.0,
+          top: 16.0,
+          bottom: 16.0,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -190,8 +194,10 @@ class TickerDetailScreen extends ConsumerWidget {
             children: [
               Text(
                 '${regularMarketPrice.toStringAsFixed(2)} $currency',
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(width: 8),
               Text(
