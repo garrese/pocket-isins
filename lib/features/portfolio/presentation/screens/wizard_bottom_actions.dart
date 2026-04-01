@@ -20,48 +20,52 @@ class WizardBottomActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 16),
-      child: Wrap(
-        alignment: WrapAlignment.spaceBetween,
-        spacing: 8,
-        runSpacing: 8,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              TextButton.icon(
-                onPressed: onCancel,
-                icon: const Icon(Icons.close),
-                label: const Text('Cancel'),
-                style: TextButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.error,
+          Expanded(
+            child: Wrap(
+              alignment: WrapAlignment.start,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                TextButton.icon(
+                  onPressed: onCancel,
+                  icon: const Icon(Icons.close),
+                  label: const Text('Cancel'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
                 ),
-              ),
-              if (!isFirstStep)
-                OutlinedButton.icon(
-                  onPressed: onPrevious,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Previous'),
-                ),
-            ],
+                if (!isFirstStep)
+                  OutlinedButton.icon(
+                    onPressed: onPrevious,
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Previous'),
+                  ),
+              ],
+            ),
           ),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              if (onContinue != null)
-                ElevatedButton.icon(
-                  onPressed: onContinue,
-                  icon: const Icon(Icons.arrow_forward),
-                  label: const Text('Continue'),
-                ),
-              if (onSave != null)
-                FilledButton.icon(
-                  onPressed: onSave,
-                  icon: const Icon(Icons.save),
-                  label: const Text('Save'),
-                ),
-            ],
+          Expanded(
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (onContinue != null)
+                  ElevatedButton.icon(
+                    onPressed: onContinue,
+                    icon: const Icon(Icons.arrow_forward),
+                    label: const Text('Continue'),
+                  ),
+                if (onSave != null)
+                  FilledButton.icon(
+                    onPressed: onSave,
+                    icon: const Icon(Icons.save),
+                    label: const Text('Save'),
+                  ),
+              ],
+            ),
           ),
         ],
       ),

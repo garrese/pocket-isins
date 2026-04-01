@@ -10,9 +10,14 @@ import 'isin_step_screen.dart';
 class RegisteredNameStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
+  final bool isEntryPoint;
 
-  const RegisteredNameStepScreen(
-      {super.key, required this.formData, this.isEditing = false});
+  const RegisteredNameStepScreen({
+    super.key,
+    required this.formData,
+    this.isEditing = false,
+    this.isEntryPoint = false,
+  });
 
   @override
   ConsumerState<RegisteredNameStepScreen> createState() =>
@@ -49,13 +54,11 @@ class _RegisteredNameStepScreenState
   Future<void> _handleBackNavigation(bool didPop) async {
     if (didPop) return;
 
-    if (!widget.isEditing) {
-      // In creation flow, just go back to the previous step without warning.
+    if (!widget.isEntryPoint) {
       Navigator.of(context).pop();
       return;
     }
 
-    // In edit flow, going back means cancelling the edit operation.
     await _cancelWizard();
   }
 
@@ -83,7 +86,7 @@ class _RegisteredNameStepScreenState
     if (shouldCancel == true) {
       if (context.mounted) {
         if (widget.isEditing) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop('CANCEL');
         } else {
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
@@ -138,37 +141,27 @@ class _RegisteredNameStepScreenState
     }
   }
 
-  void _onContinue() {
+  Future<void> _onContinue() async {
     if (_formKey.currentState!.validate()) {
       widget.formData.registeredName = _nameController.text.trim();
       final route = MaterialPageRoute(
         builder: (context) => MarketsStepScreen(
           formData: widget.formData,
           isEditing: widget.isEditing,
+          isEntryPoint: false,
         ),
       );
-      if (widget.isEditing) {
-        Navigator.pushReplacement(context, route);
-      } else {
-        Navigator.push(context, route);
+      final result = await Navigator.push(context, route);
+      if (result == 'CANCEL' || result == 'SAVED') {
+        if (mounted) {
+          Navigator.pop(context, result);
+        }
       }
     }
   }
 
   void _onPrevious() {
-    if (widget.isEditing) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => IsinStepScreen(
-            formData: widget.formData,
-            isEditing: true,
-          ),
-        ),
-      );
-    } else {
-      Navigator.pop(context);
-    }
+    Navigator.pop(context);
   }
 
   void _showManualEditWarning() {
