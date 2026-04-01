@@ -328,6 +328,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isTallScreen = MediaQuery.of(context).size.height > 800;
+    final showFound = isTallScreen || _isFoundExpanded;
+    final showAdded = isTallScreen || !_isFoundExpanded;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
@@ -341,30 +345,33 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InkWell(
-                onTap: () {
-                  setState(() {
-                    _isFoundExpanded = !_isFoundExpanded;
-                  });
-                },
+                onTap: isTallScreen
+                    ? null
+                    : () {
+                        setState(() {
+                          _isFoundExpanded = !_isFoundExpanded;
+                        });
+                      },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: const Text(
+                      const Expanded(
+                        child: Text(
                           'Found Markets:',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      Icon(_isFoundExpanded
-                          ? Icons.expand_less
-                          : Icons.expand_more),
+                      if (!isTallScreen)
+                        Icon(_isFoundExpanded
+                            ? Icons.expand_less
+                            : Icons.expand_more),
                     ],
                   ),
                 ),
               ),
-              if (_isFoundExpanded) ...[
+              if (showFound) ...[
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (_searchResults.isEmpty)
@@ -385,13 +392,19 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                             q['longname'] ?? q['shortname'] ?? 'Unknown';
                         final symbol = q['symbol'] ?? 'Unknown';
 
+                        final isAlreadyAdded = widget.formData.tickers
+                            .any((t) => t.symbol == symbol);
+
                         return ListTile(
                           title: Text(name),
                           subtitle: Text('${q['exchange']} - $symbol'),
                           trailing: IconButton(
-                            icon: const Icon(
-                              Icons.add_circle,
-                              color: Colors.blue,
+                            icon: Icon(
+                              isAlreadyAdded
+                                  ? Icons.check_circle
+                                  : Icons.add_circle,
+                              color:
+                                  isAlreadyAdded ? Colors.green : Colors.blue,
                             ),
                             onPressed: () => _addMarketFromSearch(q),
                           ),
@@ -402,11 +415,13 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
               ],
               const Divider(thickness: 2),
               InkWell(
-                onTap: () {
-                  setState(() {
-                    _isFoundExpanded = !_isFoundExpanded;
-                  });
-                },
+                onTap: isTallScreen
+                    ? null
+                    : () {
+                        setState(() {
+                          _isFoundExpanded = !_isFoundExpanded;
+                        });
+                      },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Row(
@@ -424,16 +439,17 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                             icon: const Icon(Icons.add),
                             label: const Text('Add Manually'),
                           ),
-                          Icon(!_isFoundExpanded
-                              ? Icons.expand_less
-                              : Icons.expand_more),
+                          if (!isTallScreen)
+                            Icon(!_isFoundExpanded
+                                ? Icons.expand_less
+                                : Icons.expand_more),
                         ],
                       ),
                     ],
                   ),
                 ),
               ),
-              if (!_isFoundExpanded) ...[
+              if (showAdded) ...[
                 Expanded(
                   child: widget.formData.tickers.isEmpty
                       ? const Center(
