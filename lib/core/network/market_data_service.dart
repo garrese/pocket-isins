@@ -6,10 +6,7 @@ import 'dio_provider.dart';
 import '../services/log/talker_provider.dart';
 
 final marketDataServiceProvider = Provider<MarketDataService>((ref) {
-  return MarketDataService(
-    ref.watch(dioProvider),
-    ref.watch(talkerProvider),
-  );
+  return MarketDataService(ref.watch(dioProvider), ref.watch(talkerProvider));
 });
 
 class MarketDataService {
@@ -33,7 +30,9 @@ class MarketDataService {
         }
       }
       _log.warning(
-          'No data found for $symbol', 'Status code: ${response.statusCode}');
+        'No data found for $symbol',
+        'Status code: ${response.statusCode}',
+      );
       return null;
     } catch (e, stackTrace) {
       _log.handle(e, stackTrace, 'Failed to fetch data for $symbol');
@@ -42,7 +41,10 @@ class MarketDataService {
   }
 
   Future<Map<String, dynamic>?> fetchHistoricalData(
-      String symbol, String interval, String range) async {
+    String symbol,
+    String interval,
+    String range,
+  ) async {
     try {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=$interval&range=$range';
@@ -56,8 +58,10 @@ class MarketDataService {
           return result;
         }
       }
-      _log.warning('No historical data found for $symbol',
-          'Status code: ${response.statusCode}');
+      _log.warning(
+        'No historical data found for $symbol',
+        'Status code: ${response.statusCode}',
+      );
       return null;
     } catch (e, stackTrace) {
       _log.handle(e, stackTrace, 'Failed to fetch historical data for $symbol');
@@ -79,12 +83,44 @@ class MarketDataService {
           return result;
         }
       }
-      _log.warning('No intraday data found for $symbol',
-          'Status code: ${response.statusCode}');
+      _log.warning(
+        'No intraday data found for $symbol',
+        'Status code: ${response.statusCode}',
+      );
       return null;
     } catch (e, stackTrace) {
       _log.handle(e, stackTrace, 'Failed to fetch intraday data for $symbol');
       return null;
+    }
+  }
+
+  Future<List<dynamic>> searchSymbol(String query) async {
+    try {
+      final url = 'https://query2.finance.yahoo.com/v1/finance/search';
+      _log.info('Searching symbol for query: $query');
+      final response = await _dio.get(
+        url,
+        queryParameters: {'newsCount': 0, 'q': query},
+        options: Options(
+          headers: {
+            'User-Agent': 'yaak',
+            'Accept': '*/*',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final quotes = response.data['quotes'] as List<dynamic>? ?? [];
+        _log.debug('Found ${quotes.length} results for query: $query');
+        return quotes;
+      }
+
+      _log.warning('No search results found for query: $query',
+          'Status code: ${response.statusCode}');
+      return [];
+    } catch (e, stackTrace) {
+      _log.handle(e, stackTrace, 'Failed to search symbol for $query');
+      return [];
     }
   }
 }

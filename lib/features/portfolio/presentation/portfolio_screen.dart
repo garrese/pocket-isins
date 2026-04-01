@@ -7,7 +7,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../data/portfolio_provider.dart';
-import 'isin_form_screen.dart';
+import 'screens/isin_step_screen.dart';
+import 'screens/isin_summary_screen.dart';
+import '../domain/portfolio_form_data.dart';
 import '../../../core/theme/app_drawer.dart';
 
 class PortfolioScreen extends ConsumerWidget {
@@ -40,7 +42,8 @@ class PortfolioScreen extends ConsumerWidget {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('Portfolio imported successfully')),
+                        content: Text('Portfolio imported successfully'),
+                      ),
                     );
                   }
                 }
@@ -81,7 +84,8 @@ class PortfolioScreen extends ConsumerWidget {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('Portfolio exported successfully')),
+                          content: Text('Portfolio exported successfully'),
+                        ),
                       );
                     }
                   }
@@ -110,7 +114,8 @@ class PortfolioScreen extends ConsumerWidget {
         data: (isins) {
           if (isins.isEmpty) {
             return const Center(
-                child: Text('Your portfolio is empty. Add some ISINs!'));
+              child: Text('Your portfolio is empty. Add some ISINs!'),
+            );
           }
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
@@ -133,7 +138,8 @@ class PortfolioScreen extends ConsumerWidget {
                 }
               }
               String tickersList = isin.tickers.map((t) => t.symbol).join(
-                  ', '); // Although we change UI to Yahoo Symbol, we keep variable names internal as isin.tickers.map((t) => t.symbol)
+                    ', ',
+                  ); // Although we change UI to Yahoo Symbol, we keep variable names internal as isin.tickers.map((t) => t.symbol)
 
               // bool hasPositions = numShares > 0 || totalCapital > 0;
 
@@ -144,7 +150,8 @@ class PortfolioScreen extends ConsumerWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => IsinFormScreen(isinToEdit: isin)),
+                        builder: (_) => IsinSummaryScreen(isin: isin),
+                      ),
                     );
                   },
                   title: Text(
@@ -176,7 +183,9 @@ class PortfolioScreen extends ConsumerWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const IsinFormScreen()),
+            MaterialPageRoute(
+              builder: (_) => IsinStepScreen(formData: IsinFormData()),
+            ),
           );
         },
         child: const Icon(Icons.add),

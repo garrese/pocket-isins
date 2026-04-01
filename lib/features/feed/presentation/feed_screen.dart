@@ -87,7 +87,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Clear Feed'),
         content: const Text(
-            'Are you sure you want to delete all news from the feed?'),
+          'Are you sure you want to delete all news from the feed?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -235,8 +236,9 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                           findChildIndexCallback: (Key key) {
                             if (key is ValueKey<int?>) {
                               final int? id = key.value;
-                              final index =
-                                  newsList.indexWhere((n) => n.id == id);
+                              final index = newsList.indexWhere(
+                                (n) => n.id == id,
+                              );
                               if (index == -1) return null;
                               return index;
                             }

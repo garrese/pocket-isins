@@ -16,7 +16,8 @@ class BotRepository {
   Future<List<ChatMessageData>> getChatHistory() async {
     return await (_db.select(_db.chatMessages)
           ..orderBy([
-            (t) => OrderingTerm(expression: t.timestamp, mode: OrderingMode.asc)
+            (t) =>
+                OrderingTerm(expression: t.timestamp, mode: OrderingMode.asc),
           ]))
         .get();
   }

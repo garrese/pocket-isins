@@ -70,17 +70,18 @@ class FeedService {
           await db.batch((batch) {
             for (final news in newsList) {
               batch.insert(
-                  db.feedNews,
-                  FeedNewsCompanion.insert(
-                    isinId: news.isinId,
-                    title: news.title,
-                    link: news.link,
-                    sourceUrl: news.sourceUrl,
-                    sourceName: news.sourceName,
-                    pubDate: news.pubDate,
-                    round: news.round,
-                    subround: news.subround,
-                  ));
+                db.feedNews,
+                FeedNewsCompanion.insert(
+                  isinId: news.isinId,
+                  title: news.title,
+                  link: news.link,
+                  sourceUrl: news.sourceUrl,
+                  sourceName: news.sourceName,
+                  pubDate: news.pubDate,
+                  round: news.round,
+                  subround: news.subround,
+                ),
+              );
             }
           });
         }
@@ -92,8 +93,9 @@ class FeedService {
       // Cleanup old rounds (keep last 10)
       final minRoundToKeep =
           newRound - 9; // e.g. if newRound=15, keep 6 to 15 (10 rounds)
-      await (db.delete(db.feedNews)
-            ..where((tbl) => tbl.round.isSmallerThanValue(minRoundToKeep)))
+      await (db.delete(
+        db.feedNews,
+      )..where((tbl) => tbl.round.isSmallerThanValue(minRoundToKeep)))
           .go();
     } catch (e, st) {
       debugPrint('Error during feed round: $e\n$st');
@@ -123,15 +125,12 @@ class FeedService {
             : unratedNews.length;
         final batch = unratedNews.sublist(i, end);
 
-        final newsBatchPayload = batch
-            .map((news) => {
-                  'id': news.id,
-                  'title': news.title,
-                })
-            .toList();
+        final newsBatchPayload =
+            batch.map((news) => {'id': news.id, 'title': news.title}).toList();
 
-        final results =
-            await _aiService.rateNewsRelevanceBatch(newsBatchPayload);
+        final results = await _aiService.rateNewsRelevanceBatch(
+          newsBatchPayload,
+        );
 
         if (results.isNotEmpty) {
           await db.batch((batchWriter) {

@@ -18,3 +18,19 @@ class TickerFormData {
     List<PositionFormData>? positions,
   }) : positions = positions ?? [];
 }
+
+class IsinFormData {
+  int? id;
+  String isinCode;
+  String registeredName;
+  String? shortName;
+  List<TickerFormData> tickers;
+
+  IsinFormData({
+    this.id,
+    this.isinCode = '',
+    this.registeredName = '',
+    this.shortName,
+    List<TickerFormData>? tickers,
+  }) : tickers = tickers ?? [];
+}
