@@ -99,14 +99,16 @@ class IsinSummaryScreen extends ConsumerWidget {
             children: [
               _buildSection(
                 context,
-                title: 'ISIN / Alternative Name',
+                title: 'ISIN / Name',
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (currentIsin.isinCode?.isNotEmpty == true)
-                      Text('ISIN: ${currentIsin.isinCode}', style: const TextStyle(fontSize: 16)),
+                      Text('ISIN: ${currentIsin.isinCode}',
+                          style: const TextStyle(fontSize: 16)),
                     if (currentIsin.altName?.isNotEmpty == true)
-                      Text('Alt Name: ${currentIsin.altName}', style: const TextStyle(fontSize: 16)),
+                      Text('Name: ${currentIsin.altName}',
+                          style: const TextStyle(fontSize: 16)),
                   ],
                 ),
                 onEdit: () {
@@ -128,8 +130,14 @@ class IsinSummaryScreen extends ConsumerWidget {
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: currentIsin.registeredNames.isEmpty
-                      ? [const Text('No registered names selected', style: TextStyle(fontStyle: FontStyle.italic))]
-                      : currentIsin.registeredNames.map((name) => Text(name, style: const TextStyle(fontSize: 16))).toList(),
+                      ? [
+                          const Text('No registered names selected',
+                              style: TextStyle(fontStyle: FontStyle.italic))
+                        ]
+                      : currentIsin.registeredNames
+                          .map((name) =>
+                              Text(name, style: const TextStyle(fontSize: 16)))
+                          .toList(),
                 ),
                 onEdit: () {
                   final formData = _createFormData();
@@ -160,7 +168,8 @@ class IsinSummaryScreen extends ConsumerWidget {
                           .map(
                             (t) => Padding(
                               padding: const EdgeInsets.only(bottom: 2.0),
-                              child: Text('${t.symbol} (${t.currency ?? "N/A"})'),
+                              child:
+                                  Text('${t.symbol} (${t.currency ?? "N/A"})'),
                             ),
                           )
                           .toList(),

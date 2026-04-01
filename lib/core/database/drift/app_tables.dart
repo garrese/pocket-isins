@@ -28,7 +28,6 @@ class Tickers extends Table {
   IntColumn get isinId => integer().references(Isins, #id)();
 }
 
-
 @DataClassName('MarketDataCacheData')
 class MarketDataCaches extends Table {
   IntColumn get id => integer().autoIncrement()();
