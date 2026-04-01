@@ -44,12 +44,6 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
   Future<void> _handleBackNavigation(bool didPop) async {
     if (didPop) return;
-
-    if (!widget.isEntryPoint) {
-      Navigator.of(context).pop();
-      return;
-    }
-
     await _cancelWizard();
   }
 
@@ -406,7 +400,20 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
   }
 
   void _onPrevious() {
-    Navigator.pop(context);
+    if (widget.isEntryPoint) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RegisteredNameStepScreen(
+            formData: widget.formData,
+            isEditing: widget.isEditing,
+            isEntryPoint: true,
+          ),
+        ),
+      );
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   String _formatTime(int? unixStart, int? unixEnd, int? gmtOffset) {
@@ -434,6 +441,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text('Markets'),
         ),
         body: Padding(
