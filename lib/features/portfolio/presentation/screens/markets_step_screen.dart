@@ -6,6 +6,7 @@ import '../../../../core/network/market_data_service.dart';
 import '../../../../core/services/log/talker_provider.dart';
 import '../../data/portfolio_provider.dart';
 import 'additional_data_step_screen.dart';
+import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 
 class MarketsStepScreen extends ConsumerStatefulWidget {
