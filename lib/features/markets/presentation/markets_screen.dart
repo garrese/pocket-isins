@@ -5,9 +5,11 @@ import 'package:marquee/marquee.dart';
 
 import 'package:intl/intl.dart';
 import '../../../core/database/models/isin.dart';
+import '../../../core/database/models/ticker.dart';
 import '../data/markets_provider.dart';
 import 'screens/ticker_detail_screen.dart';
 import '../../../core/theme/app_drawer.dart';
+import 'models/ticker_view_model.dart';
 
 class MarketsScreen extends ConsumerWidget {
   const MarketsScreen({super.key});
@@ -34,12 +36,44 @@ class MarketsScreen extends ConsumerWidget {
             return const Center(child: Text('No ISINs in your portfolio.'));
           }
 
-          final sortedIsins = List<Isin>.from(isins);
-          sortedIsins.sort((a, b) {
-            final varA = _getRepresentativeVariation(a);
-            final varB = _getRepresentativeVariation(b);
-            // Descending order: highest positive first
-            return varB.compareTo(varA);
+          final List<TickerViewModel> allTickers = [];
+          for (final isin in isins) {
+            for (final ticker in isin.tickers) {
+              final cache = ticker.marketDataCache;
+              double variation = 0.0;
+              double variationPercent = 0.0;
+              if (cache != null) {
+                variation = cache.regularMarketPrice - cache.chartPreviousClose;
+                variationPercent = cache.chartPreviousClose > 0
+                    ? (variation / cache.chartPreviousClose) * 100
+                    : 0.0;
+              }
+
+              allTickers.add(
+                TickerViewModel(
+                  isin: isin,
+                  ticker: ticker,
+                  variationPercent: variationPercent,
+                  variation: variation,
+                  state: _getMarketState(ticker),
+                ),
+              );
+            }
+          }
+
+          allTickers.sort((a, b) {
+            // Group 1: Open, Group 2: Not open
+            final aIsOpen = a.state == MarketState.open;
+            final bIsOpen = b.state == MarketState.open;
+
+            if (aIsOpen && !bIsOpen) {
+              return -1;
+            } else if (!aIsOpen && bIsOpen) {
+              return 1;
+            }
+
+            // Within the same group, sort by daily variation descending
+            return b.variationPercent.compareTo(a.variationPercent);
           });
 
           return LayoutBuilder(
@@ -50,13 +84,13 @@ class MarketsScreen extends ConsumerWidget {
                   (availableWidth + 8) ~/ 368; // 360 width + 8 spacing
               if (crossAxisCount < 1) crossAxisCount = 1;
 
-              final List<List<Isin>> chunks = [];
-              for (int i = 0; i < sortedIsins.length; i += crossAxisCount) {
+              final List<List<TickerViewModel>> chunks = [];
+              for (int i = 0; i < allTickers.length; i += crossAxisCount) {
                 chunks.add(
-                  sortedIsins.sublist(
+                  allTickers.sublist(
                     i,
-                    i + crossAxisCount > sortedIsins.length
-                        ? sortedIsins.length
+                    i + crossAxisCount > allTickers.length
+                        ? allTickers.length
                         : i + crossAxisCount,
                   ),
                 );
@@ -69,193 +103,163 @@ class MarketsScreen extends ConsumerWidget {
                     vertical: 16.0,
                   ),
                   child: Column(
-                    children: chunks.map((rowIsins) {
+                    children: chunks.map((rowTickers) {
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
+                        padding: const EdgeInsets.only(bottom: 8.0),
                         child: IntrinsicHeight(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: rowIsins.map((isin) {
+                            children: rowTickers.map((tickerVm) {
+                              final cache = tickerVm.ticker.marketDataCache;
+
+                              Widget innerContent;
+                              if (cache == null) {
+                                innerContent = ListTile(
+                                  title: Text(tickerVm.ticker.symbol),
+                                  subtitle: const Text(
+                                    'Data not available. Invalid ticker or not found on Yahoo.',
+                                    style: TextStyle(color: Colors.redAccent),
+                                  ),
+                                  trailing: const Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red,
+                                  ),
+                                );
+                              } else {
+                                final isPositive = tickerVm.variation >= 0;
+                                final color = isPositive
+                                    ? Colors.green
+                                    : Colors.red;
+
+                                innerContent = InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => TickerDetailScreen(
+                                          symbol: tickerVm.ticker.symbol,
+                                          displayName:
+                                              tickerVm.isin.displayName,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 12,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Header Row: ISIN Name + State
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: _buildMarqueeText(
+                                                context,
+                                                tickerVm.isin.displayName,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                maxWidth:
+                                                    (availableWidth < 360
+                                                        ? availableWidth
+                                                        : 360) -
+                                                    80,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              tickerVm.state.name.toUpperCase(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        // Ticker Details + Sparkline
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              // Ticker Info
+                                              SizedBox(
+                                                width: 110,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    _buildMarqueeText(
+                                                      context,
+                                                      tickerVm.ticker.symbol,
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                      ),
+                                                      maxWidth: 110.0,
+                                                    ),
+                                                    _buildMarqueeText(
+                                                      context,
+                                                      '${cache.regularMarketPrice.toStringAsFixed(2)} ${tickerVm.ticker.currency}',
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                      ),
+                                                      maxWidth: 110.0,
+                                                    ),
+                                                    _buildMarqueeText(
+                                                      context,
+                                                      '${isPositive ? '+' : ''}${tickerVm.variation.toStringAsFixed(2)} (${tickerVm.variationPercent.toStringAsFixed(2)}%)',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: color,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      maxWidth: 110.0,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              // Sparkline Chart
+                                              Expanded(
+                                                child: SizedBox(
+                                                  height: 50,
+                                                  child: _buildSparkline(
+                                                    cache.intradayPrices,
+                                                    cache.intradayTimestamps,
+                                                    color,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+
                               return Padding(
                                 padding: EdgeInsets.only(
-                                  right: isin == rowIsins.last ? 0 : 8.0,
+                                  right: tickerVm == rowTickers.last ? 0 : 8.0,
                                 ),
-                                child: Container(
+                                child: SizedBox(
                                   width: availableWidth < 360
                                       ? availableWidth
                                       : 360,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                            .cardTheme
-                                            .color
-                                            ?.withValues(alpha: 0.5) ??
-                                        const Color(
-                                          0xFF1E1E2C,
-                                        ).withValues(alpha: 0.5),
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.1,
-                                      ),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 12,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 8.0,
-                                          left: 4.0,
-                                        ),
-                                        child: Text(
-                                          isin.displayName,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: isin.tickers.map((ticker) {
-                                            final cache =
-                                                ticker.marketDataCache;
-                                            if (cache == null) {
-                                              return Card(
-                                                margin: const EdgeInsets.only(
-                                                  bottom: 4,
-                                                ),
-                                                child: ListTile(
-                                                  title: Text(ticker.symbol),
-                                                  subtitle: const Text(
-                                                    'Data not available. Invalid ticker or not found on Yahoo.',
-                                                    style: TextStyle(
-                                                      color: Colors.redAccent,
-                                                    ),
-                                                  ),
-                                                  trailing: const Icon(
-                                                    Icons.error_outline,
-                                                    color: Colors.red,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-
-                                            final variation =
-                                                cache.regularMarketPrice -
-                                                    cache.chartPreviousClose;
-                                            final variationPercent = cache
-                                                        .chartPreviousClose >
-                                                    0
-                                                ? (variation /
-                                                        cache
-                                                            .chartPreviousClose) *
-                                                    100
-                                                : 0.0;
-                                            final isPositive = variation >= 0;
-                                            final color = isPositive
-                                                ? Colors.green
-                                                : Colors.red;
-
-                                            return Card(
-                                              margin: const EdgeInsets.only(
-                                                bottom: 4,
-                                              ),
-                                              child: InkWell(
-                                                onTap: () {
-                                                  Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          TickerDetailScreen(
-                                                        symbol: ticker.symbol,
-                                                        displayName:
-                                                            isin.displayName,
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                                child: Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 4,
-                                                    vertical: 8,
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      // Ticker Info
-                                                      SizedBox(
-                                                        width: 110,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            _buildMarqueeText(
-                                                              context,
-                                                              ticker.symbol,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 14,
-                                                              ),
-                                                              maxWidth: 110.0,
-                                                            ),
-                                                            _buildMarqueeText(
-                                                              context,
-                                                              '${cache.regularMarketPrice.toStringAsFixed(2)} ${ticker.currency}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 12,
-                                                              ),
-                                                              maxWidth: 110.0,
-                                                            ),
-                                                            _buildMarqueeText(
-                                                              context,
-                                                              '${isPositive ? '+' : ''}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                                color: color,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                              maxWidth: 110.0,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 8),
-                                                      // Sparkline Chart
-                                                      Expanded(
-                                                        child: SizedBox(
-                                                          height: 50,
-                                                          child:
-                                                              _buildSparkline(
-                                                            cache
-                                                                .intradayPrices,
-                                                            cache
-                                                                .intradayTimestamps,
-                                                            color,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ),
-                                    ],
+                                  child: Card(
+                                    margin: EdgeInsets.zero,
+                                    child: innerContent,
                                   ),
                                 ),
                               );
@@ -280,36 +284,29 @@ class MarketsScreen extends ConsumerWidget {
     );
   }
 
-  double _getRepresentativeVariation(Isin isin) {
-    if (isin.tickers.isEmpty) return 0.0;
+  MarketState _getMarketState(Ticker ticker) {
+    final now = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
 
-    double variation = 0.0;
-    int mostRecentTimestamp = -1;
-
-    for (final ticker in isin.tickers) {
-      final cache = ticker.marketDataCache;
-      if (cache == null) continue;
-
-      int lastTs = -1;
-      if (cache.intradayTimestamps.isNotEmpty) {
-        lastTs = cache.intradayTimestamps.lastWhere(
-          (ts) => ts > 0,
-          orElse: () => -1,
-        );
-      }
-
-      if (lastTs > mostRecentTimestamp) {
-        mostRecentTimestamp = lastTs;
-        if (cache.chartPreviousClose > 0) {
-          final diff = cache.regularMarketPrice - cache.chartPreviousClose;
-          variation = (diff / cache.chartPreviousClose) * 100;
-        } else {
-          variation = 0.0;
-        }
+    if (ticker.regularMarketStart != null && ticker.regularMarketEnd != null) {
+      if (now >= ticker.regularMarketStart! &&
+          now <= ticker.regularMarketEnd!) {
+        return MarketState.open;
       }
     }
 
-    return variation;
+    if (ticker.preMarketStart != null && ticker.preMarketEnd != null) {
+      if (now >= ticker.preMarketStart! && now <= ticker.preMarketEnd!) {
+        return MarketState.pre;
+      }
+    }
+
+    if (ticker.postMarketStart != null && ticker.postMarketEnd != null) {
+      if (now >= ticker.postMarketStart! && now <= ticker.postMarketEnd!) {
+        return MarketState.post;
+      }
+    }
+
+    return MarketState.closed;
   }
 
   Widget _buildMarqueeText(
