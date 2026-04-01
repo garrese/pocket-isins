@@ -54,12 +54,6 @@ class _RegisteredNameStepScreenState
 
   Future<void> _handleBackNavigation(bool didPop) async {
     if (didPop) return;
-
-    if (!widget.isEntryPoint) {
-      Navigator.of(context).pop();
-      return;
-    }
-
     await _cancelWizard();
   }
 
@@ -188,7 +182,20 @@ class _RegisteredNameStepScreenState
   }
 
   void _onPrevious() {
-    Navigator.pop(context);
+    if (widget.isEntryPoint) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => IsinStepScreen(
+            formData: widget.formData,
+            isEditing: widget.isEditing,
+            isEntryPoint: true,
+          ),
+        ),
+      );
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   void _addManualName() {
@@ -211,6 +218,7 @@ class _RegisteredNameStepScreenState
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text('Registered Names'),
         ),
         body: Padding(

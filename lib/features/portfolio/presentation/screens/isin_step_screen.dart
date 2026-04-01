@@ -60,12 +60,10 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
 
   Future<void> _handleBackNavigation(bool didPop) async {
     if (didPop) return;
+    await _cancelWizard();
+  }
 
-    if (!widget.isEntryPoint) {
-      Navigator.of(context).pop();
-      return;
-    }
-
+  Future<void> _cancelWizard() async {
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -97,10 +95,6 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
     }
   }
 
-  Future<void> _cancelWizard() async {
-    await _handleBackNavigation(false);
-  }
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -108,6 +102,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text('Add ISIN / Alternative Name'),
         ),
         body: Padding(
