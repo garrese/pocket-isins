@@ -4,12 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:marquee/marquee.dart';
 
 import 'package:intl/intl.dart';
-import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/ticker.dart';
 import '../data/markets_provider.dart';
 import 'screens/ticker_detail_screen.dart';
 import '../../../core/theme/app_drawer.dart';
 import 'models/ticker_view_model.dart';
+
+final sortGroupedByStateProvider = StateProvider<bool>((ref) => true);
 
 class MarketsScreen extends ConsumerWidget {
   const MarketsScreen({super.key});
@@ -17,12 +18,32 @@ class MarketsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final marketsAsync = ref.watch(marketsProvider);
+    final sortGroupedByState = ref.watch(sortGroupedByStateProvider);
 
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Markets Overview'),
         actions: [
+          PopupMenuButton<bool>(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Sort options',
+            onSelected: (bool value) {
+              ref.read(sortGroupedByStateProvider.notifier).state = value;
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<bool>>[
+              CheckedPopupMenuItem<bool>(
+                value: true,
+                checked: sortGroupedByState,
+                child: const Text('Group by Open State'),
+              ),
+              CheckedPopupMenuItem<bool>(
+                value: false,
+                checked: !sortGroupedByState,
+                child: const Text('Sort by Daily Growth'),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh market data',
@@ -62,17 +83,19 @@ class MarketsScreen extends ConsumerWidget {
           }
 
           allTickers.sort((a, b) {
-            // Group 1: Open, Group 2: Not open
-            final aIsOpen = a.state == MarketState.open;
-            final bIsOpen = b.state == MarketState.open;
+            if (sortGroupedByState) {
+              // Group 1: Open, Group 2: Not open
+              final aIsOpen = a.state == MarketState.open;
+              final bIsOpen = b.state == MarketState.open;
 
-            if (aIsOpen && !bIsOpen) {
-              return -1;
-            } else if (!aIsOpen && bIsOpen) {
-              return 1;
+              if (aIsOpen && !bIsOpen) {
+                return -1;
+              } else if (!aIsOpen && bIsOpen) {
+                return 1;
+              }
             }
 
-            // Within the same group, sort by daily variation descending
+            // Sort by daily variation descending
             return b.variationPercent.compareTo(a.variationPercent);
           });
 
@@ -175,11 +198,15 @@ class MarketsScreen extends ConsumerWidget {
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
-                                              tickerVm.state.name.toUpperCase(),
-                                              style: const TextStyle(
+                                              _getMarketStateLabel(
+                                                tickerVm.state,
+                                              ),
+                                              style: TextStyle(
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.grey,
+                                                color: _getMarketStateColor(
+                                                  tickerVm.state,
+                                                  context,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -282,6 +309,26 @@ class MarketsScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  String _getMarketStateLabel(MarketState state) {
+    switch (state) {
+      case MarketState.open:
+        return 'Open';
+      case MarketState.pre:
+        return 'Premarket';
+      case MarketState.post:
+        return 'Postmarket';
+      case MarketState.closed:
+        return 'Closed';
+    }
+  }
+
+  Color _getMarketStateColor(MarketState state, BuildContext context) {
+    if (state == MarketState.open) {
+      return Colors.amber;
+    }
+    return Colors.grey;
   }
 
   MarketState _getMarketState(Ticker ticker) {
