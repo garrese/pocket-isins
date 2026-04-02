@@ -156,7 +156,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'No markets found automatically. You can add them manually.',
+                'No tickers found automatically. You can add them manually.',
               ),
             ),
           );
@@ -171,10 +171,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       await _fetchChartDataForResults(mergedResults);
     } catch (e, stack) {
       if (mounted) {
-        ref.read(talkerProvider).handle(e, stack, 'Error searching markets');
+        ref.read(talkerProvider).handle(e, stack, 'Error searching tickers');
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error searching markets: $e')));
+        ).showSnackBar(SnackBar(content: Text('Error searching tickers: $e')));
       }
     } finally {
       if (mounted) {
@@ -286,7 +286,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         if (showSnackbar) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Added market: $symbol'),
+              content: Text('Added ticker: $symbol'),
               duration: const Duration(seconds: 1),
             ),
           );
@@ -294,7 +294,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       } else if (showSnackbar) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Market $symbol is already in the list.'),
+            content: Text('Ticker $symbol is already in the list.'),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -309,7 +309,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Add Market Manually'),
+          title: const Text('Add Ticker Manually'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -396,7 +396,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                   content:
-                      Text('Could not find market data for symbol: $symbol')),
+                      Text('Could not find ticker data for symbol: $symbol')),
             );
           }
         }
@@ -404,9 +404,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         if (mounted) {
           ref
               .read(talkerProvider)
-              .handle(e, stack, 'Error manually adding market');
+              .handle(e, stack, 'Error manually adding ticker');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error finding market: $e')),
+            SnackBar(content: Text('Error finding ticker: $e')),
           );
         }
       } finally {
@@ -423,7 +423,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     if (widget.formData.tickers.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please add at least one market before saving.'),
+          content: Text('Please add at least one ticker before saving.'),
         ),
       );
       return;
@@ -453,7 +453,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       if (mounted) {
         ref
             .read(talkerProvider)
-            .handle(e, stack, 'Error saving ISIN from Markets step');
+            .handle(e, stack, 'Error saving ISIN from Tickers step');
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error saving: $e')));
@@ -523,7 +523,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text('Markets'),
+          title: const Text('Tickers'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -535,7 +535,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   const Text(
-                    'Select Markets:',
+                    'Select Tickers:',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   TextButton.icon(
