@@ -200,13 +200,13 @@ class IsinSummaryScreen extends ConsumerWidget {
               const Divider(height: 1),
               _buildSection(
                 context,
-                title: 'Markets',
+                title: 'Tickers',
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: currentIsin.tickers.isEmpty
                       ? [
                           const Text(
-                            'No markets configured.',
+                            'No tickers configured.',
                             style: TextStyle(fontStyle: FontStyle.italic),
                           ),
                         ]

@@ -151,9 +151,8 @@ class MarketsScreen extends ConsumerWidget {
                                 );
                               } else {
                                 final isPositive = tickerVm.variation >= 0;
-                                final color = isPositive
-                                    ? Colors.green
-                                    : Colors.red;
+                                final color =
+                                    isPositive ? Colors.green : Colors.red;
 
                                 innerContent = InkWell(
                                   onTap: () {
@@ -189,8 +188,7 @@ class MarketsScreen extends ConsumerWidget {
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                 ),
-                                                maxWidth:
-                                                    (availableWidth < 360
+                                                maxWidth: (availableWidth < 360
                                                         ? availableWidth
                                                         : 360) -
                                                     80,
