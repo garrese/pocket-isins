@@ -1,4 +1,6 @@
-import 'package:flutter/foundation.dart';
+file_path = "lib/features/portfolio/domain/portfolio_form_data.dart"
+with open(file_path, "w") as f:
+    f.write("""import 'package:flutter/foundation.dart';
 
 class TickerFormData {
   String symbol;
@@ -124,3 +126,4 @@ class IsinFormData {
       tickers.hashCode;
   }
 }
+""")

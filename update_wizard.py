@@ -1,4 +1,10 @@
-import 'package:flutter/material.dart';
+import re
+
+file_path = "lib/features/portfolio/presentation/screens/wizard_bottom_actions.dart"
+with open(file_path, "r") as f:
+    content = f.read()
+
+replacement = """import 'package:flutter/material.dart';
 
 class WizardBottomActions extends StatelessWidget {
   final VoidCallback onCancel;
@@ -142,3 +148,7 @@ class WizardBottomActions extends StatelessWidget {
     );
   }
 }
+"""
+
+with open(file_path, "w") as f:
+    f.write(replacement)

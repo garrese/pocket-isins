@@ -34,9 +34,12 @@ class _RegisteredNameStepScreenState
   // Custom manual entry
   late TextEditingController _nameController;
 
+  late IsinFormData _originalFormData;
+
   @override
   void initState() {
     super.initState();
+    _originalFormData = widget.formData.clone();
     _selectedNames.addAll(widget.formData.registeredNames);
     _nameController = TextEditingController();
 
@@ -56,7 +59,18 @@ class _RegisteredNameStepScreenState
     await _cancelWizard();
   }
 
+  bool _hasChanges() {
+    final currentFormData = widget.formData.clone();
+    currentFormData.registeredNames = _selectedNames.toList();
+    return currentFormData != _originalFormData;
+  }
+
   Future<void> _cancelWizard() async {
+    if (!_hasChanges()) {
+      _performCancel();
+      return;
+    }
+
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -78,12 +92,16 @@ class _RegisteredNameStepScreenState
     );
 
     if (shouldCancel == true) {
-      if (context.mounted) {
-        if (widget.isEditing) {
-          Navigator.of(context).pop('CANCEL');
-        } else {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        }
+      _performCancel();
+    }
+  }
+
+  void _performCancel() {
+    if (context.mounted) {
+      if (widget.isEditing) {
+        Navigator.of(context).pop('CANCEL');
+      } else {
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     }
   }
