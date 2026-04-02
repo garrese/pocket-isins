@@ -1,0 +1,69 @@
+5: import '../../../../core/network/market_data_service.dart';
+12: class MarketsStepScreen extends ConsumerStatefulWidget {
+17:   const MarketsStepScreen({
+25:   ConsumerState<MarketsStepScreen> createState() => _MarketsStepScreenState();
+28: class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
+39:       _searchMarkets();
+80:   Future<void> _searchMarkets() async {
+88:       final marketService = ref.read(marketDataServiceProvider);
+93:         isinQuotes = await marketService.searchSymbol(widget.formData.isinCode);
+105:             await marketService.searchSymbol(widget.formData.altName);
+112:           final res = await marketService.searchSymbol(rn);
+142:             'regularMarketStart': ticker.regularMarketStart,
+143:             'regularMarketEnd': ticker.regularMarketEnd,
+144:             'preMarketStart': ticker.preMarketStart,
+145:             'preMarketEnd': ticker.preMarketEnd,
+146:             'postMarketStart': ticker.postMarketStart,
+147:             'postMarketEnd': ticker.postMarketEnd,
+159:                 'No markets found automatically. You can add them manually.',
+174:         ref.read(talkerProvider).handle(e, stack, 'Error searching markets');
+177:         ).showSnackBar(SnackBar(content: Text('Error searching markets: $e')));
+189:     final marketService = ref.read(marketDataServiceProvider);
+201:           final chartData = await marketService.fetchHistoricalData(
+215:                 mutableQ['preMarketStart'] = tradingPeriods['pre']?['start'];
+216:                 mutableQ['preMarketEnd'] = tradingPeriods['pre']?['end'];
+217:                 mutableQ['regularMarketStart'] =
+219:                 mutableQ['regularMarketEnd'] =
+221:                 mutableQ['postMarketStart'] = tradingPeriods['post']?['start'];
+222:                 mutableQ['postMarketEnd'] = tradingPeriods['post']?['end'];
+243:   void _toggleMarketSelection(dynamic q, bool? isSelected) {
+245:       _addMarketFromSearch(q, showSnackbar: false);
+256:   void _addMarketFromSearch(dynamic q, {bool showSnackbar = true}) {
+261:     final regularMarketStart = q['regularMarketStart'];
+262:     final regularMarketEnd = q['regularMarketEnd'];
+263:     final preMarketStart = q['preMarketStart'];
+264:     final preMarketEnd = q['preMarketEnd'];
+265:     final postMarketStart = q['postMarketStart'];
+266:     final postMarketEnd = q['postMarketEnd'];
+277:             regularMarketStart:
+278:                 regularMarketStart is int ? regularMarketStart : null,
+279:             regularMarketEnd: regularMarketEnd is int ? regularMarketEnd : null,
+280:             preMarketStart: preMarketStart is int ? preMarketStart : null,
+281:             preMarketEnd: preMarketEnd is int ? preMarketEnd : null,
+282:             postMarketStart: postMarketStart is int ? postMarketStart : null,
+283:             postMarketEnd: postMarketEnd is int ? postMarketEnd : null,
+289:               content: Text('Added market: $symbol'),
+297:             content: Text('Market $symbol is already in the list.'),
+305:   Future<void> _showAddMarketDialog() async {
+312:           title: const Text('Add Market Manually'),
+347:         final marketService = ref.read(marketDataServiceProvider);
+348:         final searchResults = await marketService.searchSymbol(symbol);
+363:           final chartData = await marketService.fetchHistoricalData(
+373:                 foundQuote['preMarketStart'] = tradingPeriods['pre']?['start'];
+374:                 foundQuote['preMarketEnd'] = tradingPeriods['pre']?['end'];
+375:                 foundQuote['regularMarketStart'] =
+377:                 foundQuote['regularMarketEnd'] =
+379:                 foundQuote['postMarketStart'] =
+381:                 foundQuote['postMarketEnd'] = tradingPeriods['post']?['end'];
+393:           _addMarketFromSearch(foundQuote);
+399:                       Text('Could not find market data for symbol: $symbol')),
+407:               .handle(e, stack, 'Error manually adding market');
+409:             SnackBar(content: Text('Error finding market: $e')),
+426:           content: Text('Please add at least one market before saving.'),
+456:             .handle(e, stack, 'Error saving ISIN from Markets step');
+526:           title: const Text('Markets'),
+538:                     'Select Markets:',
+542:                     onPressed: _showAddMarketDialog,
+576:                           final regStart = q['regularMarketStart'] as int?;
+577:                           final regEnd = q['regularMarketEnd'] as int?;
+613:                                 _toggleMarketSelection(q, value),
