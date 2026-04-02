@@ -27,9 +27,12 @@ class _AdditionalDataStepScreenState
     extends ConsumerState<AdditionalDataStepScreen> {
   late TextEditingController _shortNameController;
 
+  late IsinFormData _originalFormData;
+
   @override
   void initState() {
     super.initState();
+    _originalFormData = widget.formData.clone();
     _shortNameController = TextEditingController(
       text: widget.formData.shortName,
     );
@@ -46,7 +49,20 @@ class _AdditionalDataStepScreenState
     await _cancelWizard();
   }
 
+  bool _hasChanges() {
+    final currentFormData = widget.formData.clone();
+    currentFormData.shortName = _shortNameController.text.trim().isEmpty
+        ? null
+        : _shortNameController.text.trim();
+    return currentFormData != _originalFormData;
+  }
+
   Future<void> _cancelWizard() async {
+    if (!_hasChanges()) {
+      _performCancel();
+      return;
+    }
+
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -68,12 +84,16 @@ class _AdditionalDataStepScreenState
     );
 
     if (shouldCancel == true) {
-      if (context.mounted) {
-        if (widget.isEditing) {
-          Navigator.of(context).pop('CANCEL');
-        } else {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        }
+      _performCancel();
+    }
+  }
+
+  void _performCancel() {
+    if (context.mounted) {
+      if (widget.isEditing) {
+        Navigator.of(context).pop('CANCEL');
+      } else {
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     }
   }

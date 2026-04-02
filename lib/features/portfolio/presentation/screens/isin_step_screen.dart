@@ -24,9 +24,12 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
   late TextEditingController _isinController;
   late TextEditingController _altNameController;
 
+  late IsinFormData _originalFormData;
+
   @override
   void initState() {
     super.initState();
+    _originalFormData = widget.formData.clone();
     _isinController = TextEditingController(text: widget.formData.isinCode);
     _altNameController = TextEditingController(text: widget.formData.altName);
   }
@@ -63,7 +66,19 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
     await _cancelWizard();
   }
 
+  bool _hasChanges() {
+    final currentFormData = widget.formData.clone();
+    currentFormData.isinCode = _isinController.text.trim();
+    currentFormData.altName = _altNameController.text.trim();
+    return currentFormData != _originalFormData;
+  }
+
   Future<void> _cancelWizard() async {
+    if (!_hasChanges()) {
+      _performCancel();
+      return;
+    }
+
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -85,12 +100,16 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
     );
 
     if (shouldCancel == true) {
-      if (context.mounted) {
-        if (widget.isEditing) {
-          Navigator.of(context).pop('CANCEL');
-        } else {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        }
+      _performCancel();
+    }
+  }
+
+  void _performCancel() {
+    if (context.mounted) {
+      if (widget.isEditing) {
+        Navigator.of(context).pop('CANCEL');
+      } else {
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     }
   }
