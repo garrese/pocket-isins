@@ -169,7 +169,7 @@ class MarketsScreen extends ConsumerWidget {
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
-                                      vertical: 12,
+                                      vertical: 6,
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
@@ -209,7 +209,7 @@ class MarketsScreen extends ConsumerWidget {
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 4),
                                         // Ticker Details + Sparkline
                                         Expanded(
                                           child: Row(
@@ -332,21 +332,29 @@ class MarketsScreen extends ConsumerWidget {
   MarketState _getMarketState(Ticker ticker) {
     final now = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
 
-    if (ticker.regularMarketStart != null && ticker.regularMarketEnd != null) {
-      if (now >= ticker.regularMarketStart! &&
-          now <= ticker.regularMarketEnd!) {
+    final cache = ticker.marketDataCache;
+
+    final regStart = cache?.regularMarketStart ?? ticker.regularMarketStart;
+    final regEnd = cache?.regularMarketEnd ?? ticker.regularMarketEnd;
+    final preStart = cache?.preMarketStart ?? ticker.preMarketStart;
+    final preEnd = cache?.preMarketEnd ?? ticker.preMarketEnd;
+    final postStart = cache?.postMarketStart ?? ticker.postMarketStart;
+    final postEnd = cache?.postMarketEnd ?? ticker.postMarketEnd;
+
+    if (regStart != null && regEnd != null) {
+      if (now >= regStart && now <= regEnd) {
         return MarketState.open;
       }
     }
 
-    if (ticker.preMarketStart != null && ticker.preMarketEnd != null) {
-      if (now >= ticker.preMarketStart! && now <= ticker.preMarketEnd!) {
+    if (preStart != null && preEnd != null) {
+      if (now >= preStart && now <= preEnd) {
         return MarketState.pre;
       }
     }
 
-    if (ticker.postMarketStart != null && ticker.postMarketEnd != null) {
-      if (now >= ticker.postMarketStart! && now <= ticker.postMarketEnd!) {
+    if (postStart != null && postEnd != null) {
+      if (now >= postStart && now <= postEnd) {
         return MarketState.post;
       }
     }

@@ -1002,6 +1002,42 @@ class $MarketDataCachesTable extends MarketDataCaches
               defaultValue: const Constant('[]'))
           .withConverter<List<int>>(
               $MarketDataCachesTable.$converterintradayTimestamps);
+  static const VerificationMeta _regularMarketStartMeta =
+      const VerificationMeta('regularMarketStart');
+  @override
+  late final GeneratedColumn<int> regularMarketStart = GeneratedColumn<int>(
+      'regular_market_start', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _regularMarketEndMeta =
+      const VerificationMeta('regularMarketEnd');
+  @override
+  late final GeneratedColumn<int> regularMarketEnd = GeneratedColumn<int>(
+      'regular_market_end', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _preMarketStartMeta =
+      const VerificationMeta('preMarketStart');
+  @override
+  late final GeneratedColumn<int> preMarketStart = GeneratedColumn<int>(
+      'pre_market_start', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _preMarketEndMeta =
+      const VerificationMeta('preMarketEnd');
+  @override
+  late final GeneratedColumn<int> preMarketEnd = GeneratedColumn<int>(
+      'pre_market_end', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _postMarketStartMeta =
+      const VerificationMeta('postMarketStart');
+  @override
+  late final GeneratedColumn<int> postMarketStart = GeneratedColumn<int>(
+      'post_market_start', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _postMarketEndMeta =
+      const VerificationMeta('postMarketEnd');
+  @override
+  late final GeneratedColumn<int> postMarketEnd = GeneratedColumn<int>(
+      'post_market_end', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _tickerIdMeta =
       const VerificationMeta('tickerId');
   @override
@@ -1020,6 +1056,12 @@ class $MarketDataCachesTable extends MarketDataCaches
         chartPreviousClose,
         intradayPrices,
         intradayTimestamps,
+        regularMarketStart,
+        regularMarketEnd,
+        preMarketStart,
+        preMarketEnd,
+        postMarketStart,
+        postMarketEnd,
         tickerId
       ];
   @override
@@ -1062,6 +1104,42 @@ class $MarketDataCachesTable extends MarketDataCaches
           chartPreviousClose.isAcceptableOrUnknown(
               data['chart_previous_close']!, _chartPreviousCloseMeta));
     }
+    if (data.containsKey('regular_market_start')) {
+      context.handle(
+          _regularMarketStartMeta,
+          regularMarketStart.isAcceptableOrUnknown(
+              data['regular_market_start']!, _regularMarketStartMeta));
+    }
+    if (data.containsKey('regular_market_end')) {
+      context.handle(
+          _regularMarketEndMeta,
+          regularMarketEnd.isAcceptableOrUnknown(
+              data['regular_market_end']!, _regularMarketEndMeta));
+    }
+    if (data.containsKey('pre_market_start')) {
+      context.handle(
+          _preMarketStartMeta,
+          preMarketStart.isAcceptableOrUnknown(
+              data['pre_market_start']!, _preMarketStartMeta));
+    }
+    if (data.containsKey('pre_market_end')) {
+      context.handle(
+          _preMarketEndMeta,
+          preMarketEnd.isAcceptableOrUnknown(
+              data['pre_market_end']!, _preMarketEndMeta));
+    }
+    if (data.containsKey('post_market_start')) {
+      context.handle(
+          _postMarketStartMeta,
+          postMarketStart.isAcceptableOrUnknown(
+              data['post_market_start']!, _postMarketStartMeta));
+    }
+    if (data.containsKey('post_market_end')) {
+      context.handle(
+          _postMarketEndMeta,
+          postMarketEnd.isAcceptableOrUnknown(
+              data['post_market_end']!, _postMarketEndMeta));
+    }
     if (data.containsKey('ticker_id')) {
       context.handle(_tickerIdMeta,
           tickerId.isAcceptableOrUnknown(data['ticker_id']!, _tickerIdMeta));
@@ -1093,6 +1171,18 @@ class $MarketDataCachesTable extends MarketDataCaches
       intradayTimestamps: $MarketDataCachesTable.$converterintradayTimestamps
           .fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string,
               data['${effectivePrefix}intraday_timestamps'])!),
+      regularMarketStart: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}regular_market_start']),
+      regularMarketEnd: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}regular_market_end']),
+      preMarketStart: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}pre_market_start']),
+      preMarketEnd: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}pre_market_end']),
+      postMarketStart: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}post_market_start']),
+      postMarketEnd: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}post_market_end']),
       tickerId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}ticker_id'])!,
     );
@@ -1118,6 +1208,12 @@ class MarketDataCacheData extends DataClass
   final double chartPreviousClose;
   final List<double> intradayPrices;
   final List<int> intradayTimestamps;
+  final int? regularMarketStart;
+  final int? regularMarketEnd;
+  final int? preMarketStart;
+  final int? preMarketEnd;
+  final int? postMarketStart;
+  final int? postMarketEnd;
   final int tickerId;
   const MarketDataCacheData(
       {required this.id,
@@ -1127,6 +1223,12 @@ class MarketDataCacheData extends DataClass
       required this.chartPreviousClose,
       required this.intradayPrices,
       required this.intradayTimestamps,
+      this.regularMarketStart,
+      this.regularMarketEnd,
+      this.preMarketStart,
+      this.preMarketEnd,
+      this.postMarketStart,
+      this.postMarketEnd,
       required this.tickerId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1146,6 +1248,24 @@ class MarketDataCacheData extends DataClass
           .$converterintradayTimestamps
           .toSql(intradayTimestamps));
     }
+    if (!nullToAbsent || regularMarketStart != null) {
+      map['regular_market_start'] = Variable<int>(regularMarketStart);
+    }
+    if (!nullToAbsent || regularMarketEnd != null) {
+      map['regular_market_end'] = Variable<int>(regularMarketEnd);
+    }
+    if (!nullToAbsent || preMarketStart != null) {
+      map['pre_market_start'] = Variable<int>(preMarketStart);
+    }
+    if (!nullToAbsent || preMarketEnd != null) {
+      map['pre_market_end'] = Variable<int>(preMarketEnd);
+    }
+    if (!nullToAbsent || postMarketStart != null) {
+      map['post_market_start'] = Variable<int>(postMarketStart);
+    }
+    if (!nullToAbsent || postMarketEnd != null) {
+      map['post_market_end'] = Variable<int>(postMarketEnd);
+    }
     map['ticker_id'] = Variable<int>(tickerId);
     return map;
   }
@@ -1159,6 +1279,24 @@ class MarketDataCacheData extends DataClass
       chartPreviousClose: Value(chartPreviousClose),
       intradayPrices: Value(intradayPrices),
       intradayTimestamps: Value(intradayTimestamps),
+      regularMarketStart: regularMarketStart == null && nullToAbsent
+          ? const Value.absent()
+          : Value(regularMarketStart),
+      regularMarketEnd: regularMarketEnd == null && nullToAbsent
+          ? const Value.absent()
+          : Value(regularMarketEnd),
+      preMarketStart: preMarketStart == null && nullToAbsent
+          ? const Value.absent()
+          : Value(preMarketStart),
+      preMarketEnd: preMarketEnd == null && nullToAbsent
+          ? const Value.absent()
+          : Value(preMarketEnd),
+      postMarketStart: postMarketStart == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postMarketStart),
+      postMarketEnd: postMarketEnd == null && nullToAbsent
+          ? const Value.absent()
+          : Value(postMarketEnd),
       tickerId: Value(tickerId),
     );
   }
@@ -1177,6 +1315,12 @@ class MarketDataCacheData extends DataClass
       intradayPrices: serializer.fromJson<List<double>>(json['intradayPrices']),
       intradayTimestamps:
           serializer.fromJson<List<int>>(json['intradayTimestamps']),
+      regularMarketStart: serializer.fromJson<int?>(json['regularMarketStart']),
+      regularMarketEnd: serializer.fromJson<int?>(json['regularMarketEnd']),
+      preMarketStart: serializer.fromJson<int?>(json['preMarketStart']),
+      preMarketEnd: serializer.fromJson<int?>(json['preMarketEnd']),
+      postMarketStart: serializer.fromJson<int?>(json['postMarketStart']),
+      postMarketEnd: serializer.fromJson<int?>(json['postMarketEnd']),
       tickerId: serializer.fromJson<int>(json['tickerId']),
     );
   }
@@ -1191,6 +1335,12 @@ class MarketDataCacheData extends DataClass
       'chartPreviousClose': serializer.toJson<double>(chartPreviousClose),
       'intradayPrices': serializer.toJson<List<double>>(intradayPrices),
       'intradayTimestamps': serializer.toJson<List<int>>(intradayTimestamps),
+      'regularMarketStart': serializer.toJson<int?>(regularMarketStart),
+      'regularMarketEnd': serializer.toJson<int?>(regularMarketEnd),
+      'preMarketStart': serializer.toJson<int?>(preMarketStart),
+      'preMarketEnd': serializer.toJson<int?>(preMarketEnd),
+      'postMarketStart': serializer.toJson<int?>(postMarketStart),
+      'postMarketEnd': serializer.toJson<int?>(postMarketEnd),
       'tickerId': serializer.toJson<int>(tickerId),
     };
   }
@@ -1203,6 +1353,12 @@ class MarketDataCacheData extends DataClass
           double? chartPreviousClose,
           List<double>? intradayPrices,
           List<int>? intradayTimestamps,
+          Value<int?> regularMarketStart = const Value.absent(),
+          Value<int?> regularMarketEnd = const Value.absent(),
+          Value<int?> preMarketStart = const Value.absent(),
+          Value<int?> preMarketEnd = const Value.absent(),
+          Value<int?> postMarketStart = const Value.absent(),
+          Value<int?> postMarketEnd = const Value.absent(),
           int? tickerId}) =>
       MarketDataCacheData(
         id: id ?? this.id,
@@ -1212,6 +1368,21 @@ class MarketDataCacheData extends DataClass
         chartPreviousClose: chartPreviousClose ?? this.chartPreviousClose,
         intradayPrices: intradayPrices ?? this.intradayPrices,
         intradayTimestamps: intradayTimestamps ?? this.intradayTimestamps,
+        regularMarketStart: regularMarketStart.present
+            ? regularMarketStart.value
+            : this.regularMarketStart,
+        regularMarketEnd: regularMarketEnd.present
+            ? regularMarketEnd.value
+            : this.regularMarketEnd,
+        preMarketStart:
+            preMarketStart.present ? preMarketStart.value : this.preMarketStart,
+        preMarketEnd:
+            preMarketEnd.present ? preMarketEnd.value : this.preMarketEnd,
+        postMarketStart: postMarketStart.present
+            ? postMarketStart.value
+            : this.postMarketStart,
+        postMarketEnd:
+            postMarketEnd.present ? postMarketEnd.value : this.postMarketEnd,
         tickerId: tickerId ?? this.tickerId,
       );
   MarketDataCacheData copyWithCompanion(MarketDataCachesCompanion data) {
@@ -1232,6 +1403,24 @@ class MarketDataCacheData extends DataClass
       intradayTimestamps: data.intradayTimestamps.present
           ? data.intradayTimestamps.value
           : this.intradayTimestamps,
+      regularMarketStart: data.regularMarketStart.present
+          ? data.regularMarketStart.value
+          : this.regularMarketStart,
+      regularMarketEnd: data.regularMarketEnd.present
+          ? data.regularMarketEnd.value
+          : this.regularMarketEnd,
+      preMarketStart: data.preMarketStart.present
+          ? data.preMarketStart.value
+          : this.preMarketStart,
+      preMarketEnd: data.preMarketEnd.present
+          ? data.preMarketEnd.value
+          : this.preMarketEnd,
+      postMarketStart: data.postMarketStart.present
+          ? data.postMarketStart.value
+          : this.postMarketStart,
+      postMarketEnd: data.postMarketEnd.present
+          ? data.postMarketEnd.value
+          : this.postMarketEnd,
       tickerId: data.tickerId.present ? data.tickerId.value : this.tickerId,
     );
   }
@@ -1246,14 +1435,33 @@ class MarketDataCacheData extends DataClass
           ..write('chartPreviousClose: $chartPreviousClose, ')
           ..write('intradayPrices: $intradayPrices, ')
           ..write('intradayTimestamps: $intradayTimestamps, ')
+          ..write('regularMarketStart: $regularMarketStart, ')
+          ..write('regularMarketEnd: $regularMarketEnd, ')
+          ..write('preMarketStart: $preMarketStart, ')
+          ..write('preMarketEnd: $preMarketEnd, ')
+          ..write('postMarketStart: $postMarketStart, ')
+          ..write('postMarketEnd: $postMarketEnd, ')
           ..write('tickerId: $tickerId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, symbol, lastUpdated, regularMarketPrice,
-      chartPreviousClose, intradayPrices, intradayTimestamps, tickerId);
+  int get hashCode => Object.hash(
+      id,
+      symbol,
+      lastUpdated,
+      regularMarketPrice,
+      chartPreviousClose,
+      intradayPrices,
+      intradayTimestamps,
+      regularMarketStart,
+      regularMarketEnd,
+      preMarketStart,
+      preMarketEnd,
+      postMarketStart,
+      postMarketEnd,
+      tickerId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1265,6 +1473,12 @@ class MarketDataCacheData extends DataClass
           other.chartPreviousClose == this.chartPreviousClose &&
           other.intradayPrices == this.intradayPrices &&
           other.intradayTimestamps == this.intradayTimestamps &&
+          other.regularMarketStart == this.regularMarketStart &&
+          other.regularMarketEnd == this.regularMarketEnd &&
+          other.preMarketStart == this.preMarketStart &&
+          other.preMarketEnd == this.preMarketEnd &&
+          other.postMarketStart == this.postMarketStart &&
+          other.postMarketEnd == this.postMarketEnd &&
           other.tickerId == this.tickerId);
 }
 
@@ -1276,6 +1490,12 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
   final Value<double> chartPreviousClose;
   final Value<List<double>> intradayPrices;
   final Value<List<int>> intradayTimestamps;
+  final Value<int?> regularMarketStart;
+  final Value<int?> regularMarketEnd;
+  final Value<int?> preMarketStart;
+  final Value<int?> preMarketEnd;
+  final Value<int?> postMarketStart;
+  final Value<int?> postMarketEnd;
   final Value<int> tickerId;
   const MarketDataCachesCompanion({
     this.id = const Value.absent(),
@@ -1285,6 +1505,12 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
     this.chartPreviousClose = const Value.absent(),
     this.intradayPrices = const Value.absent(),
     this.intradayTimestamps = const Value.absent(),
+    this.regularMarketStart = const Value.absent(),
+    this.regularMarketEnd = const Value.absent(),
+    this.preMarketStart = const Value.absent(),
+    this.preMarketEnd = const Value.absent(),
+    this.postMarketStart = const Value.absent(),
+    this.postMarketEnd = const Value.absent(),
     this.tickerId = const Value.absent(),
   });
   MarketDataCachesCompanion.insert({
@@ -1295,6 +1521,12 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
     this.chartPreviousClose = const Value.absent(),
     this.intradayPrices = const Value.absent(),
     this.intradayTimestamps = const Value.absent(),
+    this.regularMarketStart = const Value.absent(),
+    this.regularMarketEnd = const Value.absent(),
+    this.preMarketStart = const Value.absent(),
+    this.preMarketEnd = const Value.absent(),
+    this.postMarketStart = const Value.absent(),
+    this.postMarketEnd = const Value.absent(),
     required int tickerId,
   })  : symbol = Value(symbol),
         lastUpdated = Value(lastUpdated),
@@ -1307,6 +1539,12 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
     Expression<double>? chartPreviousClose,
     Expression<String>? intradayPrices,
     Expression<String>? intradayTimestamps,
+    Expression<int>? regularMarketStart,
+    Expression<int>? regularMarketEnd,
+    Expression<int>? preMarketStart,
+    Expression<int>? preMarketEnd,
+    Expression<int>? postMarketStart,
+    Expression<int>? postMarketEnd,
     Expression<int>? tickerId,
   }) {
     return RawValuesInsertable({
@@ -1319,6 +1557,13 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
         'chart_previous_close': chartPreviousClose,
       if (intradayPrices != null) 'intraday_prices': intradayPrices,
       if (intradayTimestamps != null) 'intraday_timestamps': intradayTimestamps,
+      if (regularMarketStart != null)
+        'regular_market_start': regularMarketStart,
+      if (regularMarketEnd != null) 'regular_market_end': regularMarketEnd,
+      if (preMarketStart != null) 'pre_market_start': preMarketStart,
+      if (preMarketEnd != null) 'pre_market_end': preMarketEnd,
+      if (postMarketStart != null) 'post_market_start': postMarketStart,
+      if (postMarketEnd != null) 'post_market_end': postMarketEnd,
       if (tickerId != null) 'ticker_id': tickerId,
     });
   }
@@ -1331,6 +1576,12 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
       Value<double>? chartPreviousClose,
       Value<List<double>>? intradayPrices,
       Value<List<int>>? intradayTimestamps,
+      Value<int?>? regularMarketStart,
+      Value<int?>? regularMarketEnd,
+      Value<int?>? preMarketStart,
+      Value<int?>? preMarketEnd,
+      Value<int?>? postMarketStart,
+      Value<int?>? postMarketEnd,
       Value<int>? tickerId}) {
     return MarketDataCachesCompanion(
       id: id ?? this.id,
@@ -1340,6 +1591,12 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
       chartPreviousClose: chartPreviousClose ?? this.chartPreviousClose,
       intradayPrices: intradayPrices ?? this.intradayPrices,
       intradayTimestamps: intradayTimestamps ?? this.intradayTimestamps,
+      regularMarketStart: regularMarketStart ?? this.regularMarketStart,
+      regularMarketEnd: regularMarketEnd ?? this.regularMarketEnd,
+      preMarketStart: preMarketStart ?? this.preMarketStart,
+      preMarketEnd: preMarketEnd ?? this.preMarketEnd,
+      postMarketStart: postMarketStart ?? this.postMarketStart,
+      postMarketEnd: postMarketEnd ?? this.postMarketEnd,
       tickerId: tickerId ?? this.tickerId,
     );
   }
@@ -1372,6 +1629,24 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
           .$converterintradayTimestamps
           .toSql(intradayTimestamps.value));
     }
+    if (regularMarketStart.present) {
+      map['regular_market_start'] = Variable<int>(regularMarketStart.value);
+    }
+    if (regularMarketEnd.present) {
+      map['regular_market_end'] = Variable<int>(regularMarketEnd.value);
+    }
+    if (preMarketStart.present) {
+      map['pre_market_start'] = Variable<int>(preMarketStart.value);
+    }
+    if (preMarketEnd.present) {
+      map['pre_market_end'] = Variable<int>(preMarketEnd.value);
+    }
+    if (postMarketStart.present) {
+      map['post_market_start'] = Variable<int>(postMarketStart.value);
+    }
+    if (postMarketEnd.present) {
+      map['post_market_end'] = Variable<int>(postMarketEnd.value);
+    }
     if (tickerId.present) {
       map['ticker_id'] = Variable<int>(tickerId.value);
     }
@@ -1388,6 +1663,12 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
           ..write('chartPreviousClose: $chartPreviousClose, ')
           ..write('intradayPrices: $intradayPrices, ')
           ..write('intradayTimestamps: $intradayTimestamps, ')
+          ..write('regularMarketStart: $regularMarketStart, ')
+          ..write('regularMarketEnd: $regularMarketEnd, ')
+          ..write('preMarketStart: $preMarketStart, ')
+          ..write('preMarketEnd: $preMarketEnd, ')
+          ..write('postMarketStart: $postMarketStart, ')
+          ..write('postMarketEnd: $postMarketEnd, ')
           ..write('tickerId: $tickerId')
           ..write(')'))
         .toString();
@@ -2951,6 +3232,12 @@ typedef $$MarketDataCachesTableCreateCompanionBuilder
   Value<double> chartPreviousClose,
   Value<List<double>> intradayPrices,
   Value<List<int>> intradayTimestamps,
+  Value<int?> regularMarketStart,
+  Value<int?> regularMarketEnd,
+  Value<int?> preMarketStart,
+  Value<int?> preMarketEnd,
+  Value<int?> postMarketStart,
+  Value<int?> postMarketEnd,
   required int tickerId,
 });
 typedef $$MarketDataCachesTableUpdateCompanionBuilder
@@ -2962,6 +3249,12 @@ typedef $$MarketDataCachesTableUpdateCompanionBuilder
   Value<double> chartPreviousClose,
   Value<List<double>> intradayPrices,
   Value<List<int>> intradayTimestamps,
+  Value<int?> regularMarketStart,
+  Value<int?> regularMarketEnd,
+  Value<int?> preMarketStart,
+  Value<int?> preMarketEnd,
+  Value<int?> postMarketStart,
+  Value<int?> postMarketEnd,
   Value<int> tickerId,
 });
 
@@ -3022,6 +3315,28 @@ class $$MarketDataCachesTableFilterComposer
           column: $table.intradayTimestamps,
           builder: (column) => ColumnWithTypeConverterFilters(column));
 
+  ColumnFilters<int> get regularMarketStart => $composableBuilder(
+      column: $table.regularMarketStart,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get regularMarketEnd => $composableBuilder(
+      column: $table.regularMarketEnd,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get preMarketStart => $composableBuilder(
+      column: $table.preMarketStart,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get preMarketEnd => $composableBuilder(
+      column: $table.preMarketEnd, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get postMarketStart => $composableBuilder(
+      column: $table.postMarketStart,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get postMarketEnd => $composableBuilder(
+      column: $table.postMarketEnd, builder: (column) => ColumnFilters(column));
+
   $$TickersTableFilterComposer get tickerId {
     final $$TickersTableFilterComposer composer = $composerBuilder(
         composer: this,
@@ -3077,6 +3392,30 @@ class $$MarketDataCachesTableOrderingComposer
       column: $table.intradayTimestamps,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get regularMarketStart => $composableBuilder(
+      column: $table.regularMarketStart,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get regularMarketEnd => $composableBuilder(
+      column: $table.regularMarketEnd,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get preMarketStart => $composableBuilder(
+      column: $table.preMarketStart,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get preMarketEnd => $composableBuilder(
+      column: $table.preMarketEnd,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get postMarketStart => $composableBuilder(
+      column: $table.postMarketStart,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get postMarketEnd => $composableBuilder(
+      column: $table.postMarketEnd,
+      builder: (column) => ColumnOrderings(column));
+
   $$TickersTableOrderingComposer get tickerId {
     final $$TickersTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -3130,6 +3469,24 @@ class $$MarketDataCachesTableAnnotationComposer
       $composableBuilder(
           column: $table.intradayTimestamps, builder: (column) => column);
 
+  GeneratedColumn<int> get regularMarketStart => $composableBuilder(
+      column: $table.regularMarketStart, builder: (column) => column);
+
+  GeneratedColumn<int> get regularMarketEnd => $composableBuilder(
+      column: $table.regularMarketEnd, builder: (column) => column);
+
+  GeneratedColumn<int> get preMarketStart => $composableBuilder(
+      column: $table.preMarketStart, builder: (column) => column);
+
+  GeneratedColumn<int> get preMarketEnd => $composableBuilder(
+      column: $table.preMarketEnd, builder: (column) => column);
+
+  GeneratedColumn<int> get postMarketStart => $composableBuilder(
+      column: $table.postMarketStart, builder: (column) => column);
+
+  GeneratedColumn<int> get postMarketEnd => $composableBuilder(
+      column: $table.postMarketEnd, builder: (column) => column);
+
   $$TickersTableAnnotationComposer get tickerId {
     final $$TickersTableAnnotationComposer composer = $composerBuilder(
         composer: this,
@@ -3182,6 +3539,12 @@ class $$MarketDataCachesTableTableManager extends RootTableManager<
             Value<double> chartPreviousClose = const Value.absent(),
             Value<List<double>> intradayPrices = const Value.absent(),
             Value<List<int>> intradayTimestamps = const Value.absent(),
+            Value<int?> regularMarketStart = const Value.absent(),
+            Value<int?> regularMarketEnd = const Value.absent(),
+            Value<int?> preMarketStart = const Value.absent(),
+            Value<int?> preMarketEnd = const Value.absent(),
+            Value<int?> postMarketStart = const Value.absent(),
+            Value<int?> postMarketEnd = const Value.absent(),
             Value<int> tickerId = const Value.absent(),
           }) =>
               MarketDataCachesCompanion(
@@ -3192,6 +3555,12 @@ class $$MarketDataCachesTableTableManager extends RootTableManager<
             chartPreviousClose: chartPreviousClose,
             intradayPrices: intradayPrices,
             intradayTimestamps: intradayTimestamps,
+            regularMarketStart: regularMarketStart,
+            regularMarketEnd: regularMarketEnd,
+            preMarketStart: preMarketStart,
+            preMarketEnd: preMarketEnd,
+            postMarketStart: postMarketStart,
+            postMarketEnd: postMarketEnd,
             tickerId: tickerId,
           ),
           createCompanionCallback: ({
@@ -3202,6 +3571,12 @@ class $$MarketDataCachesTableTableManager extends RootTableManager<
             Value<double> chartPreviousClose = const Value.absent(),
             Value<List<double>> intradayPrices = const Value.absent(),
             Value<List<int>> intradayTimestamps = const Value.absent(),
+            Value<int?> regularMarketStart = const Value.absent(),
+            Value<int?> regularMarketEnd = const Value.absent(),
+            Value<int?> preMarketStart = const Value.absent(),
+            Value<int?> preMarketEnd = const Value.absent(),
+            Value<int?> postMarketStart = const Value.absent(),
+            Value<int?> postMarketEnd = const Value.absent(),
             required int tickerId,
           }) =>
               MarketDataCachesCompanion.insert(
@@ -3212,6 +3587,12 @@ class $$MarketDataCachesTableTableManager extends RootTableManager<
             chartPreviousClose: chartPreviousClose,
             intradayPrices: intradayPrices,
             intradayTimestamps: intradayTimestamps,
+            regularMarketStart: regularMarketStart,
+            regularMarketEnd: regularMarketEnd,
+            preMarketStart: preMarketStart,
+            preMarketEnd: preMarketEnd,
+            postMarketStart: postMarketStart,
+            postMarketEnd: postMarketEnd,
             tickerId: tickerId,
           ),
           withReferenceMapper: (p0) => p0
