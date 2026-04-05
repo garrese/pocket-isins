@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_drawer.dart';
 import 'bot_provider.dart';
@@ -60,6 +62,81 @@ class _BotScreenState extends ConsumerState<BotScreen> {
               itemBuilder: (context, index) {
                 final message = botState.messages[index];
                 final isUser = message.role == 'user';
+                final isSystem = message.role == 'system';
+
+                if (isSystem) {
+                  return const SizedBox.shrink(); // Hide system messages
+                }
+
+                // Check for action commands
+                final createIsinRegExp = RegExp(
+                    r'\[\$ACTION:CREATE_ISIN\s+isinCode="([^"]+)"\s+name="([^"]+)"\]');
+                final marketDataRegExp = RegExp(
+                    r'\[\$ACTION:MARKET_DATA\s+symbol="([^"]+)"\s+interval="([^"]+)"\s+range="([^"]+)"\]');
+
+                String displayContent = message.content;
+                Widget? actionWidget;
+
+                if (!isUser) {
+                  // Handle CREATE_ISIN
+                  final isinMatch = createIsinRegExp.firstMatch(displayContent);
+                  if (isinMatch != null) {
+                    final isinCode = isinMatch.group(1)!;
+                    final name = isinMatch.group(2)!;
+
+                    // Replace the raw command with empty string for rendering
+                    displayContent =
+                        displayContent.replaceAll(createIsinRegExp, '').trim();
+
+                    actionWidget = Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.add_circle_outline),
+                        label: Text('Create ISIN: $name'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                        onPressed: () {
+                          // Navigate to ISIN wizard with prefilled data
+                          context.go('/isins/wizard', extra: {
+                            'isinCode': isinCode,
+                            'name': name,
+                          });
+                        },
+                      ),
+                    );
+                  }
+
+                  // Handle MARKET_DATA (just hide the raw command)
+                  final marketMatch =
+                      marketDataRegExp.firstMatch(displayContent);
+                  if (marketMatch != null) {
+                    final symbol = marketMatch.group(1)!;
+                    displayContent =
+                        displayContent.replaceAll(marketDataRegExp, '').trim();
+
+                    actionWidget ??= Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Fetching market data for $symbol...',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    );
+                  }
+                }
+
+                // If content is empty and there's no action widget, don't show an empty bubble
+                if (displayContent.isEmpty && actionWidget == null) {
+                  return const SizedBox.shrink();
+                }
+
                 return Align(
                   alignment:
                       isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -75,15 +152,33 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.75,
+                      maxWidth: MediaQuery.of(context).size.width * 0.85,
                     ),
-                    child: Text(
-                      message.content,
-                      style: TextStyle(
-                        color: isUser
-                            ? Theme.of(context).colorScheme.onPrimaryContainer
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (displayContent.isNotEmpty)
+                          isUser
+                              ? Text(
+                                  displayContent,
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
+                                )
+                              : MarkdownBody(
+                                  data: displayContent,
+                                  styleSheet: MarkdownStyleSheet(
+                                    p: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                        if (actionWidget != null) actionWidget,
+                      ],
                     ),
                   ),
                 );
