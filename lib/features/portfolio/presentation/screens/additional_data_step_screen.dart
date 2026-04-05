@@ -163,28 +163,34 @@ class _AdditionalDataStepScreenState
           automaticallyImplyLeading: false,
           title: const Text('Additional Data'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _shortNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Short Name (Optional)',
-                  border: OutlineInputBorder(),
-                  helperText:
-                      'Used across the app instead of full name if provided.',
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextFormField(
+                      controller: _shortNameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Short Name (Optional)',
+                        border: OutlineInputBorder(),
+                        helperText:
+                            'Used across the app instead of full name if provided.',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
-              WizardBottomActions(
-                onCancel: _cancelWizard,
-                onPrevious: _onPrevious,
-                onSave: _saveTransaction,
-              ),
-            ],
-          ),
+            ),
+            WizardBottomActions(
+              onCancel: _cancelWizard,
+              onPrevious: _onPrevious,
+              onSave: _saveTransaction,
+            ),
+          ],
         ),
       ),
     );
