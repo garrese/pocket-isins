@@ -31,6 +31,9 @@ class LogScreen extends ConsumerWidget {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         textColor: Theme.of(context).colorScheme.onSurface,
         cardColor: Theme.of(context).cardColor,
+        logColors: {
+          LogLevel.debug: Colors.green,
+        },
       ),
     );
   }
