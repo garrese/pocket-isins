@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:drift/drift.dart' as drift;
 

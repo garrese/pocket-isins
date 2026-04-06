@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../../../core/network/market_data_service.dart';
-import 'package:talker_flutter/talker_flutter.dart';
+
 import '../../../../core/services/log/talker_provider.dart';
 import 'isin_step_screen.dart';
 import 'markets_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 
 class RegisteredNameStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -261,10 +262,10 @@ class _RegisteredNameStepScreenState
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: AppBar(
+        appBar: CustomAppBar(appBar: AppBar(
           automaticallyImplyLeading: false,
           title: const Text('Registered Names'),
-        ),
+        )),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

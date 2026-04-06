@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/constrained_width.dart';
 import '../data/ai_settings_repository.dart';
 import '../domain/ai_settings.dart';
+import '../../../core/widgets/custom_app_bar.dart';
 
 final aiSettingsProvider = FutureProvider.autoDispose<AiSettings>((ref) async {
   final repo = ref.watch(aiSettingsRepositoryProvider);
@@ -86,7 +88,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
     final settingsAsyncValue = ref.watch(aiSettingsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('BYOK AI Configuration')),
+      appBar: CustomAppBar(appBar: AppBar(title: const Text('BYOK AI Configuration'))),
       body: settingsAsyncValue.when(
         data: (settings) {
           // Initialize controllers with current values
@@ -99,9 +101,10 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
             _modelNameController.text = settings.modelName;
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
+          return ConstrainedWidth.narrow(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -202,6 +205,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                   ),
                 ],
               ),
+            ),
             ),
           );
         },

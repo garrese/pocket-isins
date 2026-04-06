@@ -16,7 +16,7 @@ import 'features/logs/presentation/log_screen.dart';
 import 'core/services/log/custom_talker_formatter.dart';
 import '../../../core/services/log/talker_provider.dart';
 import 'core/theme/app_drawer.dart';
-import 'core/widgets/constrained_width.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -147,7 +147,7 @@ class MainScreen extends ConsumerWidget {
           child: Center(
             heightFactor: 1.0,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200.0),
+              constraints: const BoxConstraints(maxWidth: 600.0),
               child: BottomNavigationBar(
                 currentIndex: activeIndex,
                 type: BottomNavigationBarType.fixed,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/drift_service.dart';
 import '../application/developer_settings_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/widgets/custom_app_bar.dart';
 
 class PurgeDataScreen extends ConsumerStatefulWidget {
   const PurgeDataScreen({super.key});
@@ -101,7 +102,7 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Purge Data')),
+      appBar: CustomAppBar(appBar: AppBar(title: const Text('Purge Data'))),
       body: ListView(
         children: [
           CheckboxListTile(

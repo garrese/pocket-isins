@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../data/portfolio_provider.dart';
-import 'package:talker_flutter/talker_flutter.dart';
+
 import '../../../../core/services/log/talker_provider.dart';
 import 'wizard_bottom_actions.dart';
 import 'markets_step_screen.dart';
 import '../../../../core/widgets/constrained_width.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 
 class AdditionalDataStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -163,10 +164,10 @@ class _AdditionalDataStepScreenState
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: AppBar(
+        appBar: CustomAppBar(appBar: AppBar(
           automaticallyImplyLeading: false,
           title: const Text('Additional Data'),
-        ),
+        )),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
