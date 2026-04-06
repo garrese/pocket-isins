@@ -41,7 +41,6 @@ class _BotScreenState extends ConsumerState<BotScreen> {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Bot'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

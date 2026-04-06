@@ -23,7 +23,6 @@ class MarketsScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Markets Overview'),
         actions: [
           PopupMenuButton<bool>(
             icon: const Icon(Icons.sort),

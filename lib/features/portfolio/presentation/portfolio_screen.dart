@@ -22,7 +22,6 @@ class PortfolioScreen extends ConsumerWidget {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('ISINs'),
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download),
