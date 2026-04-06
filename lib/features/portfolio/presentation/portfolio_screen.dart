@@ -146,7 +146,7 @@ class PortfolioScreen extends ConsumerWidget {
                     isin.displayName,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: appThemeExt?.mainTitleColor,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -161,9 +161,9 @@ class PortfolioScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.shortName!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey,
+                                color: appThemeExt?.mainTitleColor ?? Colors.white,
                               ),
                             ),
                           ),
@@ -172,9 +172,9 @@ class PortfolioScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.isinCode!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey,
+                                color: appThemeExt?.mainTitleColor ?? Colors.white,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -182,9 +182,10 @@ class PortfolioScreen extends ConsumerWidget {
                         if (tickersList.isNotEmpty)
                           Text(
                             tickersList,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                       ],
