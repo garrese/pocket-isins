@@ -264,138 +264,144 @@ class _RegisteredNameStepScreenState
           automaticallyImplyLeading: false,
           title: const Text('Registered Names'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  const Text(
-                    'Select Registered Names:',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  TextButton.icon(
-                    onPressed: _addManualName,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Manually'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator())
-              else if (_uniqueNames.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    'No results found.',
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                )
-              else
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _uniqueNames.length,
-                    itemBuilder: (context, index) {
-                      final name = _uniqueNames[index];
-                      final isSelected = _selectedNames.contains(name);
-
-                      return CheckboxListTile(
-                        title: Text(name),
-                        value: isSelected,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            if (value == true) {
-                              _selectedNames.add(name);
-                            } else {
-                              _selectedNames.remove(name);
-                            }
-                          });
-                        },
-                      );
-                    },
-                  ),
-                ),
-              const SizedBox(height: 16),
-              Form(
-                key: _formKey,
-                child: FormField<bool>(
-                  validator: (_) {
-                    if (_selectedNames.isEmpty) {
-                      return 'Please select at least one registered name, or skip if you really want to.';
-                    }
-                    return null;
-                  },
-                  builder: (state) {
-                    if (state.hasError) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        const Text(
+                          'Select Registered Names:',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        TextButton.icon(
+                          onPressed: _addManualName,
+                          icon: const Icon(Icons.add),
+                          label: const Text('Add Manually'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (_isLoading)
+                      const Expanded(child: Center(child: CircularProgressIndicator()))
+                    else if (_uniqueNames.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
                         child: Text(
-                          state.errorText!,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                            fontSize: 12,
-                          ),
+                          'No results found.',
+                          style: TextStyle(fontStyle: FontStyle.italic),
                         ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
+                      )
+                    else
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _uniqueNames.length,
+                          itemBuilder: (context, index) {
+                            final name = _uniqueNames[index];
+                            final isSelected = _selectedNames.contains(name);
+
+                            return CheckboxListTile(
+                              title: Text(name),
+                              value: isSelected,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  if (value == true) {
+                                    _selectedNames.add(name);
+                                  } else {
+                                    _selectedNames.remove(name);
+                                  }
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    Form(
+                      key: _formKey,
+                      child: FormField<bool>(
+                        validator: (_) {
+                          if (_selectedNames.isEmpty) {
+                            return 'Please select at least one registered name, or skip if you really want to.';
+                          }
+                          return null;
+                        },
+                        builder: (state) {
+                          if (state.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                state.errorText!,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
-              WizardBottomActions(
-                onCancel: _cancelWizard,
-                onPrevious: _onPrevious,
-                onContinue: () {
-                  if (_selectedNames.isEmpty) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('No Names Selected'),
-                        content: const Text(
-                          'You have not selected any registered names. Do you want to proceed anyway?',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              // Bypass validation
-                              widget.formData.registeredNames = [];
-                              final route = MaterialPageRoute(
-                                builder: (context) => MarketsStepScreen(
-                                  formData: widget.formData,
-                                  isEditing: widget.isEditing,
-                                  isEntryPoint: false,
-                                ),
-                              );
-                              Navigator.push(context, route).then((result) {
-                                if (result == 'CANCEL' || result == 'SAVED') {
-                                  if (mounted) {
-                                    Navigator.pop(context, result);
-                                  }
-                                }
-                              });
-                            },
-                            child: const Text('Proceed'),
-                          ),
-                        ],
+            ),
+            WizardBottomActions(
+              onCancel: _cancelWizard,
+              onPrevious: _onPrevious,
+              onContinue: () {
+                if (_selectedNames.isEmpty) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('No Names Selected'),
+                      content: const Text(
+                        'You have not selected any registered names. Do you want to proceed anyway?',
                       ),
-                    );
-                  } else {
-                    _onContinue();
-                  }
-                },
-              ),
-            ],
-          ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            // Bypass validation
+                            widget.formData.registeredNames = [];
+                            final route = MaterialPageRoute(
+                              builder: (context) => MarketsStepScreen(
+                                formData: widget.formData,
+                                isEditing: widget.isEditing,
+                                isEntryPoint: false,
+                              ),
+                            );
+                            Navigator.push(context, route).then((result) {
+                              if (result == 'CANCEL' || result == 'SAVED') {
+                                if (mounted) {
+                                  Navigator.pop(context, result);
+                                }
+                              }
+                            });
+                          },
+                          child: const Text('Proceed'),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  _onContinue();
+                }
+              },
+            ),
+          ],
         ),
       ),
     );

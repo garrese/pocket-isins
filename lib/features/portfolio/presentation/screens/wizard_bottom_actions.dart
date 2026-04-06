@@ -19,91 +19,112 @@ class WizardBottomActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 16),
+      // Remove top padding here since it should stick to the bottom and be full bleed
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isNarrow = constraints.maxWidth < 600;
 
-          Widget cancelButton = TextButton.icon(
-            onPressed: onCancel,
-            icon: const Icon(Icons.close),
-            label: const Text('Cancel'),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          // Common style for all buttons: square edges, no margin
+          final squareShape = RoundedRectangleBorder(borderRadius: BorderRadius.zero);
+          final buttonHeight = 56.0;
 
-          Widget? previousButton;
-          if (!isFirstStep && onPrevious != null) {
-            previousButton = OutlinedButton.icon(
-              onPressed: onPrevious,
-              icon: const Icon(Icons.arrow_back),
-              label: const Text('Previous'),
+          Widget buildCancel() {
+            return SizedBox(
+              height: buttonHeight,
+              child: TextButton.icon(
+                onPressed: onCancel,
+                icon: const Icon(Icons.close),
+                label: const Text('Cancel'),
+                style: TextButton.styleFrom(
+                  shape: squareShape,
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                  backgroundColor: Theme.of(context).colorScheme.surface, // Gives it a button look vs background
+                ),
+              ),
             );
           }
 
-          Widget? continueButton;
-          if (onContinue != null) {
-            continueButton = OutlinedButton.icon(
-              onPressed: onContinue,
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text('Continue'),
+          Widget? buildPrevious() {
+            if (isFirstStep || onPrevious == null) return null;
+            return SizedBox(
+              height: buttonHeight,
+              child: OutlinedButton.icon(
+                onPressed: onPrevious,
+                icon: const Icon(Icons.arrow_back),
+                label: const Text('Previous'),
+                style: OutlinedButton.styleFrom(
+                  shape: squareShape,
+                  side: BorderSide(color: Theme.of(context).dividerColor, width: 0.5),
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                ),
+              ),
             );
           }
 
-          Widget? saveButton;
-          if (onSave != null) {
-            saveButton = FilledButton.icon(
-              onPressed: onSave,
-              icon: const Icon(Icons.save),
-              label: const Text('Save'),
+          Widget? buildContinue() {
+            if (onContinue == null) return null;
+            return SizedBox(
+              height: buttonHeight,
+              child: OutlinedButton.icon(
+                onPressed: onContinue,
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text('Continue'),
+                style: OutlinedButton.styleFrom(
+                  shape: squareShape,
+                  side: BorderSide(color: Theme.of(context).dividerColor, width: 0.5),
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                ),
+              ),
             );
+          }
+
+          Widget? buildSave() {
+            if (onSave == null) return null;
+            return SizedBox(
+              height: buttonHeight,
+              child: FilledButton.icon(
+                onPressed: onSave,
+                icon: const Icon(Icons.save),
+                label: const Text('Save'),
+                style: FilledButton.styleFrom(
+                  shape: squareShape,
+                ),
+              ),
+            );
+          }
+
+          final previousButton = buildPrevious();
+          final cancelButton = buildCancel();
+          final continueButton = buildContinue();
+          final saveButton = buildSave();
+
+          // Left Group: Cancel, Previous
+          final leftGroup = <Widget>[];
+          leftGroup.add(Expanded(child: cancelButton));
+          if (previousButton != null) {
+            leftGroup.add(Expanded(child: previousButton));
+          }
+
+          // Right Group: Continue, Save
+          final rightGroup = <Widget>[];
+          if (continueButton != null) {
+            rightGroup.add(Expanded(child: continueButton));
+          }
+          if (saveButton != null) {
+            rightGroup.add(Expanded(child: saveButton));
           }
 
           if (isNarrow) {
             return Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                if (rightGroup.isNotEmpty)
+                  Row(
+                    children: rightGroup,
+                  ),
                 Row(
-                  children: [
-                    if (previousButton != null)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 4.0),
-                          child: previousButton,
-                        ),
-                      )
-                    else
-                      const Spacer(),
-                    if (continueButton != null)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 4.0),
-                          child: continueButton,
-                        ),
-                      )
-                    else
-                      const Spacer(),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 4.0),
-                        child: cancelButton,
-                      ),
-                    ),
-                    if (saveButton != null)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 4.0),
-                          child: saveButton,
-                        ),
-                      )
-                    else
-                      const Spacer(),
-                  ],
+                  children: leftGroup,
                 ),
               ],
             );
@@ -111,27 +132,13 @@ class WizardBottomActions extends StatelessWidget {
             return Row(
               children: [
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
-                    child: cancelButton,
+                  child: Row(
+                    children: leftGroup,
                   ),
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: previousButton ?? const SizedBox.shrink(),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: continueButton ?? const SizedBox.shrink(),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 4.0),
-                    child: saveButton ?? const SizedBox.shrink(),
+                  child: Row(
+                    children: rightGroup,
                   ),
                 ),
               ],

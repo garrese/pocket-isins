@@ -542,113 +542,121 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           automaticallyImplyLeading: false,
           title: const Text('Tickers'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  const Text(
-                    'Select Tickers:',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  TextButton.icon(
-                    onPressed: _showAddMarketDialog,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Manually'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              if (_isLoading && _searchResults.isEmpty)
-                const Center(child: CircularProgressIndicator())
-              else if (_searchResults.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    'No results found automatically.',
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                )
-              else
-                Expanded(
-                  child: Stack(
-                    children: [
-                      ListView.builder(
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          final q = _searchResults[index];
-                          final name =
-                              q['longname'] ?? q['shortname'] ?? 'Unknown';
-                          final symbol = q['symbol'] ?? 'Unknown';
-
-                          final isDirect =
-                              _isinDirectSymbols.contains(symbol.toString());
-
-                          final currency = q['currency'];
-                          final gmtOffset = q['gmtoffset'] as int?;
-                          final regStart = q['regularMarketStart'] as int?;
-                          final regEnd = q['regularMarketEnd'] as int?;
-                          final timeStr =
-                              _formatTime(regStart, regEnd, gmtOffset);
-
-                          final isAlreadyAdded = widget.formData.tickers
-                              .any((t) => t.symbol == symbol);
-
-                          return CheckboxListTile(
-                            title: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    name,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (isDirect)
-                                  const Icon(Icons.star,
-                                      color: Colors.amber, size: 16),
-                              ],
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                    '${q['exchDisp'] ?? q['exchange'] ?? 'Unknown'} - $symbol'),
-                                if (currency != null || timeStr.isNotEmpty)
-                                  Text(
-                                    '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
-                                    style: const TextStyle(
-                                        fontSize: 12, color: Colors.grey),
-                                  ),
-                              ],
-                            ),
-                            value: isAlreadyAdded,
-                            onChanged: (bool? value) =>
-                                _toggleMarketSelection(q, value),
-                          );
-                        },
-                      ),
-                      if (_isLoading)
-                        const Positioned(
-                          bottom: 16,
-                          right: 16,
-                          child: CircularProgressIndicator(),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        const Text(
+                          'Select Tickers:',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                    ],
-                  ),
+                        TextButton.icon(
+                          onPressed: _showAddMarketDialog,
+                          icon: const Icon(Icons.add),
+                          label: const Text('Add Manually'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (_isLoading && _searchResults.isEmpty)
+                      const Expanded(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (_searchResults.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        child: Text(
+                          'No results found automatically.',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      )
+                    else
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            ListView.builder(
+                              itemCount: _searchResults.length,
+                              itemBuilder: (context, index) {
+                                final q = _searchResults[index];
+                                final name =
+                                    q['longname'] ?? q['shortname'] ?? 'Unknown';
+                                final symbol = q['symbol'] ?? 'Unknown';
+
+                                final isDirect =
+                                    _isinDirectSymbols.contains(symbol.toString());
+
+                                final currency = q['currency'];
+                                final gmtOffset = q['gmtoffset'] as int?;
+                                final regStart = q['regularMarketStart'] as int?;
+                                final regEnd = q['regularMarketEnd'] as int?;
+                                final timeStr =
+                                    _formatTime(regStart, regEnd, gmtOffset);
+
+                                final isAlreadyAdded = widget.formData.tickers
+                                    .any((t) => t.symbol == symbol);
+
+                                return CheckboxListTile(
+                                  title: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          name,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      if (isDirect)
+                                        const Icon(Icons.star,
+                                            color: Colors.amber, size: 16),
+                                    ],
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                          '${q['exchDisp'] ?? q['exchange'] ?? 'Unknown'} - $symbol'),
+                                      if (currency != null || timeStr.isNotEmpty)
+                                        Text(
+                                          '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
+                                          style: const TextStyle(
+                                              fontSize: 12, color: Colors.grey),
+                                        ),
+                                    ],
+                                  ),
+                                  value: isAlreadyAdded,
+                                  onChanged: (bool? value) =>
+                                      _toggleMarketSelection(q, value),
+                                );
+                              },
+                            ),
+                            if (_isLoading)
+                              const Positioned(
+                                bottom: 16,
+                                right: 16,
+                                child: CircularProgressIndicator(),
+                              ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
-              const SizedBox(height: 16),
-              WizardBottomActions(
-                onCancel: _cancelWizard,
-                onPrevious: _onPrevious,
-                onContinue: _onAdditionalData,
-                onSave: _saveTransaction,
               ),
-            ],
-          ),
+            ),
+            WizardBottomActions(
+              onCancel: _cancelWizard,
+              onPrevious: _onPrevious,
+              onContinue: _onAdditionalData,
+              onSave: _saveTransaction,
+            ),
+          ],
         ),
       ),
     );

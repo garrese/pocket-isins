@@ -123,60 +123,66 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
         appBar: AppBar(
           title: const Text('Add ISIN / Name'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Enter ISIN and/or Name',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'At least one of them must be provided to continue.',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _isinController,
-                  decoration: const InputDecoration(
-                    labelText: 'ISIN Code',
-                    border: OutlineInputBorder(),
+        body: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Enter ISIN and/or Name',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'At least one of them must be provided to continue.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _isinController,
+                        decoration: const InputDecoration(
+                          labelText: 'ISIN Code',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if ((value == null || value.trim().isEmpty) &&
+                              _altNameController.text.trim().isEmpty) {
+                            return 'Please enter either an ISIN or a Name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _altNameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Name',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if ((value == null || value.trim().isEmpty) &&
+                              _isinController.text.trim().isEmpty) {
+                            return 'Please enter either an ISIN or a Name';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if ((value == null || value.trim().isEmpty) &&
-                        _altNameController.text.trim().isEmpty) {
-                      return 'Please enter either an ISIN or a Name';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _altNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if ((value == null || value.trim().isEmpty) &&
-                        _isinController.text.trim().isEmpty) {
-                      return 'Please enter either an ISIN or a Name';
-                    }
-                    return null;
-                  },
-                ),
-                const Spacer(),
-                WizardBottomActions(
-                  isFirstStep: true,
-                  onCancel: _cancelWizard,
-                  onContinue: _onContinue,
-                ),
-              ],
-            ),
+              ),
+              WizardBottomActions(
+                isFirstStep: true,
+                onCancel: _cancelWizard,
+                onContinue: _onContinue,
+              ),
+            ],
           ),
         ),
       ),
