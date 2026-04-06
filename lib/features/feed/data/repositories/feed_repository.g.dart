@@ -6,7 +6,7 @@ part of 'feed_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$feedRepositoryHash() => r'8c478bfc26e3a000f5958dccd446c62929eec7d8';
+String _$feedRepositoryHash() => r'568a23221590cd2a2392880c2ba201180a14518b';
 
 /// See also [feedRepository].
 @ProviderFor(feedRepository)

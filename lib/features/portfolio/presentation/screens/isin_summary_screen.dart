@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/database/models/isin.dart';
+import '../../../../core/theme/app_theme_extension.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../data/portfolio_provider.dart';
 import 'isin_step_screen.dart';
@@ -334,6 +335,7 @@ class IsinSummaryScreen extends ConsumerWidget {
     required Widget content,
     required VoidCallback onEdit,
   }) {
+    final appThemeExt = Theme.of(context).extension<AppThemeExtension>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Column(
@@ -344,10 +346,10 @@ class IsinSummaryScreen extends ConsumerWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: appThemeExt?.mainTitleColor ?? Colors.blue,
                 ),
               ),
               IconButton(

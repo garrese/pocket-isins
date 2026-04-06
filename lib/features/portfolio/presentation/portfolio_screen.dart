@@ -11,6 +11,7 @@ import 'screens/isin_step_screen.dart';
 import 'screens/isin_summary_screen.dart';
 import '../domain/portfolio_form_data.dart';
 import '../../../core/theme/app_drawer.dart';
+import '../../../core/theme/app_theme_extension.dart';
 
 class PortfolioScreen extends ConsumerWidget {
   const PortfolioScreen({super.key});
@@ -124,6 +125,8 @@ class PortfolioScreen extends ConsumerWidget {
 
               String tickersList = isin.tickers.map((t) => t.symbol).join(', ');
 
+              final appThemeExt = Theme.of(context).extension<AppThemeExtension>();
+
               return Card(
                 margin: const EdgeInsets.only(bottom: 4.0),
                 child: ListTile(
@@ -137,7 +140,10 @@ class PortfolioScreen extends ConsumerWidget {
                   },
                   title: Text(
                     isin.displayName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: appThemeExt?.mainTitleColor,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Padding(
@@ -151,9 +157,9 @@ class PortfolioScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.shortName!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey,
+                                color: appThemeExt?.subtitleColor ?? Colors.grey,
                                 fontStyle: FontStyle.italic,
                               ),
                             ),

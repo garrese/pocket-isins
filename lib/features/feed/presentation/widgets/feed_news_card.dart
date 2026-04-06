@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/models/feed_news_model.dart';
 import '../../../../core/settings/application/developer_settings_provider.dart';
+import '../../../../core/theme/app_theme_extension.dart';
 
 class FeedNewsCard extends ConsumerWidget {
   final FeedNewsModel news;
@@ -23,6 +24,7 @@ class FeedNewsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final appThemeExt = theme.extension<AppThemeExtension>();
     final formattedDate = DateFormat('MMM dd, HH:mm').format(news.pubDate);
     final debugLabelsEnabled = ref
         .watch(developerSettingsProvider)
@@ -45,7 +47,7 @@ class FeedNewsCard extends ConsumerWidget {
                     child: Text(
                       news.isinName,
                       style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.primary,
+                        color: appThemeExt?.mainTitleColor ?? theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
