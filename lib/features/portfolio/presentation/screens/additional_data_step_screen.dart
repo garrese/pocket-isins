@@ -6,6 +6,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 import '../../../../core/services/log/talker_provider.dart';
 import 'wizard_bottom_actions.dart';
 import 'markets_step_screen.dart';
+import '../../../../core/widgets/constrained_width.dart';
 
 class AdditionalDataStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -172,9 +173,10 @@ class _AdditionalDataStepScreenState
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+                child: ConstrainedWidth.narrow(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                     TextFormField(
                       controller: _shortNameController,
                       decoration: const InputDecoration(
@@ -183,8 +185,9 @@ class _AdditionalDataStepScreenState
                         helperText:
                             'Used across the app instead of full name if provided.',
                       ),
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -7,6 +7,7 @@ import '../../../../core/services/log/talker_provider.dart';
 import 'isin_step_screen.dart';
 import 'markets_step_screen.dart';
 import 'wizard_bottom_actions.dart';
+import '../../../../core/widgets/constrained_width.dart';
 
 class RegisteredNameStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -268,11 +269,12 @@ class _RegisteredNameStepScreenState
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+              child: ConstrainedWidth.narrow(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                     Wrap(
                       alignment: WrapAlignment.spaceBetween,
                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -353,9 +355,10 @@ class _RegisteredNameStepScreenState
                           }
                           return const SizedBox.shrink();
                         },
+                          ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
