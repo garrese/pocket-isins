@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_drawer.dart';
+import '../../portfolio/presentation/screens/isin_step_screen.dart';
+import '../../portfolio/domain/portfolio_form_data.dart';
 import 'bot_provider.dart';
 
 class BotScreen extends ConsumerStatefulWidget {
@@ -105,9 +106,16 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                         ),
                         onPressed: () {
                           // Navigate to ISIN wizard with prefilled data
-                          context.go(
-                            '/isins/wizard',
-                            extra: {'isinCode': isinCode, 'name': name},
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => IsinStepScreen(
+                                formData: IsinFormData(
+                                  isinCode: isinCode,
+                                  altName: name,
+                                ),
+                              ),
+                            ),
                           );
                         },
                       ),
@@ -120,6 +128,8 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                   );
                   if (marketMatch != null) {
                     final symbol = marketMatch.group(1)!;
+                    final interval = marketMatch.group(2)!;
+                    final range = marketMatch.group(3)!;
                     displayContent = displayContent
                         .replaceAll(marketDataRegExp, '')
                         .trim();
@@ -127,7 +137,7 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                     actionWidget ??= Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
-                        'Fetching market data for $symbol...',
+                        'Fetching market data for $symbol ($interval, $range)...',
                         style: TextStyle(
                           fontSize: 12,
                           fontStyle: FontStyle.italic,
