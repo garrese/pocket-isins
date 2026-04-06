@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:intl/intl.dart';
 import '../../data/ticker_detail_provider.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 
 class ChartPoint {
@@ -195,7 +196,7 @@ class TickerDetailScreen extends ConsumerWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                '${regularMarketPrice.toStringAsFixed(2)} $currency',
+                '${CurrencyFormatter.format(regularMarketPrice)} $currency',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -203,7 +204,7 @@ class TickerDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '${isPositive ? "+" : ""}${variation.toStringAsFixed(2)} (${variationPercent.toStringAsFixed(2)}%)',
+                '${isPositive ? "+" : ""}${CurrencyFormatter.format(variation)} (${variationPercent.toStringAsFixed(2)}%)',
                 style: TextStyle(
                   fontSize: 16,
                   color: color,
@@ -322,7 +323,7 @@ class TickerDetailScreen extends ConsumerWidget {
                     return SideTitleWidget(
                       axisSide: meta.axisSide,
                       child: Text(
-                        value.toStringAsFixed(1),
+                        CurrencyFormatter.format(value),
                         style: const TextStyle(fontSize: 10),
                       ),
                     );
@@ -358,16 +359,16 @@ class TickerDetailScreen extends ConsumerWidget {
 
                       return LineTooltipItem(
                         '$timeStr\n'
-                        'Close: ${point.close.toStringAsFixed(2)}\n'
-                        'High: ${point.high?.toStringAsFixed(2) ?? '-'}\n'
-                        'Low: ${point.low?.toStringAsFixed(2) ?? '-'}\n'
+                        'Close: ${CurrencyFormatter.format(point.close)}\n'
+                        'High: ${point.high != null ? CurrencyFormatter.format(point.high!) : '-'}\n'
+                        'Low: ${point.low != null ? CurrencyFormatter.format(point.low!) : '-'}\n'
                         'Vol: ${_formatVolume(point.volume)}',
                         const TextStyle(color: Colors.white, fontSize: 12),
                         textAlign: TextAlign.left,
                       );
                     } catch (e) {
                       return LineTooltipItem(
-                        touchedSpot.y.toStringAsFixed(2),
+                        CurrencyFormatter.format(touchedSpot.y),
                         const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -488,7 +489,7 @@ class TickerDetailScreen extends ConsumerWidget {
     String formattedVal = '-';
     if (val != null) {
       if (val is num) {
-        formattedVal = val.toStringAsFixed(2);
+        formattedVal = CurrencyFormatter.format(val);
       } else {
         formattedVal = val.toString();
       }
