@@ -13,8 +13,9 @@ String _$marketsHash() => r'b21b955f3b246f3c3571cf23a2e29915d0c86b5c';
 final marketsProvider = AsyncNotifierProvider<Markets, List<Isin>>.internal(
   Markets.new,
   name: r'marketsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$marketsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$marketsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

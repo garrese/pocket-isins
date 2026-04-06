@@ -13,8 +13,9 @@ String _$driftServiceHash() => r'4731cec80772fabfa2be33cbd9f9af9c43037fa7';
 final driftServiceProvider = Provider<DriftService>.internal(
   driftService,
   name: r'driftServiceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$driftServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$driftServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

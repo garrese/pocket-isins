@@ -42,15 +42,20 @@ class DeveloperSettings extends _$DeveloperSettings {
 
     // Apply log level to talker instance immediately if possible
     try {
-      ref.read(talkerProvider).configure(
+      ref
+          .read(talkerProvider)
+          .configure(
             settings: TalkerSettings(
               useHistory: true,
               maxHistoryItems: 1000,
               useConsoleLogs: true,
             ),
             logger: TalkerLogger(
-              settings: TalkerLoggerSettings(level: logLevel),
-              formatter: const CustomTalkerFormatter(),
+              settings: TalkerLoggerSettings(
+                level: logLevel,
+                colors: {LogLevel.debug: AnsiPen()..green()},
+              ),
+              formatter: CustomTalkerFormatter(() => enableLongLogDetails),
             ),
           );
     } catch (_) {
@@ -81,6 +86,25 @@ class DeveloperSettings extends _$DeveloperSettings {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_enableLongLogDetailsKey, value);
     state = state.copyWith(enableLongLogDetails: value);
+
+    try {
+      ref
+          .read(talkerProvider)
+          .configure(
+            settings: TalkerSettings(
+              useHistory: true,
+              maxHistoryItems: 1000,
+              useConsoleLogs: true,
+            ),
+            logger: TalkerLogger(
+              settings: TalkerLoggerSettings(
+                level: state.logLevel,
+                colors: {LogLevel.debug: AnsiPen()..green()},
+              ),
+              formatter: CustomTalkerFormatter(() => value),
+            ),
+          );
+    } catch (_) {}
   }
 
   Future<void> setLogLevel(LogLevel level) async {
@@ -88,15 +112,22 @@ class DeveloperSettings extends _$DeveloperSettings {
     await prefs.setInt(_logLevelKey, level.index);
 
     try {
-      ref.read(talkerProvider).configure(
+      ref
+          .read(talkerProvider)
+          .configure(
             settings: TalkerSettings(
               useHistory: true,
               maxHistoryItems: 1000,
               useConsoleLogs: true,
             ),
             logger: TalkerLogger(
-              settings: TalkerLoggerSettings(level: level),
-              formatter: const CustomTalkerFormatter(),
+              settings: TalkerLoggerSettings(
+                level: level,
+                colors: {LogLevel.debug: AnsiPen()..green()},
+              ),
+              formatter: CustomTalkerFormatter(
+                () => state.enableLongLogDetails,
+              ),
             ),
           );
     } catch (_) {}

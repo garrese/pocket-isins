@@ -72,18 +72,20 @@ class Portfolio extends _$Portfolio {
         if (isinCode != null) {
           final existingIsin = await (db.select(
             db.isins,
-          )..where((t) => t.isinCode.equals(isinCode)))
-              .getSingleOrNull();
+          )..where((t) => t.isinCode.equals(isinCode))).getSingleOrNull();
           if (existingIsin != null) continue;
         }
 
-        final registeredNames = (isinData['registeredNames'] as List<dynamic>?)
+        final registeredNames =
+            (isinData['registeredNames'] as List<dynamic>?)
                 ?.map((e) => e.toString())
                 .toList() ??
             [];
         final shortName = isinData['shortName'] as String?;
 
-        final newIsinId = await db.into(db.isins).insert(
+        final newIsinId = await db
+            .into(db.isins)
+            .insert(
               drift.IsinsCompanion.insert(
                 isinCode: Value(isinCode),
                 altName: Value(altName),
@@ -101,8 +103,7 @@ class Portfolio extends _$Portfolio {
 
           final existingTicker = await (db.select(
             db.tickers,
-          )..where((t) => t.symbol.equals(symbol)))
-              .getSingleOrNull();
+          )..where((t) => t.symbol.equals(symbol))).getSingleOrNull();
           if (existingTicker != null) continue;
 
           final exchange = tData['exchange'] as String? ?? '';
@@ -115,7 +116,9 @@ class Portfolio extends _$Portfolio {
           final postMarketStart = tData['postMarketStart'] as int?;
           final postMarketEnd = tData['postMarketEnd'] as int?;
 
-          await db.into(db.tickers).insert(
+          await db
+              .into(db.tickers)
+              .insert(
                 drift.TickersCompanion.insert(
                   symbol: symbol,
                   exchange: exchange,
@@ -155,8 +158,9 @@ class Portfolio extends _$Portfolio {
         tickers: [],
       );
 
-      final isinTickers =
-          allTickersData.where((t) => t.isinId == isinRow.id).toList();
+      final isinTickers = allTickersData
+          .where((t) => t.isinId == isinRow.id)
+          .toList();
       for (final tickerRow in isinTickers) {
         final tickerModel = Ticker(
           id: tickerRow.id,
@@ -194,7 +198,8 @@ class Portfolio extends _$Portfolio {
     final actionType = id != null ? 'Updating' : 'Creating';
     log.info('$actionType ISIN: ${isinCode ?? altName}');
     log.debug(
-        'ISIN details - ID: $id, Code: $isinCode, AltName: $altName, RegisteredNames: $registeredNames, ShortName: $shortName, Tickers: ${tickersData.length}');
+      'ISIN details - ID: $id, Code: $isinCode, AltName: $altName, RegisteredNames: $registeredNames, ShortName: $shortName, Tickers: ${tickersData.length}',
+    );
 
     await db.transaction(() async {
       int currentIsinId;
@@ -203,11 +208,12 @@ class Portfolio extends _$Portfolio {
         currentIsinId = id;
         await (db.update(db.isins)..where((t) => t.id.equals(id))).write(
           drift.IsinsCompanion(
-            isinCode: Value(isinCode != null && isinCode.trim().isNotEmpty
-                ? isinCode
-                : null),
+            isinCode: Value(
+              isinCode != null && isinCode.trim().isNotEmpty ? isinCode : null,
+            ),
             altName: Value(
-                altName != null && altName.trim().isNotEmpty ? altName : null),
+              altName != null && altName.trim().isNotEmpty ? altName : null,
+            ),
             registeredNames: Value(registeredNames),
             shortName: Value(shortName),
           ),
@@ -217,8 +223,7 @@ class Portfolio extends _$Portfolio {
         final retainedSymbols = tickersData.map((e) => e.symbol).toSet();
         final currentTickers = await (db.select(
           db.tickers,
-        )..where((t) => t.isinId.equals(id)))
-            .get();
+        )..where((t) => t.isinId.equals(id))).get();
         final toRemove = currentTickers
             .where((t) => !retainedSymbols.contains(t.symbol))
             .toList();
@@ -227,14 +232,18 @@ class Portfolio extends _$Portfolio {
           await (db.delete(db.tickers)..where((t2) => t2.id.equals(t.id))).go();
         }
       } else {
-        currentIsinId = await db.into(db.isins).insert(
+        currentIsinId = await db
+            .into(db.isins)
+            .insert(
               drift.IsinsCompanion.insert(
-                isinCode: Value(isinCode != null && isinCode.trim().isNotEmpty
-                    ? isinCode
-                    : null),
-                altName: Value(altName != null && altName.trim().isNotEmpty
-                    ? altName
-                    : null),
+                isinCode: Value(
+                  isinCode != null && isinCode.trim().isNotEmpty
+                      ? isinCode
+                      : null,
+                ),
+                altName: Value(
+                  altName != null && altName.trim().isNotEmpty ? altName : null,
+                ),
                 registeredNames: Value(registeredNames),
                 shortName: Value(shortName),
               ),
@@ -246,17 +255,19 @@ class Portfolio extends _$Portfolio {
         drift.TickerData? tickerRow;
 
         if (id != null) {
-          tickerRow = await (db.select(db.tickers)
-                ..where(
-                  (t) =>
-                      t.isinId.equals(currentIsinId) &
-                      t.symbol.equals(tData.symbol),
-                ))
-              .getSingleOrNull();
+          tickerRow =
+              await (db.select(db.tickers)..where(
+                    (t) =>
+                        t.isinId.equals(currentIsinId) &
+                        t.symbol.equals(tData.symbol),
+                  ))
+                  .getSingleOrNull();
         }
 
         if (tickerRow == null) {
-          await db.into(db.tickers).insert(
+          await db
+              .into(db.tickers)
+              .insert(
                 drift.TickersCompanion.insert(
                   symbol: tData.symbol,
                   exchange: tData.exchange,
@@ -275,8 +286,7 @@ class Portfolio extends _$Portfolio {
           int currentTickerId = tickerRow.id;
           await (db.update(
             db.tickers,
-          )..where((t) => t.id.equals(currentTickerId)))
-              .write(
+          )..where((t) => t.id.equals(currentTickerId))).write(
             drift.TickersCompanion(
               exchange: Value(tData.exchange),
               currency: Value(tData.currency),
@@ -303,22 +313,20 @@ class Portfolio extends _$Portfolio {
 
     log.info('Deleting ISIN with ID: $id');
     log.debug(
-        'Deleting ISIN ID $id and its associated tickers and market data caches.');
+      'Deleting ISIN ID $id and its associated tickers and market data caches.',
+    );
 
     await db.transaction(() async {
       final tickers = await (db.select(
         db.tickers,
-      )..where((t) => t.isinId.equals(id)))
-          .get();
+      )..where((t) => t.isinId.equals(id))).get();
       for (final tickerRow in tickers) {
         await (db.delete(
           db.marketDataCaches,
-        )..where((c) => c.tickerId.equals(tickerRow.id)))
-            .go();
+        )..where((c) => c.tickerId.equals(tickerRow.id))).go();
         await (db.delete(
           db.tickers,
-        )..where((t) => t.id.equals(tickerRow.id)))
-            .go();
+        )..where((t) => t.id.equals(tickerRow.id))).go();
       }
       await (db.delete(db.isins)..where((i) => i.id.equals(id))).go();
     });

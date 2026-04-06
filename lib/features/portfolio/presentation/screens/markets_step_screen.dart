@@ -119,8 +119,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       // 2) Search by Alternative Name
       List<dynamic> altNameQuotes = [];
       if (widget.formData.altName.isNotEmpty) {
-        altNameQuotes =
-            await marketService.searchSymbol(widget.formData.altName);
+        altNameQuotes = await marketService.searchSymbol(
+          widget.formData.altName,
+        );
       }
 
       // 3) Search by each selected Registered Name
@@ -217,14 +218,18 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         try {
           // Fetch 1d interval, 1d range for basic metadata
           final chartData = await marketService.fetchHistoricalData(
-              symbol.toString(), '1d', '1d');
+            symbol.toString(),
+            '1d',
+            '1d',
+          );
 
           if (chartData != null) {
             final meta = chartData['meta'];
             if (meta != null) {
               // We create a mutable map for the UI state
-              final Map<String, dynamic> mutableQ =
-                  Map<String, dynamic>.from(q);
+              final Map<String, dynamic> mutableQ = Map<String, dynamic>.from(
+                q,
+              );
 
               mutableQ['currency'] = meta['currency'];
 
@@ -292,8 +297,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
             exchange: exchange,
             currency: currency,
             quoteType: quoteType,
-            regularMarketStart:
-                regularMarketStart is int ? regularMarketStart : null,
+            regularMarketStart: regularMarketStart is int
+                ? regularMarketStart
+                : null,
             regularMarketEnd: regularMarketEnd is int ? regularMarketEnd : null,
             preMarketStart: preMarketStart is int ? preMarketStart : null,
             preMarketEnd: preMarketEnd is int ? preMarketEnd : null,
@@ -379,7 +385,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
         if (foundQuote != null) {
           final chartData = await marketService.fetchHistoricalData(
-              foundQuote['symbol'].toString(), '1d', '1d');
+            foundQuote['symbol'].toString(),
+            '1d',
+            '1d',
+          );
 
           if (chartData != null) {
             final meta = chartData['meta'];
@@ -403,8 +412,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           }
 
           setState(() {
-            if (!_searchResults
-                .any((element) => element['symbol'] == foundQuote['symbol'])) {
+            if (!_searchResults.any(
+              (element) => element['symbol'] == foundQuote['symbol'],
+            )) {
               _searchResults.add(foundQuote);
             }
           });
@@ -413,8 +423,8 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content:
-                      Text('Could not find ticker data for symbol: $symbol')),
+                content: Text('Could not find ticker data for symbol: $symbol'),
+              ),
             );
           }
         }
@@ -423,9 +433,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           ref
               .read(talkerProvider)
               .handle(e, stack, 'Error manually adding ticker');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error finding ticker: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error finding ticker: $e')));
         }
       } finally {
         if (mounted) {
@@ -448,7 +458,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     }
 
     try {
-      await ref.read(portfolioProvider.notifier).saveIsin(
+      await ref
+          .read(portfolioProvider.notifier)
+          .saveIsin(
             id: widget.formData.id,
             isinCode: widget.formData.isinCode,
             altName: widget.formData.altName,
@@ -523,11 +535,13 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     // gmtOffset is in seconds. We adjust the unix timestamp to represent local time
     // in UTC format, so we can format it easily.
     final startLocal = DateTime.fromMillisecondsSinceEpoch(
-        (unixStart + gmtOffset) * 1000,
-        isUtc: true);
+      (unixStart + gmtOffset) * 1000,
+      isUtc: true,
+    );
     final endLocal = DateTime.fromMillisecondsSinceEpoch(
-        (unixEnd + gmtOffset) * 1000,
-        isUtc: true);
+      (unixEnd + gmtOffset) * 1000,
+      isUtc: true,
+    );
 
     final formatter = DateFormat('HH:mm');
     return '${formatter.format(startLocal)} - ${formatter.format(endLocal)}';
@@ -559,7 +573,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                         const Text(
                           'Select Tickers:',
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         TextButton.icon(
                           onPressed: _showAddMarketDialog,
@@ -589,21 +605,26 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                               itemCount: _searchResults.length,
                               itemBuilder: (context, index) {
                                 final q = _searchResults[index];
-                                final name = q['longname'] ??
+                                final name =
+                                    q['longname'] ??
                                     q['shortname'] ??
                                     'Unknown';
                                 final symbol = q['symbol'] ?? 'Unknown';
 
-                                final isDirect = _isinDirectSymbols
-                                    .contains(symbol.toString());
+                                final isDirect = _isinDirectSymbols.contains(
+                                  symbol.toString(),
+                                );
 
                                 final currency = q['currency'];
                                 final gmtOffset = q['gmtoffset'] as int?;
                                 final regStart =
                                     q['regularMarketStart'] as int?;
                                 final regEnd = q['regularMarketEnd'] as int?;
-                                final timeStr =
-                                    _formatTime(regStart, regEnd, gmtOffset);
+                                final timeStr = _formatTime(
+                                  regStart,
+                                  regEnd,
+                                  gmtOffset,
+                                );
 
                                 final isAlreadyAdded = widget.formData.tickers
                                     .any((t) => t.symbol == symbol);
@@ -618,8 +639,11 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                                         ),
                                       ),
                                       if (isDirect)
-                                        const Icon(Icons.star,
-                                            color: Colors.amber, size: 16),
+                                        const Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                          size: 16,
+                                        ),
                                     ],
                                   ),
                                   subtitle: Column(
@@ -627,13 +651,16 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                          '${q['exchDisp'] ?? q['exchange'] ?? 'Unknown'} - $symbol'),
+                                        '${q['exchDisp'] ?? q['exchange'] ?? 'Unknown'} - $symbol',
+                                      ),
                                       if (currency != null ||
                                           timeStr.isNotEmpty)
                                         Text(
                                           '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
                                           style: const TextStyle(
-                                              fontSize: 12, color: Colors.grey),
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
                                         ),
                                     ],
                                   ),
