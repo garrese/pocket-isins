@@ -45,30 +45,30 @@ class TickerFormData {
     if (identical(this, other)) return true;
 
     return other is TickerFormData &&
-      other.symbol == symbol &&
-      other.exchange == exchange &&
-      other.currency == currency &&
-      other.quoteType == quoteType &&
-      other.regularMarketStart == regularMarketStart &&
-      other.regularMarketEnd == regularMarketEnd &&
-      other.preMarketStart == preMarketStart &&
-      other.preMarketEnd == preMarketEnd &&
-      other.postMarketStart == postMarketStart &&
-      other.postMarketEnd == postMarketEnd;
+        other.symbol == symbol &&
+        other.exchange == exchange &&
+        other.currency == currency &&
+        other.quoteType == quoteType &&
+        other.regularMarketStart == regularMarketStart &&
+        other.regularMarketEnd == regularMarketEnd &&
+        other.preMarketStart == preMarketStart &&
+        other.preMarketEnd == preMarketEnd &&
+        other.postMarketStart == postMarketStart &&
+        other.postMarketEnd == postMarketEnd;
   }
 
   @override
   int get hashCode {
     return symbol.hashCode ^
-      exchange.hashCode ^
-      currency.hashCode ^
-      quoteType.hashCode ^
-      regularMarketStart.hashCode ^
-      regularMarketEnd.hashCode ^
-      preMarketStart.hashCode ^
-      preMarketEnd.hashCode ^
-      postMarketStart.hashCode ^
-      postMarketEnd.hashCode;
+        exchange.hashCode ^
+        currency.hashCode ^
+        quoteType.hashCode ^
+        regularMarketStart.hashCode ^
+        regularMarketEnd.hashCode ^
+        preMarketStart.hashCode ^
+        preMarketEnd.hashCode ^
+        postMarketStart.hashCode ^
+        postMarketEnd.hashCode;
   }
 }
 
@@ -106,21 +106,21 @@ class IsinFormData {
     if (identical(this, other)) return true;
 
     return other is IsinFormData &&
-      other.id == id &&
-      other.isinCode == isinCode &&
-      other.altName == altName &&
-      listEquals(other.registeredNames, registeredNames) &&
-      other.shortName == shortName &&
-      listEquals(other.tickers, tickers);
+        other.id == id &&
+        other.isinCode == isinCode &&
+        other.altName == altName &&
+        listEquals(other.registeredNames, registeredNames) &&
+        other.shortName == shortName &&
+        listEquals(other.tickers, tickers);
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      isinCode.hashCode ^
-      altName.hashCode ^
-      registeredNames.hashCode ^
-      shortName.hashCode ^
-      tickers.hashCode;
+        isinCode.hashCode ^
+        altName.hashCode ^
+        registeredNames.hashCode ^
+        shortName.hashCode ^
+        tickers.hashCode;
   }
 }

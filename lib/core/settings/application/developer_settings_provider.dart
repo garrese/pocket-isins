@@ -3,7 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../domain/developer_settings_state.dart';
-import '../../services/log/talker_provider.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../../core/services/log/talker_provider.dart';
 import '../../services/log/custom_talker_formatter.dart';
 
 part 'developer_settings_provider.g.dart';
@@ -12,7 +13,7 @@ part 'developer_settings_provider.g.dart';
 class DeveloperSettings extends _$DeveloperSettings {
   static const _debugLabelsKey = 'debug_labels_enabled';
   static const _showLogConsoleKey = 'show_log_console';
-  static const _logHttpBodiesKey = 'log_http_bodies';
+  static const _enableLongLogDetailsKey = 'enable_long_log_details';
   static const _logLevelKey = 'log_level';
 
   @override
@@ -21,7 +22,7 @@ class DeveloperSettings extends _$DeveloperSettings {
     return const DeveloperSettingsState(
       debugLabelsEnabled: false,
       showLogConsole: false,
-      logHttpBodies: false,
+      enableLongLogDetails: false,
       logLevel: LogLevel.info,
     );
   }
@@ -35,6 +36,9 @@ class DeveloperSettings extends _$DeveloperSettings {
             orElse: () => LogLevel.info,
           )
         : LogLevel.info;
+
+    final enableLongLogDetails =
+        prefs.getBool(_enableLongLogDetailsKey) ?? false;
 
     // Apply log level to talker instance immediately if possible
     try {
@@ -56,7 +60,7 @@ class DeveloperSettings extends _$DeveloperSettings {
     state = DeveloperSettingsState(
       debugLabelsEnabled: prefs.getBool(_debugLabelsKey) ?? false,
       showLogConsole: prefs.getBool(_showLogConsoleKey) ?? false,
-      logHttpBodies: prefs.getBool(_logHttpBodiesKey) ?? false,
+      enableLongLogDetails: enableLongLogDetails,
       logLevel: logLevel,
     );
   }
@@ -73,10 +77,10 @@ class DeveloperSettings extends _$DeveloperSettings {
     state = state.copyWith(showLogConsole: value);
   }
 
-  Future<void> setLogHttpBodies(bool value) async {
+  Future<void> setEnableLongLogDetails(bool value) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_logHttpBodiesKey, value);
-    state = state.copyWith(logHttpBodies: value);
+    await prefs.setBool(_enableLongLogDetailsKey, value);
+    state = state.copyWith(enableLongLogDetails: value);
   }
 
   Future<void> setLogLevel(LogLevel level) async {

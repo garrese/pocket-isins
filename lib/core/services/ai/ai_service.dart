@@ -1,10 +1,10 @@
-import 'package:talker_flutter/talker_flutter.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../network/dio_provider.dart';
-import '../log/talker_provider.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../../core/services/log/talker_provider.dart';
 import '../../../features/bot/domain/ai_settings.dart';
 import '../../../features/bot/domain/news_card_model.dart';
 import '../../../features/bot/data/ai_settings_repository.dart';
@@ -39,17 +39,6 @@ class AiService {
                 {'role': 'user', 'content': userPrompt},
               ]
             : []);
-
-    // LOG: Only log the last message
-    if (activeMessages.isNotEmpty) {
-      final lastMsg = activeMessages.last;
-      _log.info(
-        'AI Request [${settings.apiProvider}]',
-        'Prompt: ${lastMsg["content"]}',
-      );
-    } else {
-      _log.info('AI Request [${settings.apiProvider}] No prompt provided.');
-    }
 
     if (settings.apiProvider == 'google_ai_studio') {
       return _generateGoogleAIStudio(
@@ -224,10 +213,6 @@ Example format:
       if (response.statusCode == 200) {
         final reply = response.data['candidates'][0]['content']['parts'][0]
             ['text'] as String;
-        _log.info(
-          'AI Response (Google)',
-          '${reply.substring(0, reply.length > 100 ? 100 : reply.length)}...',
-        );
         return reply;
       } else {
         _log.handle(
@@ -297,10 +282,6 @@ Example format:
       if (response.statusCode == 200) {
         final reply =
             response.data['choices'][0]['message']['content'] as String;
-        _log.info(
-          'AI Response (OpenAI)',
-          '${reply.substring(0, reply.length > 100 ? 100 : reply.length)}...',
-        );
         return reply;
       } else {
         _log.handle(

@@ -1,9 +1,12 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../application/developer_settings_provider.dart';
 import 'purge_data_screen.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../../core/services/log/talker_provider.dart';
 
 class DeveloperOptionsScreen extends ConsumerWidget {
   const DeveloperOptionsScreen({super.key});
@@ -43,16 +46,16 @@ class DeveloperOptionsScreen extends ConsumerWidget {
             },
           ),
           CheckboxListTile(
-            title: const Text('Log HTTP Bodies'),
+            title: const Text('Enable long log details'),
             subtitle: const Text(
-              'Include large request/response bodies in logs',
+              'Show full log details without truncating',
             ),
-            value: settings.logHttpBodies,
+            value: settings.enableLongLogDetails,
             onChanged: (value) {
               if (value != null) {
                 ref
                     .read(developerSettingsProvider.notifier)
-                    .setLogHttpBodies(value);
+                    .setEnableLongLogDetails(value);
               }
             },
           ),
@@ -91,6 +94,35 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                 MaterialPageRoute(
                   builder: (context) => const PurgeDataScreen(),
                 ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            title: const Text('Test Logs'),
+            subtitle:
+                const Text('Generate dummy logs to test logging functionality'),
+            leading: const Icon(Icons.bug_report),
+            onTap: () {
+              final talker = ref.read(talkerProvider);
+              talker.info('Test Info log\nSummary of action...');
+              talker.debug(
+                  'Test Debug log\nDetails of the action with some data:\n{"key": "value", "status": "ok"}');
+              talker.verbose(
+                  'Test Verbose log\nFull context and very detailed trace for a specific event.');
+              talker.handle(Exception('Test Exception'), StackTrace.current,
+                  'Test Exception occurred');
+
+              // Generate long log
+              final random = Random();
+              const chars =
+                  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ';
+              final longString = String.fromCharCodes(Iterable.generate(
+                  5200, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
+              talker.verbose('Test Long Log (>5000 chars)\n$longString');
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Test logs generated!')),
               );
             },
           ),

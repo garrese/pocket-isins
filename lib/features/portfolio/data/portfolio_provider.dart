@@ -6,6 +6,8 @@ import '../../../core/database/drift_service.dart';
 import '../../../core/database/drift/app_database.dart' as drift;
 import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/ticker.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../../core/services/log/talker_provider.dart';
 import '../domain/portfolio_form_data.dart';
 
 part 'portfolio_provider.g.dart';
@@ -187,6 +189,12 @@ class Portfolio extends _$Portfolio {
     required List<TickerFormData> tickersData,
   }) async {
     final db = ref.read(driftServiceProvider).db;
+    final log = ref.read(talkerProvider);
+
+    final actionType = id != null ? 'Updating' : 'Creating';
+    log.info('$actionType ISIN: ${isinCode ?? altName}');
+    log.debug(
+        'ISIN details - ID: $id, Code: $isinCode, AltName: $altName, RegisteredNames: $registeredNames, ShortName: $shortName, Tickers: ${tickersData.length}');
 
     await db.transaction(() async {
       int currentIsinId;
@@ -291,6 +299,11 @@ class Portfolio extends _$Portfolio {
 
   Future<void> removeIsin(int id) async {
     final db = ref.read(driftServiceProvider).db;
+    final log = ref.read(talkerProvider);
+
+    log.info('Deleting ISIN with ID: $id');
+    log.debug(
+        'Deleting ISIN ID $id and its associated tickers and market data caches.');
 
     await db.transaction(() async {
       final tickers = await (db.select(
