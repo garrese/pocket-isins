@@ -47,7 +47,9 @@ class MarketsScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh market data',
-            onPressed: () => ref.read(marketsProvider.notifier).forceRefresh(),
+            onPressed: () {
+              ref.read(marketsProvider.notifier).forceRefresh();
+            },
           ),
         ],
       ),
