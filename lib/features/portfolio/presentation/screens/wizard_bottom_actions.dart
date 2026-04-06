@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class WizardBottomActions extends StatelessWidget {
@@ -26,8 +28,8 @@ class WizardBottomActions extends StatelessWidget {
           final isNarrow = constraints.maxWidth < 600;
 
           // Common style for all buttons: square edges, no margin
-          final squareShape = RoundedRectangleBorder(borderRadius: BorderRadius.zero);
-          final buttonHeight = 56.0;
+          const squareShape = RoundedRectangleBorder(borderRadius: BorderRadius.zero);
+          const buttonHeight = 56.0;
 
           Widget buildCancel() {
             return SizedBox(
@@ -99,49 +101,68 @@ class WizardBottomActions extends StatelessWidget {
           final continueButton = buildContinue();
           final saveButton = buildSave();
 
-          // Left Group: Cancel, Previous
-          final leftGroup = <Widget>[];
-          leftGroup.add(Expanded(child: cancelButton));
-          if (previousButton != null) {
-            leftGroup.add(Expanded(child: previousButton));
-          }
-
-          // Right Group: Continue, Save
-          final rightGroup = <Widget>[];
-          if (continueButton != null) {
-            rightGroup.add(Expanded(child: continueButton));
-          }
-          if (saveButton != null) {
-            rightGroup.add(Expanded(child: saveButton));
-          }
-
           if (isNarrow) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (rightGroup.isNotEmpty)
-                  Row(
-                    children: rightGroup,
+            final leftWidgets = <Widget>[];
+            if (previousButton != null) leftWidgets.add(Expanded(child: previousButton));
+            leftWidgets.add(Expanded(child: cancelButton));
+
+            final rightWidgets = <Widget>[];
+            if (continueButton != null) rightWidgets.add(Expanded(child: continueButton));
+            if (saveButton != null) rightWidgets.add(Expanded(child: saveButton));
+
+            final maxItems = math.max(leftWidgets.length, rightWidgets.length);
+            final totalHeight = maxItems * buttonHeight;
+
+            return SizedBox(
+              height: totalHeight,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: leftWidgets,
+                    ),
                   ),
-                Row(
-                  children: leftGroup,
-                ),
-              ],
+                  if (rightWidgets.isNotEmpty)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: rightWidgets,
+                      ),
+                    ),
+                ],
+              ),
             );
           } else {
-            return Row(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: leftGroup,
+            final leftWidgets = <Widget>[];
+            leftWidgets.add(Expanded(child: cancelButton));
+            if (previousButton != null) leftWidgets.add(Expanded(child: previousButton));
+
+            final rightWidgets = <Widget>[];
+            if (continueButton != null) rightWidgets.add(Expanded(child: continueButton));
+            if (saveButton != null) rightWidgets.add(Expanded(child: saveButton));
+
+            return SizedBox(
+              height: buttonHeight,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: leftWidgets,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Row(
-                    children: rightGroup,
-                  ),
-                ),
-              ],
+                  if (rightWidgets.isNotEmpty)
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: rightWidgets,
+                      ),
+                    ),
+                ],
+              ),
             );
           }
         },
