@@ -42,6 +42,12 @@ class Markets extends _$Markets {
             chartPreviousClose: cacheRow.chartPreviousClose,
             intradayPrices: cacheRow.intradayPrices,
             intradayTimestamps: cacheRow.intradayTimestamps,
+            regularMarketStart: cacheRow.regularMarketStart,
+            regularMarketEnd: cacheRow.regularMarketEnd,
+            preMarketStart: cacheRow.preMarketStart,
+            preMarketEnd: cacheRow.preMarketEnd,
+            postMarketStart: cacheRow.postMarketStart,
+            postMarketEnd: cacheRow.postMarketEnd,
             ticker: ticker,
           );
         }
@@ -112,6 +118,23 @@ class Markets extends _$Markets {
                   }
                 }
 
+                int? regStart;
+                int? regEnd;
+                int? preStart;
+                int? preEnd;
+                int? postStart;
+                int? postEnd;
+
+                final currentPeriod = meta['currentTradingPeriod'];
+                if (currentPeriod != null) {
+                  regStart = currentPeriod['regular']?['start'] as int?;
+                  regEnd = currentPeriod['regular']?['end'] as int?;
+                  preStart = currentPeriod['pre']?['start'] as int?;
+                  preEnd = currentPeriod['pre']?['end'] as int?;
+                  postStart = currentPeriod['post']?['start'] as int?;
+                  postEnd = currentPeriod['post']?['end'] as int?;
+                }
+
                 // Save to Drift
                 await db.transaction(() async {
                   if (ticker.marketDataCache != null) {
@@ -126,6 +149,12 @@ class Markets extends _$Markets {
                         chartPreviousClose: Value(chartPreviousClose),
                         intradayPrices: Value(intradayPrices),
                         intradayTimestamps: Value(intradayTimestamps),
+                        regularMarketStart: Value(regStart),
+                        regularMarketEnd: Value(regEnd),
+                        preMarketStart: Value(preStart),
+                        preMarketEnd: Value(preEnd),
+                        postMarketStart: Value(postStart),
+                        postMarketEnd: Value(postEnd),
                       ),
                     );
                     ticker.marketDataCache!.lastUpdated = now;
@@ -136,6 +165,12 @@ class Markets extends _$Markets {
                     ticker.marketDataCache!.intradayPrices = intradayPrices;
                     ticker.marketDataCache!.intradayTimestamps =
                         intradayTimestamps;
+                    ticker.marketDataCache!.regularMarketStart = regStart;
+                    ticker.marketDataCache!.regularMarketEnd = regEnd;
+                    ticker.marketDataCache!.preMarketStart = preStart;
+                    ticker.marketDataCache!.preMarketEnd = preEnd;
+                    ticker.marketDataCache!.postMarketStart = postStart;
+                    ticker.marketDataCache!.postMarketEnd = postEnd;
                   } else {
                     final newId = await db.into(db.marketDataCaches).insert(
                           drift.MarketDataCachesCompanion.insert(
@@ -145,6 +180,12 @@ class Markets extends _$Markets {
                             chartPreviousClose: Value(chartPreviousClose),
                             intradayPrices: Value(intradayPrices),
                             intradayTimestamps: Value(intradayTimestamps),
+                            regularMarketStart: Value(regStart),
+                            regularMarketEnd: Value(regEnd),
+                            preMarketStart: Value(preStart),
+                            preMarketEnd: Value(preEnd),
+                            postMarketStart: Value(postStart),
+                            postMarketEnd: Value(postEnd),
                             tickerId: ticker.id,
                           ),
                         );
@@ -157,6 +198,12 @@ class Markets extends _$Markets {
                       chartPreviousClose: chartPreviousClose,
                       intradayPrices: intradayPrices,
                       intradayTimestamps: intradayTimestamps,
+                      regularMarketStart: regStart,
+                      regularMarketEnd: regEnd,
+                      preMarketStart: preStart,
+                      preMarketEnd: preEnd,
+                      postMarketStart: postStart,
+                      postMarketEnd: postEnd,
                       ticker: ticker,
                     );
                   }
