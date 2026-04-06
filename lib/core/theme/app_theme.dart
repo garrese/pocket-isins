@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'app_theme_extension.dart';
 
+// White-grey 0xFFE2E8F0
+// Purple light 0xFFA5B4FC
 class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData.dark().copyWith(
       extensions: const [
         AppThemeExtension(
-          mainTitleColor: Color(0xFFA5B4FC),
+          mainTitleColor: Color(0xFFFFFFFF),
           subtitleColor: Color(0xFF90CAF9),
         ),
       ],
