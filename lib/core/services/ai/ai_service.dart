@@ -217,7 +217,7 @@ Example format:
           ],
         },
       ];
-      _log.debug('AI Turn Request (Google):\n${jsonEncode(debugData)}');
+      _log.info('AI Turn Request (Google):\n${jsonEncode(debugData)}');
     }
 
     try {
@@ -299,10 +299,9 @@ Example format:
     if (messages.isNotEmpty) {
       final debugData = Map<String, dynamic>.from(data);
       debugData['messages'] = [
-        {'role': 'system', 'content': systemPrompt},
         {'role': messages.last['role'], 'content': messages.last['content']},
       ];
-      _log.debug('AI Turn Request (OpenAI):\n${jsonEncode(debugData)}');
+      _log.info('AI Turn Request (OpenAI):\n${jsonEncode(debugData)}');
     }
 
     try {
