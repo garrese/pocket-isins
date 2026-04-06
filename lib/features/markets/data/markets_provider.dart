@@ -137,8 +137,7 @@ class Markets extends _$Markets {
           final List<double> intradayPrices = [];
           final List<int> intradayTimestamps = [];
           final closeArray = indicators['close'] as List<dynamic>? ?? [];
-          final timestampArray =
-              rawData['timestamp'] as List<dynamic>? ?? [];
+          final timestampArray = rawData['timestamp'] as List<dynamic>? ?? [];
 
           for (var i = 0; i < closeArray.length; i++) {
             final val = closeArray[i];
@@ -196,13 +195,10 @@ class Markets extends _$Markets {
                 ),
               );
               ticker.marketDataCache!.lastUpdated = now;
-              ticker.marketDataCache!.regularMarketPrice =
-                  regularMarketPrice;
-              ticker.marketDataCache!.chartPreviousClose =
-                  chartPreviousClose;
+              ticker.marketDataCache!.regularMarketPrice = regularMarketPrice;
+              ticker.marketDataCache!.chartPreviousClose = chartPreviousClose;
               ticker.marketDataCache!.intradayPrices = intradayPrices;
-              ticker.marketDataCache!.intradayTimestamps =
-                  intradayTimestamps;
+              ticker.marketDataCache!.intradayTimestamps = intradayTimestamps;
               ticker.marketDataCache!.regularMarketStart = regStart;
               ticker.marketDataCache!.regularMarketEnd = regEnd;
               ticker.marketDataCache!.preMarketStart = preStart;

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/ai/ai_service.dart';
 import '../../../core/network/market_data_service.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../../core/services/log/talker_provider.dart';
 import '../../../core/database/drift/app_database.dart';
 import '../data/bot_repository.dart';
 
@@ -30,8 +32,10 @@ class BotController extends StateNotifier<BotState> {
   final BotRepository _repository;
   final AiService _aiService;
   final MarketDataService _marketDataService;
+  final Talker _log;
 
-  BotController(this._repository, this._aiService, this._marketDataService)
+  BotController(
+      this._repository, this._aiService, this._marketDataService, this._log)
       : super(BotState(messages: [])) {
     loadHistory();
   }
@@ -42,6 +46,7 @@ class BotController extends StateNotifier<BotState> {
   }
 
   Future<void> clearHistory() async {
+    _log.info('Clearing bot chat history');
     await _repository.clearChatHistory();
     state = BotState(messages: [], error: null, isTyping: false);
   }
@@ -61,6 +66,8 @@ class BotController extends StateNotifier<BotState> {
     );
 
     try {
+      _log.debug('User Message: $text');
+
       // Fetch ISINs and generate system prompt
       final isins = await _repository.getAllIsins();
       final isinsJson = isins
@@ -97,11 +104,17 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
           .map((m) => {'role': m.role, 'content': m.content})
           .toList();
 
+      _log.verbose(
+          'Bot AI Request Context:\nSystem Prompt: $systemPrompt\nMessages Context: ${jsonEncode(historyMaps)}');
+
       final response = await _aiService.getGenericCompletion(
         systemPrompt: systemPrompt,
         messages: historyMaps,
         webSearch: true,
       );
+
+      _log.debug('Assistant Response:\n$response');
+      _log.verbose('Bot AI Full Response:\n$response');
 
       await _handleAiResponse(response, systemPrompt);
     } catch (e) {
@@ -197,5 +210,6 @@ final botControllerProvider = StateNotifierProvider<BotController, BotState>((
     ref.watch(botRepositoryProvider),
     ref.watch(aiServiceProvider),
     ref.watch(marketDataServiceProvider),
+    ref.watch(talkerProvider),
   );
 });

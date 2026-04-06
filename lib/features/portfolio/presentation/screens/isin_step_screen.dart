@@ -136,7 +136,8 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                     children: [
                       const Text(
                         'Enter ISIN and/or Name',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       const Text(

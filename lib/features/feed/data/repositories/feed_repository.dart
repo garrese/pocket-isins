@@ -4,14 +4,17 @@ import 'package:xml/xml.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/network/dio_provider.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../../../core/services/log/talker_provider.dart';
 import '../../domain/models/feed_news_model.dart';
 
 part 'feed_repository.g.dart';
 
 class FeedRepository {
   final Dio _dio;
+  final Talker _log;
 
-  FeedRepository(this._dio);
+  FeedRepository(this._dio, this._log);
 
   Future<List<FeedNewsModel>> fetchNewsForIsin({
     required int isinId,
@@ -27,6 +30,8 @@ class FeedRepository {
       );
       final url = 'https://news.google.com/rss/search?q=$encodedQuery&hl=en-US';
 
+      _log.info('Fetching news for $isinName (Round $round)\nURL: $url');
+
       final response = await _dio.get(
         url,
         options: Options(
@@ -37,6 +42,8 @@ class FeedRepository {
 
       if (response.statusCode == 200 && response.data != null) {
         final String xmlString = response.data.toString();
+        _log.verbose('Feed response for $isinName:\n$xmlString');
+
         final document = XmlDocument.parse(xmlString);
 
         final items = document.findAllElements('item');
@@ -98,11 +105,12 @@ class FeedRepository {
 
         return newsList;
       } else {
-        debugPrint('Feed API Error: ${response.statusCode}');
+        _log.warning('Feed API Error: ${response.statusCode}',
+            'Response: ${response.data}');
         return [];
       }
     } catch (e, stackTrace) {
-      debugPrint('Error fetching news for $isinName: $e\n$stackTrace');
+      _log.handle(e, stackTrace, 'Error fetching news for $isinName');
       return [];
     }
   }
@@ -182,5 +190,6 @@ class HttpDate {
 @riverpod
 FeedRepository feedRepository(FeedRepositoryRef ref) {
   final dio = ref.watch(dioProvider);
-  return FeedRepository(dio);
+  final log = ref.watch(talkerProvider);
+  return FeedRepository(dio, log);
 }

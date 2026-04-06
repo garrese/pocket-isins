@@ -1,9 +1,9 @@
-import 'package:talker_flutter/talker_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dio_provider.dart';
-import '../services/log/talker_provider.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../../core/services/log/talker_provider.dart';
 
 final marketDataServiceProvider = Provider<MarketDataService>((ref) {
   return MarketDataService(ref.watch(dioProvider), ref.watch(talkerProvider));
@@ -19,13 +19,14 @@ class MarketDataService {
     try {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=1d&range=1d';
-      _log.info('Fetching ticker data for $symbol');
+      _log.info(
+          'Fetching ticker data for $symbol (interval=1d, range=1d)\nURL: $url');
       final response = await _dio.get(url);
+      _log.debug('Response for $symbol:\n${response.data}');
 
       if (response.statusCode == 200) {
         final result = response.data['chart']['result']?[0];
         if (result != null) {
-          _log.debug('Data received for $symbol');
           return result;
         }
       }
@@ -48,13 +49,14 @@ class MarketDataService {
     try {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=$interval&range=$range';
-      _log.info('Fetching historical data for $symbol (range $range)');
+      _log.info(
+          'Fetching historical data for $symbol (interval=$interval, range=$range)\nURL: $url');
       final response = await _dio.get(url);
+      _log.debug('Historical response for $symbol:\n${response.data}');
 
       if (response.statusCode == 200) {
         final result = response.data['chart']['result']?[0];
         if (result != null) {
-          _log.debug('Historical data received for $symbol');
           return result;
         }
       }
@@ -73,13 +75,14 @@ class MarketDataService {
     try {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=5m&range=1d';
-      _log.info('Fetching intraday data for $symbol');
+      _log.info(
+          'Fetching intraday data for $symbol (interval=5m, range=1d)\nURL: $url');
       final response = await _dio.get(url);
+      _log.debug('Intraday response for $symbol:\n${response.data}');
 
       if (response.statusCode == 200) {
         final result = response.data['chart']['result']?[0];
         if (result != null) {
-          _log.debug('Intraday data received for $symbol');
           return result;
         }
       }
@@ -97,7 +100,7 @@ class MarketDataService {
   Future<List<dynamic>> searchSymbol(String query) async {
     try {
       final url = 'https://query2.finance.yahoo.com/v1/finance/search';
-      _log.info('Searching symbol for query: $query');
+      _log.info('Searching symbol for query: $query\nURL: $url');
       final response = await _dio.get(
         url,
         queryParameters: {'newsCount': 0, 'q': query},
@@ -108,10 +111,10 @@ class MarketDataService {
           },
         ),
       );
+      _log.debug('Search response for $query:\n${response.data}');
 
       if (response.statusCode == 200) {
         final quotes = response.data['quotes'] as List<dynamic>? ?? [];
-        _log.debug('Found ${quotes.length} results for query: $query');
         return quotes;
       }
 

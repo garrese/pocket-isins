@@ -5,6 +5,8 @@ import 'package:drift/drift.dart' as drift;
 import '../../../../core/database/drift_service.dart';
 import '../../../../core/database/drift/app_database.dart';
 import '../../../../core/services/ai/ai_service.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import '../../../core/services/log/talker_provider.dart';
 import '../data/repositories/feed_repository.dart';
 
 part 'feed_service.g.dart';
@@ -13,8 +15,9 @@ class FeedService {
   final FeedRepository _repository;
   final DriftService _driftService;
   final AiService _aiService;
+  final Talker _log;
 
-  FeedService(this._repository, this._driftService, this._aiService);
+  FeedService(this._repository, this._driftService, this._aiService, this._log);
 
   // Starts a new round, fetches news for each ISIN, inserts into DB sequentially
   Future<void> startNewRound() async {
@@ -32,9 +35,10 @@ class FeedService {
       final isins = await db.select(db.isins).get();
 
       if (isins.isEmpty) {
-        debugPrint('No ISINs saved, skipping feed round.');
+        _log.info('No ISINs saved, skipping feed round.');
         return;
       }
+      _log.info('Starting feed round $newRound for ${isins.length} ISINs');
 
       // Pre-load all existing links and titles globally to prevent duplicate news
       final existingNewsQuery = db.selectOnly(db.feedNews)
@@ -108,7 +112,7 @@ class FeedService {
       )..where((tbl) => tbl.round.isSmallerThanValue(minRoundToKeep)))
           .go();
     } catch (e, st) {
-      debugPrint('Error during feed round: $e\n$st');
+      _log.handle(e, st, 'Error during feed round');
     }
   }
 
@@ -123,9 +127,12 @@ class FeedService {
       final unratedNews = await unratedNewsQuery.get();
 
       if (unratedNews.isEmpty) {
-        debugPrint('No unrated news found.');
+        _log.info('No unrated news found for AI analysis.');
         return;
       }
+
+      _log.info(
+          'Starting AI rating analysis for ${unratedNews.length} news items');
 
       // Process in batches of 10
       const batchSize = 10;
@@ -138,9 +145,15 @@ class FeedService {
         final newsBatchPayload =
             batch.map((news) => {'id': news.id, 'title': news.title}).toList();
 
+        _log.debug(
+            'AI Feed Analysis Prompt (Batch ${i ~/ batchSize + 1}):\n${newsBatchPayload.toString()}');
+
         final results = await _aiService.rateNewsRelevanceBatch(
           newsBatchPayload,
         );
+
+        _log.debug(
+            'AI Feed Analysis Response (Batch ${i ~/ batchSize + 1}):\n${results.toString()}');
 
         if (results.isNotEmpty) {
           await db.batch((batchWriter) {
@@ -160,7 +173,7 @@ class FeedService {
         }
       }
     } catch (e, st) {
-      debugPrint('Error analyzing ratings: $e\n$st');
+      _log.handle(e, st, 'Error analyzing ratings');
     }
   }
 
@@ -180,5 +193,6 @@ FeedService feedService(FeedServiceRef ref) {
   final repository = ref.watch(feedRepositoryProvider);
   final driftServiceInstance = ref.watch(driftServiceProvider);
   final aiService = ref.watch(aiServiceProvider);
-  return FeedService(repository, driftServiceInstance, aiService);
+  final log = ref.watch(talkerProvider);
+  return FeedService(repository, driftServiceInstance, aiService, log);
 }
