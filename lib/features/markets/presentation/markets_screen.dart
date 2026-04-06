@@ -8,6 +8,7 @@ import '../../../core/database/models/ticker.dart';
 import '../data/markets_provider.dart';
 import 'screens/ticker_detail_screen.dart';
 import '../../../core/theme/app_drawer.dart';
+import '../../../core/theme/app_theme_extension.dart';
 import 'models/ticker_view_model.dart';
 
 final sortGroupedByStateProvider = StateProvider<bool>((ref) => true);
@@ -104,6 +105,7 @@ class MarketsScreen extends ConsumerWidget {
             builder: (context, constraints) {
               final double availableWidth =
                   constraints.maxWidth - 16; // 8 padding on each side
+              final appThemeExt = Theme.of(context).extension<AppThemeExtension>();
               int crossAxisCount =
                   (availableWidth + 8) ~/ 368; // 360 width + 8 spacing
               if (crossAxisCount < 1) crossAxisCount = 1;
@@ -186,9 +188,10 @@ class MarketsScreen extends ConsumerWidget {
                                               child: _buildMarqueeText(
                                                 context,
                                                 tickerVm.isin.displayName,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
+                                                  color: appThemeExt?.mainTitleColor,
                                                 ),
                                                 maxWidth:
                                                     (availableWidth < 360

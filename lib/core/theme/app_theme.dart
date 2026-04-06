@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'app_theme_extension.dart';
 
 class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData.dark().copyWith(
-      primaryColor: Colors.tealAccent,
+      extensions: const [
+        AppThemeExtension(
+          mainTitleColor: Color(0xFFA5B4FC),
+          subtitleColor: Color(0xFF90CAF9),
+        ),
+      ],
       colorScheme: const ColorScheme.dark(
         primary: Colors.tealAccent,
         secondary: Colors.amberAccent,
