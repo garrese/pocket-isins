@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../../../core/network/market_data_service.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import '../../../../core/services/log/talker_provider.dart';
 import 'isin_step_screen.dart';
 import 'markets_step_screen.dart';
@@ -279,7 +280,8 @@ class _RegisteredNameStepScreenState
                       children: [
                         const Text(
                           'Select Registered Names:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         TextButton.icon(
                           onPressed: _addManualName,
@@ -290,7 +292,8 @@ class _RegisteredNameStepScreenState
                     ),
                     const SizedBox(height: 8),
                     if (_isLoading)
-                      const Expanded(child: Center(child: CircularProgressIndicator()))
+                      const Expanded(
+                          child: Center(child: CircularProgressIndicator()))
                     else if (_uniqueNames.isEmpty)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.0),

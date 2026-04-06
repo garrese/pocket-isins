@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../../../core/network/market_data_service.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import '../../../../core/services/log/talker_provider.dart';
 import '../../data/portfolio_provider.dart';
 import 'additional_data_step_screen.dart';
@@ -557,7 +558,8 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                       children: [
                         const Text(
                           'Select Tickers:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         TextButton.icon(
                           onPressed: _showAddMarketDialog,
@@ -587,16 +589,18 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                               itemCount: _searchResults.length,
                               itemBuilder: (context, index) {
                                 final q = _searchResults[index];
-                                final name =
-                                    q['longname'] ?? q['shortname'] ?? 'Unknown';
+                                final name = q['longname'] ??
+                                    q['shortname'] ??
+                                    'Unknown';
                                 final symbol = q['symbol'] ?? 'Unknown';
 
-                                final isDirect =
-                                    _isinDirectSymbols.contains(symbol.toString());
+                                final isDirect = _isinDirectSymbols
+                                    .contains(symbol.toString());
 
                                 final currency = q['currency'];
                                 final gmtOffset = q['gmtoffset'] as int?;
-                                final regStart = q['regularMarketStart'] as int?;
+                                final regStart =
+                                    q['regularMarketStart'] as int?;
                                 final regEnd = q['regularMarketEnd'] as int?;
                                 final timeStr =
                                     _formatTime(regStart, regEnd, gmtOffset);
@@ -619,11 +623,13 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                                     ],
                                   ),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                           '${q['exchDisp'] ?? q['exchange'] ?? 'Unknown'} - $symbol'),
-                                      if (currency != null || timeStr.isNotEmpty)
+                                      if (currency != null ||
+                                          timeStr.isNotEmpty)
                                         Text(
                                           '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
                                           style: const TextStyle(

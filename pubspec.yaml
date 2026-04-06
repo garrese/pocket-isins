@@ -52,7 +52,6 @@ dependencies:
   xml: ^6.6.1
   shared_preferences: ^2.5.5
   talker_flutter: ^5.1.16
-  talker_dio_logger: ^5.1.16
   talker_riverpod_logger: ^5.0.1
   flutter_markdown_plus: ^1.0.7
   go_router: ^17.2.0
