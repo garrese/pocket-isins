@@ -119,7 +119,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('News Feed'),
         actions: [
           PopupMenuButton<FeedSortOrder>(
             icon: const Icon(Icons.sort),
