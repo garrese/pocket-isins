@@ -28,8 +28,8 @@ class WizardBottomActions extends StatelessWidget {
           final isNarrow = constraints.maxWidth < 600;
 
           // Common style for all buttons: square edges, no margin
-          const squareShape = RoundedRectangleBorder(borderRadius: BorderRadius.zero);
-          const buttonHeight = 56.0;
+          final squareShape = RoundedRectangleBorder(borderRadius: BorderRadius.zero);
+          final buttonHeight = 56.0;
 
           Widget buildCancel() {
             return SizedBox(
@@ -41,7 +41,9 @@ class WizardBottomActions extends StatelessWidget {
                 style: TextButton.styleFrom(
                   shape: squareShape,
                   foregroundColor: Theme.of(context).colorScheme.error,
-                  backgroundColor: Theme.of(context).colorScheme.surface, // Gives it a button look vs background
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .surface, // Gives it a button look vs background
                 ),
               ),
             );
@@ -57,7 +59,8 @@ class WizardBottomActions extends StatelessWidget {
                 label: const Text('Previous'),
                 style: OutlinedButton.styleFrom(
                   shape: squareShape,
-                  side: BorderSide(color: Theme.of(context).dividerColor, width: 0.5),
+                  side: BorderSide(
+                      color: Theme.of(context).dividerColor, width: 0.5),
                   backgroundColor: Theme.of(context).colorScheme.surface,
                 ),
               ),
@@ -74,7 +77,8 @@ class WizardBottomActions extends StatelessWidget {
                 label: const Text('Continue'),
                 style: OutlinedButton.styleFrom(
                   shape: squareShape,
-                  side: BorderSide(color: Theme.of(context).dividerColor, width: 0.5),
+                  side: BorderSide(
+                      color: Theme.of(context).dividerColor, width: 0.5),
                   backgroundColor: Theme.of(context).colorScheme.surface,
                 ),
               ),

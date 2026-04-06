@@ -45,12 +45,28 @@ class AppDatabase extends _$AppDatabase {
           await m.alterTable(TableMigration(tickers));
         }
         if (from < 6) {
-          try { await m.addColumn(marketDataCaches, marketDataCaches.regularMarketStart); } catch (_) {}
-          try { await m.addColumn(marketDataCaches, marketDataCaches.regularMarketEnd); } catch (_) {}
-          try { await m.addColumn(marketDataCaches, marketDataCaches.preMarketStart); } catch (_) {}
-          try { await m.addColumn(marketDataCaches, marketDataCaches.preMarketEnd); } catch (_) {}
-          try { await m.addColumn(marketDataCaches, marketDataCaches.postMarketStart); } catch (_) {}
-          try { await m.addColumn(marketDataCaches, marketDataCaches.postMarketEnd); } catch (_) {}
+          try {
+            await m.addColumn(
+                marketDataCaches, marketDataCaches.regularMarketStart);
+          } catch (_) {}
+          try {
+            await m.addColumn(
+                marketDataCaches, marketDataCaches.regularMarketEnd);
+          } catch (_) {}
+          try {
+            await m.addColumn(
+                marketDataCaches, marketDataCaches.preMarketStart);
+          } catch (_) {}
+          try {
+            await m.addColumn(marketDataCaches, marketDataCaches.preMarketEnd);
+          } catch (_) {}
+          try {
+            await m.addColumn(
+                marketDataCaches, marketDataCaches.postMarketStart);
+          } catch (_) {}
+          try {
+            await m.addColumn(marketDataCaches, marketDataCaches.postMarketEnd);
+          } catch (_) {}
         }
       },
     );

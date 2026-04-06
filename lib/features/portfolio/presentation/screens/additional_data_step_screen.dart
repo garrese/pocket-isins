@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../data/portfolio_provider.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 import '../../../../core/services/log/talker_provider.dart';
 import 'wizard_bottom_actions.dart';
 import 'markets_step_screen.dart';
