@@ -50,31 +50,44 @@ class AppDatabase extends _$AppDatabase {
               marketDataCaches,
               marketDataCaches.regularMarketStart,
             );
-          } catch (_) {}
+          } catch (e, stackTrace) {
+            // Can be ignored if it exists, but log for visibility
+            print('Error adding regularMarketStart: $e');
+          }
           try {
             await m.addColumn(
               marketDataCaches,
               marketDataCaches.regularMarketEnd,
             );
-          } catch (_) {}
+          } catch (e, stackTrace) {
+            print('Error adding regularMarketEnd: $e');
+          }
           try {
             await m.addColumn(
               marketDataCaches,
               marketDataCaches.preMarketStart,
             );
-          } catch (_) {}
+          } catch (e, stackTrace) {
+            print('Error adding preMarketStart: $e');
+          }
           try {
             await m.addColumn(marketDataCaches, marketDataCaches.preMarketEnd);
-          } catch (_) {}
+          } catch (e, stackTrace) {
+            print('Error adding preMarketEnd: $e');
+          }
           try {
             await m.addColumn(
               marketDataCaches,
               marketDataCaches.postMarketStart,
             );
-          } catch (_) {}
+          } catch (e, stackTrace) {
+            print('Error adding postMarketStart: $e');
+          }
           try {
             await m.addColumn(marketDataCaches, marketDataCaches.postMarketEnd);
-          } catch (_) {}
+          } catch (e, stackTrace) {
+            print('Error adding postMarketEnd: $e');
+          }
         }
       },
     );

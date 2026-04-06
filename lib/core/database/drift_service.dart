@@ -9,9 +9,15 @@ class DriftService {
   late final AppDatabase db;
 
   Future<void> init() async {
-    db = AppDatabase();
-    // Verify connection by doing a simple query
-    await db.customSelect('SELECT 1').get();
+    try {
+      db = AppDatabase();
+      // Verify connection by doing a simple query
+      await db.customSelect('SELECT 1').get();
+    } catch (e, stackTrace) {
+      print('Failed to initialize Drift database: $e\n$stackTrace');
+      // Rethrow to allow the app to fail fast if DB is inaccessible
+      rethrow;
+    }
   }
 }
 
