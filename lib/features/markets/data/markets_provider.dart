@@ -9,6 +9,7 @@ import '../../../core/database/drift/app_database.dart' as drift;
 import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/market_data_cache.dart';
 import '../../../core/network/market_data_service.dart';
+import '../../../core/services/log/talker_provider.dart';
 import '../../portfolio/data/portfolio_provider.dart';
 
 part 'markets_provider.g.dart';
