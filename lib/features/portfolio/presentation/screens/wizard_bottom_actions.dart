@@ -28,7 +28,9 @@ class WizardBottomActions extends StatelessWidget {
           final isNarrow = constraints.maxWidth < 600;
 
           // Common style for all buttons: square edges, no margin
-          final squareShape = RoundedRectangleBorder(borderRadius: BorderRadius.zero);
+          final squareShape = RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          );
           final buttonHeight = 56.0;
 
           Widget buildCancel() {
@@ -41,9 +43,9 @@ class WizardBottomActions extends StatelessWidget {
                 style: TextButton.styleFrom(
                   shape: squareShape,
                   foregroundColor: Theme.of(context).colorScheme.error,
-                  backgroundColor: Theme.of(context)
-                      .colorScheme
-                      .surface, // Gives it a button look vs background
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.surface, // Gives it a button look vs background
                 ),
               ),
             );
@@ -60,7 +62,9 @@ class WizardBottomActions extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   shape: squareShape,
                   side: BorderSide(
-                      color: Theme.of(context).dividerColor, width: 0.5),
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
                   backgroundColor: Theme.of(context).colorScheme.surface,
                 ),
               ),
@@ -78,7 +82,9 @@ class WizardBottomActions extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   shape: squareShape,
                   side: BorderSide(
-                      color: Theme.of(context).dividerColor, width: 0.5),
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
                   backgroundColor: Theme.of(context).colorScheme.surface,
                 ),
               ),
@@ -93,9 +99,7 @@ class WizardBottomActions extends StatelessWidget {
                 onPressed: onSave,
                 icon: const Icon(Icons.save),
                 label: const Text('Save'),
-                style: FilledButton.styleFrom(
-                  shape: squareShape,
-                ),
+                style: FilledButton.styleFrom(shape: squareShape),
               ),
             );
           }
@@ -107,12 +111,15 @@ class WizardBottomActions extends StatelessWidget {
 
           if (isNarrow) {
             final leftWidgets = <Widget>[];
-            if (previousButton != null) leftWidgets.add(Expanded(child: previousButton));
+            if (previousButton != null)
+              leftWidgets.add(Expanded(child: previousButton));
             leftWidgets.add(Expanded(child: cancelButton));
 
             final rightWidgets = <Widget>[];
-            if (continueButton != null) rightWidgets.add(Expanded(child: continueButton));
-            if (saveButton != null) rightWidgets.add(Expanded(child: saveButton));
+            if (continueButton != null)
+              rightWidgets.add(Expanded(child: continueButton));
+            if (saveButton != null)
+              rightWidgets.add(Expanded(child: saveButton));
 
             final maxItems = math.max(leftWidgets.length, rightWidgets.length);
             final totalHeight = maxItems * buttonHeight;
@@ -141,11 +148,14 @@ class WizardBottomActions extends StatelessWidget {
           } else {
             final leftWidgets = <Widget>[];
             leftWidgets.add(Expanded(child: cancelButton));
-            if (previousButton != null) leftWidgets.add(Expanded(child: previousButton));
+            if (previousButton != null)
+              leftWidgets.add(Expanded(child: previousButton));
 
             final rightWidgets = <Widget>[];
-            if (continueButton != null) rightWidgets.add(Expanded(child: continueButton));
-            if (saveButton != null) rightWidgets.add(Expanded(child: saveButton));
+            if (continueButton != null)
+              rightWidgets.add(Expanded(child: continueButton));
+            if (saveButton != null)
+              rightWidgets.add(Expanded(child: saveButton));
 
             return SizedBox(
               height: buttonHeight,

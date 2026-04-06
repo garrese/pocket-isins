@@ -29,8 +29,14 @@ void main() async {
       useConsoleLogs: true,
     ),
     logger: TalkerLogger(
-      settings: TalkerLoggerSettings(level: LogLevel.info),
-      formatter: const CustomTalkerFormatter(),
+      settings: TalkerLoggerSettings(
+        level: LogLevel.info,
+        colors: {LogLevel.debug: AnsiPen()..green()},
+      ),
+      formatter: CustomTalkerFormatter(() {
+        // Will be updated when shared prefs loads, but default is false
+        return false;
+      }),
     ),
   );
 
@@ -78,8 +84,9 @@ class MainScreen extends ConsumerWidget {
     ];
 
     // Ensure currentIndex is valid if the Log tab is hidden while selected
-    final activeIndex =
-        currentIndex >= screens.length ? screens.length - 1 : currentIndex;
+    final activeIndex = currentIndex >= screens.length
+        ? screens.length - 1
+        : currentIndex;
 
     // Reset currentTab if it's out of bounds after toggling
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -91,8 +98,8 @@ class MainScreen extends ConsumerWidget {
     return Scaffold(
       drawer:
           activeIndex == screens.length - 1 && developerSettings.showLogConsole
-              ? const AppDrawer()
-              : null,
+          ? const AppDrawer()
+          : null,
       body: screens[activeIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: activeIndex,

@@ -33,7 +33,8 @@ class AiService {
   }) async {
     final settings = await _settingsRepo.getSettings();
 
-    final activeMessages = messages ??
+    final activeMessages =
+        messages ??
         (userPrompt != null
             ? [
                 {'role': 'user', 'content': userPrompt},
@@ -203,16 +204,38 @@ Example format:
         ],
     };
 
+    final requestJsonStr = jsonEncode(data);
+    _log.verbose('AI Request (Google):\nPOST $endpoint\n$requestJsonStr');
+
+    // Create a simplified version for DEBUG containing only the last message
+    if (messages.isNotEmpty) {
+      final debugData = Map<String, dynamic>.from(data);
+      debugData['contents'] = [
+        {
+          'role': messages.last['role'] == 'assistant' ? 'model' : 'user',
+          'parts': [
+            {'text': messages.last['content']},
+          ],
+        },
+      ];
+      _log.debug('AI Turn Request (Google):\n${jsonEncode(debugData)}');
+    }
+
     try {
       final response = await _dio.post(
         endpoint,
         options: Options(headers: headers),
-        data: jsonEncode(data),
+        data: requestJsonStr,
       );
 
+      final responseJsonStr = jsonEncode(response.data);
+      _log.verbose('AI Response (Google):\n$responseJsonStr');
+      _log.debug('AI Turn Response (Google):\n$responseJsonStr');
+
       if (response.statusCode == 200) {
-        final reply = response.data['candidates'][0]['content']['parts'][0]
-            ['text'] as String;
+        final reply =
+            response.data['candidates'][0]['content']['parts'][0]['text']
+                as String;
         return reply;
       } else {
         _log.handle(
@@ -272,12 +295,29 @@ Example format:
       }
     }
 
+    final requestJsonStr = jsonEncode(data);
+    _log.verbose('AI Request (OpenAI):\nPOST $endpoint\n$requestJsonStr');
+
+    // Create a simplified version for DEBUG containing only the last message
+    if (messages.isNotEmpty) {
+      final debugData = Map<String, dynamic>.from(data);
+      debugData['messages'] = [
+        {'role': 'system', 'content': systemPrompt},
+        {'role': messages.last['role'], 'content': messages.last['content']},
+      ];
+      _log.debug('AI Turn Request (OpenAI):\n${jsonEncode(debugData)}');
+    }
+
     try {
       final response = await _dio.post(
         endpoint,
         options: Options(headers: headers),
-        data: jsonEncode(data),
+        data: requestJsonStr,
       );
+
+      final responseJsonStr = jsonEncode(response.data);
+      _log.verbose('AI Response (OpenAI):\n$responseJsonStr');
+      _log.debug('AI Turn Response (OpenAI):\n$responseJsonStr');
 
       if (response.statusCode == 200) {
         final reply =

@@ -120,9 +120,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Add ISIN / Name'),
-        ),
+        appBar: AppBar(title: const Text('Add ISIN / Name')),
         body: Form(
           key: _formKey,
           child: Column(
@@ -137,7 +135,9 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                       const Text(
                         'Enter ISIN and/or Name',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       const Text(

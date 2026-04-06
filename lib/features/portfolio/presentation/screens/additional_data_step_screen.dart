@@ -123,7 +123,9 @@ class _AdditionalDataStepScreenState
     widget.formData.shortName = _shortNameController.text.trim();
 
     try {
-      await ref.read(portfolioProvider.notifier).saveIsin(
+      await ref
+          .read(portfolioProvider.notifier)
+          .saveIsin(
             id: widget.formData.id,
             isinCode: widget.formData.isinCode,
             altName: widget.formData.altName,

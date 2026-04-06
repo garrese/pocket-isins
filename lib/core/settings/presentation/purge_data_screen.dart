@@ -173,7 +173,8 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: FilledButton.tonalIcon(
-            onPressed: (_purgeIsins ||
+            onPressed:
+                (_purgeIsins ||
                     _purgeFeedNews ||
                     _purgeChatMessages ||
                     _purgeMarketData ||

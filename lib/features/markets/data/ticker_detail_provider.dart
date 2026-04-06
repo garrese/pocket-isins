@@ -91,7 +91,9 @@ class TickerDetail extends _$TickerDetail {
         state = state.copyWith(isLoading: false, error: errorMsg);
       }
     } catch (e, stack) {
-      ref.read(talkerProvider).handle(
+      ref
+          .read(talkerProvider)
+          .handle(
             e,
             stack,
             'Exception fetching historical data for ${state.symbol}',

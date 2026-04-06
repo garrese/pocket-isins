@@ -11,67 +11,100 @@ class $IsinsTable extends Isins with TableInfo<$IsinsTable, IsinData> {
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _isinCodeMeta =
-      const VerificationMeta('isinCode');
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _isinCodeMeta = const VerificationMeta(
+    'isinCode',
+  );
   @override
   late final GeneratedColumn<String> isinCode = GeneratedColumn<String>(
-      'isin_code', aliasedName, true,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
-  static const VerificationMeta _altNameMeta =
-      const VerificationMeta('altName');
+    'isin_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _altNameMeta = const VerificationMeta(
+    'altName',
+  );
   @override
   late final GeneratedColumn<String> altName = GeneratedColumn<String>(
-      'alt_name', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'alt_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   late final GeneratedColumnWithTypeConverter<List<String>, String>
-      registeredNames = GeneratedColumn<String>(
-              'registered_names', aliasedName, false,
-              type: DriftSqlType.string,
-              requiredDuringInsert: false,
-              defaultValue: const Constant('[]'))
-          .withConverter<List<String>>($IsinsTable.$converterregisteredNames);
-  static const VerificationMeta _shortNameMeta =
-      const VerificationMeta('shortName');
+  registeredNames = GeneratedColumn<String>(
+    'registered_names',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  ).withConverter<List<String>>($IsinsTable.$converterregisteredNames);
+  static const VerificationMeta _shortNameMeta = const VerificationMeta(
+    'shortName',
+  );
   @override
   late final GeneratedColumn<String> shortName = GeneratedColumn<String>(
-      'short_name', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'short_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, isinCode, altName, registeredNames, shortName];
+  List<GeneratedColumn> get $columns => [
+    id,
+    isinCode,
+    altName,
+    registeredNames,
+    shortName,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'isins';
   @override
-  VerificationContext validateIntegrity(Insertable<IsinData> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<IsinData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('isin_code')) {
-      context.handle(_isinCodeMeta,
-          isinCode.isAcceptableOrUnknown(data['isin_code']!, _isinCodeMeta));
+      context.handle(
+        _isinCodeMeta,
+        isinCode.isAcceptableOrUnknown(data['isin_code']!, _isinCodeMeta),
+      );
     }
     if (data.containsKey('alt_name')) {
-      context.handle(_altNameMeta,
-          altName.isAcceptableOrUnknown(data['alt_name']!, _altNameMeta));
+      context.handle(
+        _altNameMeta,
+        altName.isAcceptableOrUnknown(data['alt_name']!, _altNameMeta),
+      );
     }
     if (data.containsKey('short_name')) {
-      context.handle(_shortNameMeta,
-          shortName.isAcceptableOrUnknown(data['short_name']!, _shortNameMeta));
+      context.handle(
+        _shortNameMeta,
+        shortName.isAcceptableOrUnknown(data['short_name']!, _shortNameMeta),
+      );
     }
     return context;
   }
@@ -82,17 +115,28 @@ class $IsinsTable extends Isins with TableInfo<$IsinsTable, IsinData> {
   IsinData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return IsinData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      isinCode: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}isin_code']),
-      altName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}alt_name']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      isinCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}isin_code'],
+      ),
+      altName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}alt_name'],
+      ),
       registeredNames: $IsinsTable.$converterregisteredNames.fromSql(
-          attachedDatabase.typeMapping.read(DriftSqlType.string,
-              data['${effectivePrefix}registered_names'])!),
-      shortName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}short_name']),
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}registered_names'],
+        )!,
+      ),
+      shortName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}short_name'],
+      ),
     );
   }
 
@@ -111,12 +155,13 @@ class IsinData extends DataClass implements Insertable<IsinData> {
   final String? altName;
   final List<String> registeredNames;
   final String? shortName;
-  const IsinData(
-      {required this.id,
-      this.isinCode,
-      this.altName,
-      required this.registeredNames,
-      this.shortName});
+  const IsinData({
+    required this.id,
+    this.isinCode,
+    this.altName,
+    required this.registeredNames,
+    this.shortName,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -129,7 +174,8 @@ class IsinData extends DataClass implements Insertable<IsinData> {
     }
     {
       map['registered_names'] = Variable<String>(
-          $IsinsTable.$converterregisteredNames.toSql(registeredNames));
+        $IsinsTable.$converterregisteredNames.toSql(registeredNames),
+      );
     }
     if (!nullToAbsent || shortName != null) {
       map['short_name'] = Variable<String>(shortName);
@@ -153,15 +199,18 @@ class IsinData extends DataClass implements Insertable<IsinData> {
     );
   }
 
-  factory IsinData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory IsinData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return IsinData(
       id: serializer.fromJson<int>(json['id']),
       isinCode: serializer.fromJson<String?>(json['isinCode']),
       altName: serializer.fromJson<String?>(json['altName']),
-      registeredNames:
-          serializer.fromJson<List<String>>(json['registeredNames']),
+      registeredNames: serializer.fromJson<List<String>>(
+        json['registeredNames'],
+      ),
       shortName: serializer.fromJson<String?>(json['shortName']),
     );
   }
@@ -177,19 +226,19 @@ class IsinData extends DataClass implements Insertable<IsinData> {
     };
   }
 
-  IsinData copyWith(
-          {int? id,
-          Value<String?> isinCode = const Value.absent(),
-          Value<String?> altName = const Value.absent(),
-          List<String>? registeredNames,
-          Value<String?> shortName = const Value.absent()}) =>
-      IsinData(
-        id: id ?? this.id,
-        isinCode: isinCode.present ? isinCode.value : this.isinCode,
-        altName: altName.present ? altName.value : this.altName,
-        registeredNames: registeredNames ?? this.registeredNames,
-        shortName: shortName.present ? shortName.value : this.shortName,
-      );
+  IsinData copyWith({
+    int? id,
+    Value<String?> isinCode = const Value.absent(),
+    Value<String?> altName = const Value.absent(),
+    List<String>? registeredNames,
+    Value<String?> shortName = const Value.absent(),
+  }) => IsinData(
+    id: id ?? this.id,
+    isinCode: isinCode.present ? isinCode.value : this.isinCode,
+    altName: altName.present ? altName.value : this.altName,
+    registeredNames: registeredNames ?? this.registeredNames,
+    shortName: shortName.present ? shortName.value : this.shortName,
+  );
   IsinData copyWithCompanion(IsinsCompanion data) {
     return IsinData(
       id: data.id.present ? data.id.value : this.id,
@@ -264,12 +313,13 @@ class IsinsCompanion extends UpdateCompanion<IsinData> {
     });
   }
 
-  IsinsCompanion copyWith(
-      {Value<int>? id,
-      Value<String?>? isinCode,
-      Value<String?>? altName,
-      Value<List<String>>? registeredNames,
-      Value<String?>? shortName}) {
+  IsinsCompanion copyWith({
+    Value<int>? id,
+    Value<String?>? isinCode,
+    Value<String?>? altName,
+    Value<List<String>>? registeredNames,
+    Value<String?>? shortName,
+  }) {
     return IsinsCompanion(
       id: id ?? this.id,
       isinCode: isinCode ?? this.isinCode,
@@ -293,7 +343,8 @@ class IsinsCompanion extends UpdateCompanion<IsinData> {
     }
     if (registeredNames.present) {
       map['registered_names'] = Variable<String>(
-          $IsinsTable.$converterregisteredNames.toSql(registeredNames.value));
+        $IsinsTable.$converterregisteredNames.toSql(registeredNames.value),
+      );
     }
     if (shortName.present) {
       map['short_name'] = Variable<String>(shortName.value);
@@ -322,168 +373,253 @@ class $TickersTable extends Tickers with TableInfo<$TickersTable, TickerData> {
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _symbolMeta = const VerificationMeta('symbol');
   @override
   late final GeneratedColumn<String> symbol = GeneratedColumn<String>(
-      'symbol', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
-  static const VerificationMeta _exchangeMeta =
-      const VerificationMeta('exchange');
+    'symbol',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _exchangeMeta = const VerificationMeta(
+    'exchange',
+  );
   @override
   late final GeneratedColumn<String> exchange = GeneratedColumn<String>(
-      'exchange', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _currencyMeta =
-      const VerificationMeta('currency');
+    'exchange',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currencyMeta = const VerificationMeta(
+    'currency',
+  );
   @override
   late final GeneratedColumn<String> currency = GeneratedColumn<String>(
-      'currency', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _quoteTypeMeta =
-      const VerificationMeta('quoteType');
+    'currency',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _quoteTypeMeta = const VerificationMeta(
+    'quoteType',
+  );
   @override
   late final GeneratedColumn<String> quoteType = GeneratedColumn<String>(
-      'quote_type', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'quote_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _regularMarketStartMeta =
       const VerificationMeta('regularMarketStart');
   @override
   late final GeneratedColumn<int> regularMarketStart = GeneratedColumn<int>(
-      'regular_market_start', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _regularMarketEndMeta =
-      const VerificationMeta('regularMarketEnd');
+    'regular_market_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _regularMarketEndMeta = const VerificationMeta(
+    'regularMarketEnd',
+  );
   @override
   late final GeneratedColumn<int> regularMarketEnd = GeneratedColumn<int>(
-      'regular_market_end', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _preMarketStartMeta =
-      const VerificationMeta('preMarketStart');
+    'regular_market_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _preMarketStartMeta = const VerificationMeta(
+    'preMarketStart',
+  );
   @override
   late final GeneratedColumn<int> preMarketStart = GeneratedColumn<int>(
-      'pre_market_start', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _preMarketEndMeta =
-      const VerificationMeta('preMarketEnd');
+    'pre_market_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _preMarketEndMeta = const VerificationMeta(
+    'preMarketEnd',
+  );
   @override
   late final GeneratedColumn<int> preMarketEnd = GeneratedColumn<int>(
-      'pre_market_end', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _postMarketStartMeta =
-      const VerificationMeta('postMarketStart');
+    'pre_market_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _postMarketStartMeta = const VerificationMeta(
+    'postMarketStart',
+  );
   @override
   late final GeneratedColumn<int> postMarketStart = GeneratedColumn<int>(
-      'post_market_start', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _postMarketEndMeta =
-      const VerificationMeta('postMarketEnd');
+    'post_market_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _postMarketEndMeta = const VerificationMeta(
+    'postMarketEnd',
+  );
   @override
   late final GeneratedColumn<int> postMarketEnd = GeneratedColumn<int>(
-      'post_market_end', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'post_market_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isinIdMeta = const VerificationMeta('isinId');
   @override
   late final GeneratedColumn<int> isinId = GeneratedColumn<int>(
-      'isin_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES isins (id)'));
+    'isin_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES isins (id)',
+    ),
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        id,
-        symbol,
-        exchange,
-        currency,
-        quoteType,
-        regularMarketStart,
-        regularMarketEnd,
-        preMarketStart,
-        preMarketEnd,
-        postMarketStart,
-        postMarketEnd,
-        isinId
-      ];
+    id,
+    symbol,
+    exchange,
+    currency,
+    quoteType,
+    regularMarketStart,
+    regularMarketEnd,
+    preMarketStart,
+    preMarketEnd,
+    postMarketStart,
+    postMarketEnd,
+    isinId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'tickers';
   @override
-  VerificationContext validateIntegrity(Insertable<TickerData> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<TickerData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('symbol')) {
-      context.handle(_symbolMeta,
-          symbol.isAcceptableOrUnknown(data['symbol']!, _symbolMeta));
+      context.handle(
+        _symbolMeta,
+        symbol.isAcceptableOrUnknown(data['symbol']!, _symbolMeta),
+      );
     } else if (isInserting) {
       context.missing(_symbolMeta);
     }
     if (data.containsKey('exchange')) {
-      context.handle(_exchangeMeta,
-          exchange.isAcceptableOrUnknown(data['exchange']!, _exchangeMeta));
+      context.handle(
+        _exchangeMeta,
+        exchange.isAcceptableOrUnknown(data['exchange']!, _exchangeMeta),
+      );
     } else if (isInserting) {
       context.missing(_exchangeMeta);
     }
     if (data.containsKey('currency')) {
-      context.handle(_currencyMeta,
-          currency.isAcceptableOrUnknown(data['currency']!, _currencyMeta));
+      context.handle(
+        _currencyMeta,
+        currency.isAcceptableOrUnknown(data['currency']!, _currencyMeta),
+      );
     }
     if (data.containsKey('quote_type')) {
-      context.handle(_quoteTypeMeta,
-          quoteType.isAcceptableOrUnknown(data['quote_type']!, _quoteTypeMeta));
+      context.handle(
+        _quoteTypeMeta,
+        quoteType.isAcceptableOrUnknown(data['quote_type']!, _quoteTypeMeta),
+      );
     }
     if (data.containsKey('regular_market_start')) {
       context.handle(
+        _regularMarketStartMeta,
+        regularMarketStart.isAcceptableOrUnknown(
+          data['regular_market_start']!,
           _regularMarketStartMeta,
-          regularMarketStart.isAcceptableOrUnknown(
-              data['regular_market_start']!, _regularMarketStartMeta));
+        ),
+      );
     }
     if (data.containsKey('regular_market_end')) {
       context.handle(
+        _regularMarketEndMeta,
+        regularMarketEnd.isAcceptableOrUnknown(
+          data['regular_market_end']!,
           _regularMarketEndMeta,
-          regularMarketEnd.isAcceptableOrUnknown(
-              data['regular_market_end']!, _regularMarketEndMeta));
+        ),
+      );
     }
     if (data.containsKey('pre_market_start')) {
       context.handle(
+        _preMarketStartMeta,
+        preMarketStart.isAcceptableOrUnknown(
+          data['pre_market_start']!,
           _preMarketStartMeta,
-          preMarketStart.isAcceptableOrUnknown(
-              data['pre_market_start']!, _preMarketStartMeta));
+        ),
+      );
     }
     if (data.containsKey('pre_market_end')) {
       context.handle(
+        _preMarketEndMeta,
+        preMarketEnd.isAcceptableOrUnknown(
+          data['pre_market_end']!,
           _preMarketEndMeta,
-          preMarketEnd.isAcceptableOrUnknown(
-              data['pre_market_end']!, _preMarketEndMeta));
+        ),
+      );
     }
     if (data.containsKey('post_market_start')) {
       context.handle(
+        _postMarketStartMeta,
+        postMarketStart.isAcceptableOrUnknown(
+          data['post_market_start']!,
           _postMarketStartMeta,
-          postMarketStart.isAcceptableOrUnknown(
-              data['post_market_start']!, _postMarketStartMeta));
+        ),
+      );
     }
     if (data.containsKey('post_market_end')) {
       context.handle(
+        _postMarketEndMeta,
+        postMarketEnd.isAcceptableOrUnknown(
+          data['post_market_end']!,
           _postMarketEndMeta,
-          postMarketEnd.isAcceptableOrUnknown(
-              data['post_market_end']!, _postMarketEndMeta));
+        ),
+      );
     }
     if (data.containsKey('isin_id')) {
-      context.handle(_isinIdMeta,
-          isinId.isAcceptableOrUnknown(data['isin_id']!, _isinIdMeta));
+      context.handle(
+        _isinIdMeta,
+        isinId.isAcceptableOrUnknown(data['isin_id']!, _isinIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_isinIdMeta);
     }
@@ -496,30 +632,54 @@ class $TickersTable extends Tickers with TableInfo<$TickersTable, TickerData> {
   TickerData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TickerData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      symbol: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}symbol'])!,
-      exchange: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}exchange'])!,
-      currency: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}currency']),
-      quoteType: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}quote_type']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      symbol: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}symbol'],
+      )!,
+      exchange: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}exchange'],
+      )!,
+      currency: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency'],
+      ),
+      quoteType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}quote_type'],
+      ),
       regularMarketStart: attachedDatabase.typeMapping.read(
-          DriftSqlType.int, data['${effectivePrefix}regular_market_start']),
-      regularMarketEnd: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}regular_market_end']),
-      preMarketStart: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}pre_market_start']),
-      preMarketEnd: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}pre_market_end']),
-      postMarketStart: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}post_market_start']),
-      postMarketEnd: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}post_market_end']),
-      isinId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}isin_id'])!,
+        DriftSqlType.int,
+        data['${effectivePrefix}regular_market_start'],
+      ),
+      regularMarketEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}regular_market_end'],
+      ),
+      preMarketStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pre_market_start'],
+      ),
+      preMarketEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pre_market_end'],
+      ),
+      postMarketStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}post_market_start'],
+      ),
+      postMarketEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}post_market_end'],
+      ),
+      isinId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}isin_id'],
+      )!,
     );
   }
 
@@ -542,19 +702,20 @@ class TickerData extends DataClass implements Insertable<TickerData> {
   final int? postMarketStart;
   final int? postMarketEnd;
   final int isinId;
-  const TickerData(
-      {required this.id,
-      required this.symbol,
-      required this.exchange,
-      this.currency,
-      this.quoteType,
-      this.regularMarketStart,
-      this.regularMarketEnd,
-      this.preMarketStart,
-      this.preMarketEnd,
-      this.postMarketStart,
-      this.postMarketEnd,
-      required this.isinId});
+  const TickerData({
+    required this.id,
+    required this.symbol,
+    required this.exchange,
+    this.currency,
+    this.quoteType,
+    this.regularMarketStart,
+    this.regularMarketEnd,
+    this.preMarketStart,
+    this.preMarketEnd,
+    this.postMarketStart,
+    this.postMarketEnd,
+    required this.isinId,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -622,8 +783,10 @@ class TickerData extends DataClass implements Insertable<TickerData> {
     );
   }
 
-  factory TickerData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory TickerData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TickerData(
       id: serializer.fromJson<int>(json['id']),
@@ -659,42 +822,43 @@ class TickerData extends DataClass implements Insertable<TickerData> {
     };
   }
 
-  TickerData copyWith(
-          {int? id,
-          String? symbol,
-          String? exchange,
-          Value<String?> currency = const Value.absent(),
-          Value<String?> quoteType = const Value.absent(),
-          Value<int?> regularMarketStart = const Value.absent(),
-          Value<int?> regularMarketEnd = const Value.absent(),
-          Value<int?> preMarketStart = const Value.absent(),
-          Value<int?> preMarketEnd = const Value.absent(),
-          Value<int?> postMarketStart = const Value.absent(),
-          Value<int?> postMarketEnd = const Value.absent(),
-          int? isinId}) =>
-      TickerData(
-        id: id ?? this.id,
-        symbol: symbol ?? this.symbol,
-        exchange: exchange ?? this.exchange,
-        currency: currency.present ? currency.value : this.currency,
-        quoteType: quoteType.present ? quoteType.value : this.quoteType,
-        regularMarketStart: regularMarketStart.present
-            ? regularMarketStart.value
-            : this.regularMarketStart,
-        regularMarketEnd: regularMarketEnd.present
-            ? regularMarketEnd.value
-            : this.regularMarketEnd,
-        preMarketStart:
-            preMarketStart.present ? preMarketStart.value : this.preMarketStart,
-        preMarketEnd:
-            preMarketEnd.present ? preMarketEnd.value : this.preMarketEnd,
-        postMarketStart: postMarketStart.present
-            ? postMarketStart.value
-            : this.postMarketStart,
-        postMarketEnd:
-            postMarketEnd.present ? postMarketEnd.value : this.postMarketEnd,
-        isinId: isinId ?? this.isinId,
-      );
+  TickerData copyWith({
+    int? id,
+    String? symbol,
+    String? exchange,
+    Value<String?> currency = const Value.absent(),
+    Value<String?> quoteType = const Value.absent(),
+    Value<int?> regularMarketStart = const Value.absent(),
+    Value<int?> regularMarketEnd = const Value.absent(),
+    Value<int?> preMarketStart = const Value.absent(),
+    Value<int?> preMarketEnd = const Value.absent(),
+    Value<int?> postMarketStart = const Value.absent(),
+    Value<int?> postMarketEnd = const Value.absent(),
+    int? isinId,
+  }) => TickerData(
+    id: id ?? this.id,
+    symbol: symbol ?? this.symbol,
+    exchange: exchange ?? this.exchange,
+    currency: currency.present ? currency.value : this.currency,
+    quoteType: quoteType.present ? quoteType.value : this.quoteType,
+    regularMarketStart: regularMarketStart.present
+        ? regularMarketStart.value
+        : this.regularMarketStart,
+    regularMarketEnd: regularMarketEnd.present
+        ? regularMarketEnd.value
+        : this.regularMarketEnd,
+    preMarketStart: preMarketStart.present
+        ? preMarketStart.value
+        : this.preMarketStart,
+    preMarketEnd: preMarketEnd.present ? preMarketEnd.value : this.preMarketEnd,
+    postMarketStart: postMarketStart.present
+        ? postMarketStart.value
+        : this.postMarketStart,
+    postMarketEnd: postMarketEnd.present
+        ? postMarketEnd.value
+        : this.postMarketEnd,
+    isinId: isinId ?? this.isinId,
+  );
   TickerData copyWithCompanion(TickersCompanion data) {
     return TickerData(
       id: data.id.present ? data.id.value : this.id,
@@ -745,18 +909,19 @@ class TickerData extends DataClass implements Insertable<TickerData> {
 
   @override
   int get hashCode => Object.hash(
-      id,
-      symbol,
-      exchange,
-      currency,
-      quoteType,
-      regularMarketStart,
-      regularMarketEnd,
-      preMarketStart,
-      preMarketEnd,
-      postMarketStart,
-      postMarketEnd,
-      isinId);
+    id,
+    symbol,
+    exchange,
+    currency,
+    quoteType,
+    regularMarketStart,
+    regularMarketEnd,
+    preMarketStart,
+    preMarketEnd,
+    postMarketStart,
+    postMarketEnd,
+    isinId,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -815,9 +980,9 @@ class TickersCompanion extends UpdateCompanion<TickerData> {
     this.postMarketStart = const Value.absent(),
     this.postMarketEnd = const Value.absent(),
     required int isinId,
-  })  : symbol = Value(symbol),
-        exchange = Value(exchange),
-        isinId = Value(isinId);
+  }) : symbol = Value(symbol),
+       exchange = Value(exchange),
+       isinId = Value(isinId);
   static Insertable<TickerData> custom({
     Expression<int>? id,
     Expression<String>? symbol,
@@ -849,19 +1014,20 @@ class TickersCompanion extends UpdateCompanion<TickerData> {
     });
   }
 
-  TickersCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? symbol,
-      Value<String>? exchange,
-      Value<String?>? currency,
-      Value<String?>? quoteType,
-      Value<int?>? regularMarketStart,
-      Value<int?>? regularMarketEnd,
-      Value<int?>? preMarketStart,
-      Value<int?>? preMarketEnd,
-      Value<int?>? postMarketStart,
-      Value<int?>? postMarketEnd,
-      Value<int>? isinId}) {
+  TickersCompanion copyWith({
+    Value<int>? id,
+    Value<String>? symbol,
+    Value<String>? exchange,
+    Value<String?>? currency,
+    Value<String?>? quoteType,
+    Value<int?>? regularMarketStart,
+    Value<int?>? regularMarketEnd,
+    Value<int?>? preMarketStart,
+    Value<int?>? preMarketEnd,
+    Value<int?>? postMarketStart,
+    Value<int?>? postMarketEnd,
+    Value<int>? isinId,
+  }) {
     return TickersCompanion(
       id: id ?? this.id,
       symbol: symbol ?? this.symbol,
@@ -949,121 +1115,183 @@ class $MarketDataCachesTable extends MarketDataCaches
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _symbolMeta = const VerificationMeta('symbol');
   @override
   late final GeneratedColumn<String> symbol = GeneratedColumn<String>(
-      'symbol', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
-  static const VerificationMeta _lastUpdatedMeta =
-      const VerificationMeta('lastUpdated');
+    'symbol',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _lastUpdatedMeta = const VerificationMeta(
+    'lastUpdated',
+  );
   @override
   late final GeneratedColumn<DateTime> lastUpdated = GeneratedColumn<DateTime>(
-      'last_updated', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'last_updated',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _regularMarketPriceMeta =
       const VerificationMeta('regularMarketPrice');
   @override
   late final GeneratedColumn<double> regularMarketPrice =
-      GeneratedColumn<double>('regular_market_price', aliasedName, false,
-          type: DriftSqlType.double,
-          requiredDuringInsert: false,
-          defaultValue: const Constant(0.0));
+      GeneratedColumn<double>(
+        'regular_market_price',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0.0),
+      );
   static const VerificationMeta _chartPreviousCloseMeta =
       const VerificationMeta('chartPreviousClose');
   @override
   late final GeneratedColumn<double> chartPreviousClose =
-      GeneratedColumn<double>('chart_previous_close', aliasedName, false,
-          type: DriftSqlType.double,
-          requiredDuringInsert: false,
-          defaultValue: const Constant(0.0));
+      GeneratedColumn<double>(
+        'chart_previous_close',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0.0),
+      );
   @override
   late final GeneratedColumnWithTypeConverter<List<double>, String>
-      intradayPrices = GeneratedColumn<String>(
-              'intraday_prices', aliasedName, false,
-              type: DriftSqlType.string,
-              requiredDuringInsert: false,
-              defaultValue: const Constant('[]'))
-          .withConverter<List<double>>(
-              $MarketDataCachesTable.$converterintradayPrices);
+  intradayPrices =
+      GeneratedColumn<String>(
+        'intraday_prices',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      ).withConverter<List<double>>(
+        $MarketDataCachesTable.$converterintradayPrices,
+      );
   @override
   late final GeneratedColumnWithTypeConverter<List<int>, String>
-      intradayTimestamps = GeneratedColumn<String>(
-              'intraday_timestamps', aliasedName, false,
-              type: DriftSqlType.string,
-              requiredDuringInsert: false,
-              defaultValue: const Constant('[]'))
-          .withConverter<List<int>>(
-              $MarketDataCachesTable.$converterintradayTimestamps);
+  intradayTimestamps =
+      GeneratedColumn<String>(
+        'intraday_timestamps',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      ).withConverter<List<int>>(
+        $MarketDataCachesTable.$converterintradayTimestamps,
+      );
   static const VerificationMeta _regularMarketStartMeta =
       const VerificationMeta('regularMarketStart');
   @override
   late final GeneratedColumn<int> regularMarketStart = GeneratedColumn<int>(
-      'regular_market_start', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _regularMarketEndMeta =
-      const VerificationMeta('regularMarketEnd');
+    'regular_market_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _regularMarketEndMeta = const VerificationMeta(
+    'regularMarketEnd',
+  );
   @override
   late final GeneratedColumn<int> regularMarketEnd = GeneratedColumn<int>(
-      'regular_market_end', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _preMarketStartMeta =
-      const VerificationMeta('preMarketStart');
+    'regular_market_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _preMarketStartMeta = const VerificationMeta(
+    'preMarketStart',
+  );
   @override
   late final GeneratedColumn<int> preMarketStart = GeneratedColumn<int>(
-      'pre_market_start', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _preMarketEndMeta =
-      const VerificationMeta('preMarketEnd');
+    'pre_market_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _preMarketEndMeta = const VerificationMeta(
+    'preMarketEnd',
+  );
   @override
   late final GeneratedColumn<int> preMarketEnd = GeneratedColumn<int>(
-      'pre_market_end', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _postMarketStartMeta =
-      const VerificationMeta('postMarketStart');
+    'pre_market_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _postMarketStartMeta = const VerificationMeta(
+    'postMarketStart',
+  );
   @override
   late final GeneratedColumn<int> postMarketStart = GeneratedColumn<int>(
-      'post_market_start', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _postMarketEndMeta =
-      const VerificationMeta('postMarketEnd');
+    'post_market_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _postMarketEndMeta = const VerificationMeta(
+    'postMarketEnd',
+  );
   @override
   late final GeneratedColumn<int> postMarketEnd = GeneratedColumn<int>(
-      'post_market_end', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _tickerIdMeta =
-      const VerificationMeta('tickerId');
+    'post_market_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _tickerIdMeta = const VerificationMeta(
+    'tickerId',
+  );
   @override
   late final GeneratedColumn<int> tickerId = GeneratedColumn<int>(
-      'ticker_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES tickers (id)'));
+    'ticker_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES tickers (id)',
+    ),
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        id,
-        symbol,
-        lastUpdated,
-        regularMarketPrice,
-        chartPreviousClose,
-        intradayPrices,
-        intradayTimestamps,
-        regularMarketStart,
-        regularMarketEnd,
-        preMarketStart,
-        preMarketEnd,
-        postMarketStart,
-        postMarketEnd,
-        tickerId
-      ];
+    id,
+    symbol,
+    lastUpdated,
+    regularMarketPrice,
+    chartPreviousClose,
+    intradayPrices,
+    intradayTimestamps,
+    regularMarketStart,
+    regularMarketEnd,
+    preMarketStart,
+    preMarketEnd,
+    postMarketStart,
+    postMarketEnd,
+    tickerId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1071,78 +1299,110 @@ class $MarketDataCachesTable extends MarketDataCaches
   static const String $name = 'market_data_caches';
   @override
   VerificationContext validateIntegrity(
-      Insertable<MarketDataCacheData> instance,
-      {bool isInserting = false}) {
+    Insertable<MarketDataCacheData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('symbol')) {
-      context.handle(_symbolMeta,
-          symbol.isAcceptableOrUnknown(data['symbol']!, _symbolMeta));
+      context.handle(
+        _symbolMeta,
+        symbol.isAcceptableOrUnknown(data['symbol']!, _symbolMeta),
+      );
     } else if (isInserting) {
       context.missing(_symbolMeta);
     }
     if (data.containsKey('last_updated')) {
       context.handle(
+        _lastUpdatedMeta,
+        lastUpdated.isAcceptableOrUnknown(
+          data['last_updated']!,
           _lastUpdatedMeta,
-          lastUpdated.isAcceptableOrUnknown(
-              data['last_updated']!, _lastUpdatedMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_lastUpdatedMeta);
     }
     if (data.containsKey('regular_market_price')) {
       context.handle(
+        _regularMarketPriceMeta,
+        regularMarketPrice.isAcceptableOrUnknown(
+          data['regular_market_price']!,
           _regularMarketPriceMeta,
-          regularMarketPrice.isAcceptableOrUnknown(
-              data['regular_market_price']!, _regularMarketPriceMeta));
+        ),
+      );
     }
     if (data.containsKey('chart_previous_close')) {
       context.handle(
+        _chartPreviousCloseMeta,
+        chartPreviousClose.isAcceptableOrUnknown(
+          data['chart_previous_close']!,
           _chartPreviousCloseMeta,
-          chartPreviousClose.isAcceptableOrUnknown(
-              data['chart_previous_close']!, _chartPreviousCloseMeta));
+        ),
+      );
     }
     if (data.containsKey('regular_market_start')) {
       context.handle(
+        _regularMarketStartMeta,
+        regularMarketStart.isAcceptableOrUnknown(
+          data['regular_market_start']!,
           _regularMarketStartMeta,
-          regularMarketStart.isAcceptableOrUnknown(
-              data['regular_market_start']!, _regularMarketStartMeta));
+        ),
+      );
     }
     if (data.containsKey('regular_market_end')) {
       context.handle(
+        _regularMarketEndMeta,
+        regularMarketEnd.isAcceptableOrUnknown(
+          data['regular_market_end']!,
           _regularMarketEndMeta,
-          regularMarketEnd.isAcceptableOrUnknown(
-              data['regular_market_end']!, _regularMarketEndMeta));
+        ),
+      );
     }
     if (data.containsKey('pre_market_start')) {
       context.handle(
+        _preMarketStartMeta,
+        preMarketStart.isAcceptableOrUnknown(
+          data['pre_market_start']!,
           _preMarketStartMeta,
-          preMarketStart.isAcceptableOrUnknown(
-              data['pre_market_start']!, _preMarketStartMeta));
+        ),
+      );
     }
     if (data.containsKey('pre_market_end')) {
       context.handle(
+        _preMarketEndMeta,
+        preMarketEnd.isAcceptableOrUnknown(
+          data['pre_market_end']!,
           _preMarketEndMeta,
-          preMarketEnd.isAcceptableOrUnknown(
-              data['pre_market_end']!, _preMarketEndMeta));
+        ),
+      );
     }
     if (data.containsKey('post_market_start')) {
       context.handle(
+        _postMarketStartMeta,
+        postMarketStart.isAcceptableOrUnknown(
+          data['post_market_start']!,
           _postMarketStartMeta,
-          postMarketStart.isAcceptableOrUnknown(
-              data['post_market_start']!, _postMarketStartMeta));
+        ),
+      );
     }
     if (data.containsKey('post_market_end')) {
       context.handle(
+        _postMarketEndMeta,
+        postMarketEnd.isAcceptableOrUnknown(
+          data['post_market_end']!,
           _postMarketEndMeta,
-          postMarketEnd.isAcceptableOrUnknown(
-              data['post_market_end']!, _postMarketEndMeta));
+        ),
+      );
     }
     if (data.containsKey('ticker_id')) {
-      context.handle(_tickerIdMeta,
-          tickerId.isAcceptableOrUnknown(data['ticker_id']!, _tickerIdMeta));
+      context.handle(
+        _tickerIdMeta,
+        tickerId.isAcceptableOrUnknown(data['ticker_id']!, _tickerIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_tickerIdMeta);
     }
@@ -1155,36 +1415,67 @@ class $MarketDataCachesTable extends MarketDataCaches
   MarketDataCacheData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MarketDataCacheData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      symbol: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}symbol'])!,
-      lastUpdated: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}last_updated'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      symbol: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}symbol'],
+      )!,
+      lastUpdated: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_updated'],
+      )!,
       regularMarketPrice: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}regular_market_price'])!,
+        DriftSqlType.double,
+        data['${effectivePrefix}regular_market_price'],
+      )!,
       chartPreviousClose: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}chart_previous_close'])!,
+        DriftSqlType.double,
+        data['${effectivePrefix}chart_previous_close'],
+      )!,
       intradayPrices: $MarketDataCachesTable.$converterintradayPrices.fromSql(
-          attachedDatabase.typeMapping.read(
-              DriftSqlType.string, data['${effectivePrefix}intraday_prices'])!),
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}intraday_prices'],
+        )!,
+      ),
       intradayTimestamps: $MarketDataCachesTable.$converterintradayTimestamps
-          .fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string,
-              data['${effectivePrefix}intraday_timestamps'])!),
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}intraday_timestamps'],
+            )!,
+          ),
       regularMarketStart: attachedDatabase.typeMapping.read(
-          DriftSqlType.int, data['${effectivePrefix}regular_market_start']),
-      regularMarketEnd: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}regular_market_end']),
-      preMarketStart: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}pre_market_start']),
-      preMarketEnd: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}pre_market_end']),
-      postMarketStart: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}post_market_start']),
-      postMarketEnd: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}post_market_end']),
-      tickerId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}ticker_id'])!,
+        DriftSqlType.int,
+        data['${effectivePrefix}regular_market_start'],
+      ),
+      regularMarketEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}regular_market_end'],
+      ),
+      preMarketStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pre_market_start'],
+      ),
+      preMarketEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pre_market_end'],
+      ),
+      postMarketStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}post_market_start'],
+      ),
+      postMarketEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}post_market_end'],
+      ),
+      tickerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ticker_id'],
+      )!,
     );
   }
 
@@ -1215,21 +1506,22 @@ class MarketDataCacheData extends DataClass
   final int? postMarketStart;
   final int? postMarketEnd;
   final int tickerId;
-  const MarketDataCacheData(
-      {required this.id,
-      required this.symbol,
-      required this.lastUpdated,
-      required this.regularMarketPrice,
-      required this.chartPreviousClose,
-      required this.intradayPrices,
-      required this.intradayTimestamps,
-      this.regularMarketStart,
-      this.regularMarketEnd,
-      this.preMarketStart,
-      this.preMarketEnd,
-      this.postMarketStart,
-      this.postMarketEnd,
-      required this.tickerId});
+  const MarketDataCacheData({
+    required this.id,
+    required this.symbol,
+    required this.lastUpdated,
+    required this.regularMarketPrice,
+    required this.chartPreviousClose,
+    required this.intradayPrices,
+    required this.intradayTimestamps,
+    this.regularMarketStart,
+    this.regularMarketEnd,
+    this.preMarketStart,
+    this.preMarketEnd,
+    this.postMarketStart,
+    this.postMarketEnd,
+    required this.tickerId,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1239,14 +1531,16 @@ class MarketDataCacheData extends DataClass
     map['regular_market_price'] = Variable<double>(regularMarketPrice);
     map['chart_previous_close'] = Variable<double>(chartPreviousClose);
     {
-      map['intraday_prices'] = Variable<String>($MarketDataCachesTable
-          .$converterintradayPrices
-          .toSql(intradayPrices));
+      map['intraday_prices'] = Variable<String>(
+        $MarketDataCachesTable.$converterintradayPrices.toSql(intradayPrices),
+      );
     }
     {
-      map['intraday_timestamps'] = Variable<String>($MarketDataCachesTable
-          .$converterintradayTimestamps
-          .toSql(intradayTimestamps));
+      map['intraday_timestamps'] = Variable<String>(
+        $MarketDataCachesTable.$converterintradayTimestamps.toSql(
+          intradayTimestamps,
+        ),
+      );
     }
     if (!nullToAbsent || regularMarketStart != null) {
       map['regular_market_start'] = Variable<int>(regularMarketStart);
@@ -1301,20 +1595,25 @@ class MarketDataCacheData extends DataClass
     );
   }
 
-  factory MarketDataCacheData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory MarketDataCacheData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MarketDataCacheData(
       id: serializer.fromJson<int>(json['id']),
       symbol: serializer.fromJson<String>(json['symbol']),
       lastUpdated: serializer.fromJson<DateTime>(json['lastUpdated']),
-      regularMarketPrice:
-          serializer.fromJson<double>(json['regularMarketPrice']),
-      chartPreviousClose:
-          serializer.fromJson<double>(json['chartPreviousClose']),
+      regularMarketPrice: serializer.fromJson<double>(
+        json['regularMarketPrice'],
+      ),
+      chartPreviousClose: serializer.fromJson<double>(
+        json['chartPreviousClose'],
+      ),
       intradayPrices: serializer.fromJson<List<double>>(json['intradayPrices']),
-      intradayTimestamps:
-          serializer.fromJson<List<int>>(json['intradayTimestamps']),
+      intradayTimestamps: serializer.fromJson<List<int>>(
+        json['intradayTimestamps'],
+      ),
       regularMarketStart: serializer.fromJson<int?>(json['regularMarketStart']),
       regularMarketEnd: serializer.fromJson<int?>(json['regularMarketEnd']),
       preMarketStart: serializer.fromJson<int?>(json['preMarketStart']),
@@ -1345,52 +1644,54 @@ class MarketDataCacheData extends DataClass
     };
   }
 
-  MarketDataCacheData copyWith(
-          {int? id,
-          String? symbol,
-          DateTime? lastUpdated,
-          double? regularMarketPrice,
-          double? chartPreviousClose,
-          List<double>? intradayPrices,
-          List<int>? intradayTimestamps,
-          Value<int?> regularMarketStart = const Value.absent(),
-          Value<int?> regularMarketEnd = const Value.absent(),
-          Value<int?> preMarketStart = const Value.absent(),
-          Value<int?> preMarketEnd = const Value.absent(),
-          Value<int?> postMarketStart = const Value.absent(),
-          Value<int?> postMarketEnd = const Value.absent(),
-          int? tickerId}) =>
-      MarketDataCacheData(
-        id: id ?? this.id,
-        symbol: symbol ?? this.symbol,
-        lastUpdated: lastUpdated ?? this.lastUpdated,
-        regularMarketPrice: regularMarketPrice ?? this.regularMarketPrice,
-        chartPreviousClose: chartPreviousClose ?? this.chartPreviousClose,
-        intradayPrices: intradayPrices ?? this.intradayPrices,
-        intradayTimestamps: intradayTimestamps ?? this.intradayTimestamps,
-        regularMarketStart: regularMarketStart.present
-            ? regularMarketStart.value
-            : this.regularMarketStart,
-        regularMarketEnd: regularMarketEnd.present
-            ? regularMarketEnd.value
-            : this.regularMarketEnd,
-        preMarketStart:
-            preMarketStart.present ? preMarketStart.value : this.preMarketStart,
-        preMarketEnd:
-            preMarketEnd.present ? preMarketEnd.value : this.preMarketEnd,
-        postMarketStart: postMarketStart.present
-            ? postMarketStart.value
-            : this.postMarketStart,
-        postMarketEnd:
-            postMarketEnd.present ? postMarketEnd.value : this.postMarketEnd,
-        tickerId: tickerId ?? this.tickerId,
-      );
+  MarketDataCacheData copyWith({
+    int? id,
+    String? symbol,
+    DateTime? lastUpdated,
+    double? regularMarketPrice,
+    double? chartPreviousClose,
+    List<double>? intradayPrices,
+    List<int>? intradayTimestamps,
+    Value<int?> regularMarketStart = const Value.absent(),
+    Value<int?> regularMarketEnd = const Value.absent(),
+    Value<int?> preMarketStart = const Value.absent(),
+    Value<int?> preMarketEnd = const Value.absent(),
+    Value<int?> postMarketStart = const Value.absent(),
+    Value<int?> postMarketEnd = const Value.absent(),
+    int? tickerId,
+  }) => MarketDataCacheData(
+    id: id ?? this.id,
+    symbol: symbol ?? this.symbol,
+    lastUpdated: lastUpdated ?? this.lastUpdated,
+    regularMarketPrice: regularMarketPrice ?? this.regularMarketPrice,
+    chartPreviousClose: chartPreviousClose ?? this.chartPreviousClose,
+    intradayPrices: intradayPrices ?? this.intradayPrices,
+    intradayTimestamps: intradayTimestamps ?? this.intradayTimestamps,
+    regularMarketStart: regularMarketStart.present
+        ? regularMarketStart.value
+        : this.regularMarketStart,
+    regularMarketEnd: regularMarketEnd.present
+        ? regularMarketEnd.value
+        : this.regularMarketEnd,
+    preMarketStart: preMarketStart.present
+        ? preMarketStart.value
+        : this.preMarketStart,
+    preMarketEnd: preMarketEnd.present ? preMarketEnd.value : this.preMarketEnd,
+    postMarketStart: postMarketStart.present
+        ? postMarketStart.value
+        : this.postMarketStart,
+    postMarketEnd: postMarketEnd.present
+        ? postMarketEnd.value
+        : this.postMarketEnd,
+    tickerId: tickerId ?? this.tickerId,
+  );
   MarketDataCacheData copyWithCompanion(MarketDataCachesCompanion data) {
     return MarketDataCacheData(
       id: data.id.present ? data.id.value : this.id,
       symbol: data.symbol.present ? data.symbol.value : this.symbol,
-      lastUpdated:
-          data.lastUpdated.present ? data.lastUpdated.value : this.lastUpdated,
+      lastUpdated: data.lastUpdated.present
+          ? data.lastUpdated.value
+          : this.lastUpdated,
       regularMarketPrice: data.regularMarketPrice.present
           ? data.regularMarketPrice.value
           : this.regularMarketPrice,
@@ -1448,20 +1749,21 @@ class MarketDataCacheData extends DataClass
 
   @override
   int get hashCode => Object.hash(
-      id,
-      symbol,
-      lastUpdated,
-      regularMarketPrice,
-      chartPreviousClose,
-      intradayPrices,
-      intradayTimestamps,
-      regularMarketStart,
-      regularMarketEnd,
-      preMarketStart,
-      preMarketEnd,
-      postMarketStart,
-      postMarketEnd,
-      tickerId);
+    id,
+    symbol,
+    lastUpdated,
+    regularMarketPrice,
+    chartPreviousClose,
+    intradayPrices,
+    intradayTimestamps,
+    regularMarketStart,
+    regularMarketEnd,
+    preMarketStart,
+    preMarketEnd,
+    postMarketStart,
+    postMarketEnd,
+    tickerId,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1528,9 +1830,9 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
     this.postMarketStart = const Value.absent(),
     this.postMarketEnd = const Value.absent(),
     required int tickerId,
-  })  : symbol = Value(symbol),
-        lastUpdated = Value(lastUpdated),
-        tickerId = Value(tickerId);
+  }) : symbol = Value(symbol),
+       lastUpdated = Value(lastUpdated),
+       tickerId = Value(tickerId);
   static Insertable<MarketDataCacheData> custom({
     Expression<int>? id,
     Expression<String>? symbol,
@@ -1568,21 +1870,22 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
     });
   }
 
-  MarketDataCachesCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? symbol,
-      Value<DateTime>? lastUpdated,
-      Value<double>? regularMarketPrice,
-      Value<double>? chartPreviousClose,
-      Value<List<double>>? intradayPrices,
-      Value<List<int>>? intradayTimestamps,
-      Value<int?>? regularMarketStart,
-      Value<int?>? regularMarketEnd,
-      Value<int?>? preMarketStart,
-      Value<int?>? preMarketEnd,
-      Value<int?>? postMarketStart,
-      Value<int?>? postMarketEnd,
-      Value<int>? tickerId}) {
+  MarketDataCachesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? symbol,
+    Value<DateTime>? lastUpdated,
+    Value<double>? regularMarketPrice,
+    Value<double>? chartPreviousClose,
+    Value<List<double>>? intradayPrices,
+    Value<List<int>>? intradayTimestamps,
+    Value<int?>? regularMarketStart,
+    Value<int?>? regularMarketEnd,
+    Value<int?>? preMarketStart,
+    Value<int?>? preMarketEnd,
+    Value<int?>? postMarketStart,
+    Value<int?>? postMarketEnd,
+    Value<int>? tickerId,
+  }) {
     return MarketDataCachesCompanion(
       id: id ?? this.id,
       symbol: symbol ?? this.symbol,
@@ -1620,14 +1923,18 @@ class MarketDataCachesCompanion extends UpdateCompanion<MarketDataCacheData> {
       map['chart_previous_close'] = Variable<double>(chartPreviousClose.value);
     }
     if (intradayPrices.present) {
-      map['intraday_prices'] = Variable<String>($MarketDataCachesTable
-          .$converterintradayPrices
-          .toSql(intradayPrices.value));
+      map['intraday_prices'] = Variable<String>(
+        $MarketDataCachesTable.$converterintradayPrices.toSql(
+          intradayPrices.value,
+        ),
+      );
     }
     if (intradayTimestamps.present) {
-      map['intraday_timestamps'] = Variable<String>($MarketDataCachesTable
-          .$converterintradayTimestamps
-          .toSql(intradayTimestamps.value));
+      map['intraday_timestamps'] = Variable<String>(
+        $MarketDataCachesTable.$converterintradayTimestamps.toSql(
+          intradayTimestamps.value,
+        ),
+      );
     }
     if (regularMarketStart.present) {
       map['regular_market_start'] = Variable<int>(regularMarketStart.value);
@@ -1684,146 +1991,210 @@ class $FeedNewsTable extends FeedNews
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _isinIdMeta = const VerificationMeta('isinId');
   @override
   late final GeneratedColumn<int> isinId = GeneratedColumn<int>(
-      'isin_id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES isins (id)'));
+    'isin_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES isins (id)',
+    ),
+  );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _linkMeta = const VerificationMeta('link');
   @override
   late final GeneratedColumn<String> link = GeneratedColumn<String>(
-      'link', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _sourceUrlMeta =
-      const VerificationMeta('sourceUrl');
+    'link',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceUrlMeta = const VerificationMeta(
+    'sourceUrl',
+  );
   @override
   late final GeneratedColumn<String> sourceUrl = GeneratedColumn<String>(
-      'source_url', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _sourceNameMeta =
-      const VerificationMeta('sourceName');
+    'source_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceNameMeta = const VerificationMeta(
+    'sourceName',
+  );
   @override
   late final GeneratedColumn<String> sourceName = GeneratedColumn<String>(
-      'source_name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _pubDateMeta =
-      const VerificationMeta('pubDate');
+    'source_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pubDateMeta = const VerificationMeta(
+    'pubDate',
+  );
   @override
   late final GeneratedColumn<DateTime> pubDate = GeneratedColumn<DateTime>(
-      'pub_date', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'pub_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _roundMeta = const VerificationMeta('round');
   @override
   late final GeneratedColumn<int> round = GeneratedColumn<int>(
-      'round', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _subroundMeta =
-      const VerificationMeta('subround');
+    'round',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _subroundMeta = const VerificationMeta(
+    'subround',
+  );
   @override
   late final GeneratedColumn<int> subround = GeneratedColumn<int>(
-      'subround', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _relevanceScoreMeta =
-      const VerificationMeta('relevanceScore');
+    'subround',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _relevanceScoreMeta = const VerificationMeta(
+    'relevanceScore',
+  );
   @override
   late final GeneratedColumn<int> relevanceScore = GeneratedColumn<int>(
-      'relevance_score', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'relevance_score',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        id,
-        isinId,
-        title,
-        link,
-        sourceUrl,
-        sourceName,
-        pubDate,
-        round,
-        subround,
-        relevanceScore
-      ];
+    id,
+    isinId,
+    title,
+    link,
+    sourceUrl,
+    sourceName,
+    pubDate,
+    round,
+    subround,
+    relevanceScore,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'feed_news';
   @override
-  VerificationContext validateIntegrity(Insertable<FeedNewsData> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<FeedNewsData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('isin_id')) {
-      context.handle(_isinIdMeta,
-          isinId.isAcceptableOrUnknown(data['isin_id']!, _isinIdMeta));
+      context.handle(
+        _isinIdMeta,
+        isinId.isAcceptableOrUnknown(data['isin_id']!, _isinIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_isinIdMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
     if (data.containsKey('link')) {
       context.handle(
-          _linkMeta, link.isAcceptableOrUnknown(data['link']!, _linkMeta));
+        _linkMeta,
+        link.isAcceptableOrUnknown(data['link']!, _linkMeta),
+      );
     } else if (isInserting) {
       context.missing(_linkMeta);
     }
     if (data.containsKey('source_url')) {
-      context.handle(_sourceUrlMeta,
-          sourceUrl.isAcceptableOrUnknown(data['source_url']!, _sourceUrlMeta));
+      context.handle(
+        _sourceUrlMeta,
+        sourceUrl.isAcceptableOrUnknown(data['source_url']!, _sourceUrlMeta),
+      );
     } else if (isInserting) {
       context.missing(_sourceUrlMeta);
     }
     if (data.containsKey('source_name')) {
       context.handle(
-          _sourceNameMeta,
-          sourceName.isAcceptableOrUnknown(
-              data['source_name']!, _sourceNameMeta));
+        _sourceNameMeta,
+        sourceName.isAcceptableOrUnknown(data['source_name']!, _sourceNameMeta),
+      );
     } else if (isInserting) {
       context.missing(_sourceNameMeta);
     }
     if (data.containsKey('pub_date')) {
-      context.handle(_pubDateMeta,
-          pubDate.isAcceptableOrUnknown(data['pub_date']!, _pubDateMeta));
+      context.handle(
+        _pubDateMeta,
+        pubDate.isAcceptableOrUnknown(data['pub_date']!, _pubDateMeta),
+      );
     } else if (isInserting) {
       context.missing(_pubDateMeta);
     }
     if (data.containsKey('round')) {
       context.handle(
-          _roundMeta, round.isAcceptableOrUnknown(data['round']!, _roundMeta));
+        _roundMeta,
+        round.isAcceptableOrUnknown(data['round']!, _roundMeta),
+      );
     } else if (isInserting) {
       context.missing(_roundMeta);
     }
     if (data.containsKey('subround')) {
-      context.handle(_subroundMeta,
-          subround.isAcceptableOrUnknown(data['subround']!, _subroundMeta));
+      context.handle(
+        _subroundMeta,
+        subround.isAcceptableOrUnknown(data['subround']!, _subroundMeta),
+      );
     } else if (isInserting) {
       context.missing(_subroundMeta);
     }
     if (data.containsKey('relevance_score')) {
       context.handle(
+        _relevanceScoreMeta,
+        relevanceScore.isAcceptableOrUnknown(
+          data['relevance_score']!,
           _relevanceScoreMeta,
-          relevanceScore.isAcceptableOrUnknown(
-              data['relevance_score']!, _relevanceScoreMeta));
+        ),
+      );
     }
     return context;
   }
@@ -1834,26 +2205,46 @@ class $FeedNewsTable extends FeedNews
   FeedNewsData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return FeedNewsData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      isinId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}isin_id'])!,
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      link: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}link'])!,
-      sourceUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source_url'])!,
-      sourceName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source_name'])!,
-      pubDate: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}pub_date'])!,
-      round: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}round'])!,
-      subround: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}subround'])!,
-      relevanceScore: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}relevance_score']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      isinId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}isin_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      link: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}link'],
+      )!,
+      sourceUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_url'],
+      )!,
+      sourceName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_name'],
+      )!,
+      pubDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}pub_date'],
+      )!,
+      round: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}round'],
+      )!,
+      subround: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}subround'],
+      )!,
+      relevanceScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}relevance_score'],
+      ),
     );
   }
 
@@ -1874,17 +2265,18 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
   final int round;
   final int subround;
   final int? relevanceScore;
-  const FeedNewsData(
-      {required this.id,
-      required this.isinId,
-      required this.title,
-      required this.link,
-      required this.sourceUrl,
-      required this.sourceName,
-      required this.pubDate,
-      required this.round,
-      required this.subround,
-      this.relevanceScore});
+  const FeedNewsData({
+    required this.id,
+    required this.isinId,
+    required this.title,
+    required this.link,
+    required this.sourceUrl,
+    required this.sourceName,
+    required this.pubDate,
+    required this.round,
+    required this.subround,
+    this.relevanceScore,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1920,8 +2312,10 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
     );
   }
 
-  factory FeedNewsData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory FeedNewsData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return FeedNewsData(
       id: serializer.fromJson<int>(json['id']),
@@ -1953,30 +2347,31 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
     };
   }
 
-  FeedNewsData copyWith(
-          {int? id,
-          int? isinId,
-          String? title,
-          String? link,
-          String? sourceUrl,
-          String? sourceName,
-          DateTime? pubDate,
-          int? round,
-          int? subround,
-          Value<int?> relevanceScore = const Value.absent()}) =>
-      FeedNewsData(
-        id: id ?? this.id,
-        isinId: isinId ?? this.isinId,
-        title: title ?? this.title,
-        link: link ?? this.link,
-        sourceUrl: sourceUrl ?? this.sourceUrl,
-        sourceName: sourceName ?? this.sourceName,
-        pubDate: pubDate ?? this.pubDate,
-        round: round ?? this.round,
-        subround: subround ?? this.subround,
-        relevanceScore:
-            relevanceScore.present ? relevanceScore.value : this.relevanceScore,
-      );
+  FeedNewsData copyWith({
+    int? id,
+    int? isinId,
+    String? title,
+    String? link,
+    String? sourceUrl,
+    String? sourceName,
+    DateTime? pubDate,
+    int? round,
+    int? subround,
+    Value<int?> relevanceScore = const Value.absent(),
+  }) => FeedNewsData(
+    id: id ?? this.id,
+    isinId: isinId ?? this.isinId,
+    title: title ?? this.title,
+    link: link ?? this.link,
+    sourceUrl: sourceUrl ?? this.sourceUrl,
+    sourceName: sourceName ?? this.sourceName,
+    pubDate: pubDate ?? this.pubDate,
+    round: round ?? this.round,
+    subround: subround ?? this.subround,
+    relevanceScore: relevanceScore.present
+        ? relevanceScore.value
+        : this.relevanceScore,
+  );
   FeedNewsData copyWithCompanion(FeedNewsCompanion data) {
     return FeedNewsData(
       id: data.id.present ? data.id.value : this.id,
@@ -1984,8 +2379,9 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
       title: data.title.present ? data.title.value : this.title,
       link: data.link.present ? data.link.value : this.link,
       sourceUrl: data.sourceUrl.present ? data.sourceUrl.value : this.sourceUrl,
-      sourceName:
-          data.sourceName.present ? data.sourceName.value : this.sourceName,
+      sourceName: data.sourceName.present
+          ? data.sourceName.value
+          : this.sourceName,
       pubDate: data.pubDate.present ? data.pubDate.value : this.pubDate,
       round: data.round.present ? data.round.value : this.round,
       subround: data.subround.present ? data.subround.value : this.subround,
@@ -2013,8 +2409,18 @@ class FeedNewsData extends DataClass implements Insertable<FeedNewsData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, isinId, title, link, sourceUrl,
-      sourceName, pubDate, round, subround, relevanceScore);
+  int get hashCode => Object.hash(
+    id,
+    isinId,
+    title,
+    link,
+    sourceUrl,
+    sourceName,
+    pubDate,
+    round,
+    subround,
+    relevanceScore,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2065,14 +2471,14 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
     required int round,
     required int subround,
     this.relevanceScore = const Value.absent(),
-  })  : isinId = Value(isinId),
-        title = Value(title),
-        link = Value(link),
-        sourceUrl = Value(sourceUrl),
-        sourceName = Value(sourceName),
-        pubDate = Value(pubDate),
-        round = Value(round),
-        subround = Value(subround);
+  }) : isinId = Value(isinId),
+       title = Value(title),
+       link = Value(link),
+       sourceUrl = Value(sourceUrl),
+       sourceName = Value(sourceName),
+       pubDate = Value(pubDate),
+       round = Value(round),
+       subround = Value(subround);
   static Insertable<FeedNewsData> custom({
     Expression<int>? id,
     Expression<int>? isinId,
@@ -2099,17 +2505,18 @@ class FeedNewsCompanion extends UpdateCompanion<FeedNewsData> {
     });
   }
 
-  FeedNewsCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? isinId,
-      Value<String>? title,
-      Value<String>? link,
-      Value<String>? sourceUrl,
-      Value<String>? sourceName,
-      Value<DateTime>? pubDate,
-      Value<int>? round,
-      Value<int>? subround,
-      Value<int?>? relevanceScore}) {
+  FeedNewsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? isinId,
+    Value<String>? title,
+    Value<String>? link,
+    Value<String>? sourceUrl,
+    Value<String>? sourceName,
+    Value<DateTime>? pubDate,
+    Value<int>? round,
+    Value<int>? subround,
+    Value<int?>? relevanceScore,
+  }) {
     return FeedNewsCompanion(
       id: id ?? this.id,
       isinId: isinId ?? this.isinId,
@@ -2187,29 +2594,47 @@ class $ChatMessagesTable extends ChatMessages
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _roleMeta = const VerificationMeta('role');
   @override
   late final GeneratedColumn<String> role = GeneratedColumn<String>(
-      'role', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _contentMeta =
-      const VerificationMeta('content');
+    'role',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
   @override
   late final GeneratedColumn<String> content = GeneratedColumn<String>(
-      'content', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _timestampMeta =
-      const VerificationMeta('timestamp');
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timestampMeta = const VerificationMeta(
+    'timestamp',
+  );
   @override
   late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
-      'timestamp', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'timestamp',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [id, role, content, timestamp];
   @override
@@ -2218,8 +2643,10 @@ class $ChatMessagesTable extends ChatMessages
   String get actualTableName => $name;
   static const String $name = 'chat_messages';
   @override
-  VerificationContext validateIntegrity(Insertable<ChatMessageData> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<ChatMessageData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -2227,19 +2654,25 @@ class $ChatMessagesTable extends ChatMessages
     }
     if (data.containsKey('role')) {
       context.handle(
-          _roleMeta, role.isAcceptableOrUnknown(data['role']!, _roleMeta));
+        _roleMeta,
+        role.isAcceptableOrUnknown(data['role']!, _roleMeta),
+      );
     } else if (isInserting) {
       context.missing(_roleMeta);
     }
     if (data.containsKey('content')) {
-      context.handle(_contentMeta,
-          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
     } else if (isInserting) {
       context.missing(_contentMeta);
     }
     if (data.containsKey('timestamp')) {
-      context.handle(_timestampMeta,
-          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+      context.handle(
+        _timestampMeta,
+        timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta),
+      );
     } else if (isInserting) {
       context.missing(_timestampMeta);
     }
@@ -2252,14 +2685,22 @@ class $ChatMessagesTable extends ChatMessages
   ChatMessageData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ChatMessageData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      role: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}role'])!,
-      content: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
-      timestamp: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      role: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}role'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      timestamp: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}timestamp'],
+      )!,
     );
   }
 
@@ -2274,11 +2715,12 @@ class ChatMessageData extends DataClass implements Insertable<ChatMessageData> {
   final String role;
   final String content;
   final DateTime timestamp;
-  const ChatMessageData(
-      {required this.id,
-      required this.role,
-      required this.content,
-      required this.timestamp});
+  const ChatMessageData({
+    required this.id,
+    required this.role,
+    required this.content,
+    required this.timestamp,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2298,8 +2740,10 @@ class ChatMessageData extends DataClass implements Insertable<ChatMessageData> {
     );
   }
 
-  factory ChatMessageData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory ChatMessageData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ChatMessageData(
       id: serializer.fromJson<int>(json['id']),
@@ -2319,14 +2763,17 @@ class ChatMessageData extends DataClass implements Insertable<ChatMessageData> {
     };
   }
 
-  ChatMessageData copyWith(
-          {int? id, String? role, String? content, DateTime? timestamp}) =>
-      ChatMessageData(
-        id: id ?? this.id,
-        role: role ?? this.role,
-        content: content ?? this.content,
-        timestamp: timestamp ?? this.timestamp,
-      );
+  ChatMessageData copyWith({
+    int? id,
+    String? role,
+    String? content,
+    DateTime? timestamp,
+  }) => ChatMessageData(
+    id: id ?? this.id,
+    role: role ?? this.role,
+    content: content ?? this.content,
+    timestamp: timestamp ?? this.timestamp,
+  );
   ChatMessageData copyWithCompanion(ChatMessagesCompanion data) {
     return ChatMessageData(
       id: data.id.present ? data.id.value : this.id,
@@ -2375,9 +2822,9 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageData> {
     required String role,
     required String content,
     required DateTime timestamp,
-  })  : role = Value(role),
-        content = Value(content),
-        timestamp = Value(timestamp);
+  }) : role = Value(role),
+       content = Value(content),
+       timestamp = Value(timestamp);
   static Insertable<ChatMessageData> custom({
     Expression<int>? id,
     Expression<String>? role,
@@ -2392,11 +2839,12 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageData> {
     });
   }
 
-  ChatMessagesCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? role,
-      Value<String>? content,
-      Value<DateTime>? timestamp}) {
+  ChatMessagesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? role,
+    Value<String>? content,
+    Value<DateTime>? timestamp,
+  }) {
     return ChatMessagesCompanion(
       id: id ?? this.id,
       role: role ?? this.role,
@@ -2440,63 +2888,80 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $IsinsTable isins = $IsinsTable(this);
   late final $TickersTable tickers = $TickersTable(this);
-  late final $MarketDataCachesTable marketDataCaches =
-      $MarketDataCachesTable(this);
+  late final $MarketDataCachesTable marketDataCaches = $MarketDataCachesTable(
+    this,
+  );
   late final $FeedNewsTable feedNews = $FeedNewsTable(this);
   late final $ChatMessagesTable chatMessages = $ChatMessagesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [isins, tickers, marketDataCaches, feedNews, chatMessages];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    isins,
+    tickers,
+    marketDataCaches,
+    feedNews,
+    chatMessages,
+  ];
 }
 
-typedef $$IsinsTableCreateCompanionBuilder = IsinsCompanion Function({
-  Value<int> id,
-  Value<String?> isinCode,
-  Value<String?> altName,
-  Value<List<String>> registeredNames,
-  Value<String?> shortName,
-});
-typedef $$IsinsTableUpdateCompanionBuilder = IsinsCompanion Function({
-  Value<int> id,
-  Value<String?> isinCode,
-  Value<String?> altName,
-  Value<List<String>> registeredNames,
-  Value<String?> shortName,
-});
+typedef $$IsinsTableCreateCompanionBuilder =
+    IsinsCompanion Function({
+      Value<int> id,
+      Value<String?> isinCode,
+      Value<String?> altName,
+      Value<List<String>> registeredNames,
+      Value<String?> shortName,
+    });
+typedef $$IsinsTableUpdateCompanionBuilder =
+    IsinsCompanion Function({
+      Value<int> id,
+      Value<String?> isinCode,
+      Value<String?> altName,
+      Value<List<String>> registeredNames,
+      Value<String?> shortName,
+    });
 
 final class $$IsinsTableReferences
     extends BaseReferences<_$AppDatabase, $IsinsTable, IsinData> {
   $$IsinsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$TickersTable, List<TickerData>> _tickersRefsTable(
-          _$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(db.tickers,
-          aliasName: $_aliasNameGenerator(db.isins.id, db.tickers.isinId));
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.tickers,
+    aliasName: $_aliasNameGenerator(db.isins.id, db.tickers.isinId),
+  );
 
   $$TickersTableProcessedTableManager get tickersRefs {
-    final manager = $$TickersTableTableManager($_db, $_db.tickers)
-        .filter((f) => f.isinId.id.sqlEquals($_itemColumn<int>('id')!));
+    final manager = $$TickersTableTableManager(
+      $_db,
+      $_db.tickers,
+    ).filter((f) => f.isinId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_tickersRefsTable($_db));
     return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
+      manager.$state.copyWith(prefetchedData: cache),
+    );
   }
 
   static MultiTypedResultKey<$FeedNewsTable, List<FeedNewsData>>
-      _feedNewsRefsTable(_$AppDatabase db) =>
-          MultiTypedResultKey.fromTable(db.feedNews,
-              aliasName: $_aliasNameGenerator(db.isins.id, db.feedNews.isinId));
+  _feedNewsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.feedNews,
+    aliasName: $_aliasNameGenerator(db.isins.id, db.feedNews.isinId),
+  );
 
   $$FeedNewsTableProcessedTableManager get feedNewsRefs {
-    final manager = $$FeedNewsTableTableManager($_db, $_db.feedNews)
-        .filter((f) => f.isinId.id.sqlEquals($_itemColumn<int>('id')!));
+    final manager = $$FeedNewsTableTableManager(
+      $_db,
+      $_db.feedNews,
+    ).filter((f) => f.isinId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_feedNewsRefsTable($_db));
     return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
+      manager.$state.copyWith(prefetchedData: cache),
+    );
   }
 }
 
@@ -2509,61 +2974,78 @@ class $$IsinsTableFilterComposer extends Composer<_$AppDatabase, $IsinsTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get isinCode => $composableBuilder(
-      column: $table.isinCode, builder: (column) => ColumnFilters(column));
+    column: $table.isinCode,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get altName => $composableBuilder(
-      column: $table.altName, builder: (column) => ColumnFilters(column));
+    column: $table.altName,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnWithTypeConverterFilters<List<String>, List<String>, String>
-      get registeredNames => $composableBuilder(
-          column: $table.registeredNames,
-          builder: (column) => ColumnWithTypeConverterFilters(column));
+  get registeredNames => $composableBuilder(
+    column: $table.registeredNames,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnFilters<String> get shortName => $composableBuilder(
-      column: $table.shortName, builder: (column) => ColumnFilters(column));
+    column: $table.shortName,
+    builder: (column) => ColumnFilters(column),
+  );
 
   Expression<bool> tickersRefs(
-      Expression<bool> Function($$TickersTableFilterComposer f) f) {
+    Expression<bool> Function($$TickersTableFilterComposer f) f,
+  ) {
     final $$TickersTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.tickers,
-        getReferencedColumn: (t) => t.isinId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TickersTableFilterComposer(
-              $db: $db,
-              $table: $db.tickers,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.tickers,
+      getReferencedColumn: (t) => t.isinId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TickersTableFilterComposer(
+            $db: $db,
+            $table: $db.tickers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 
   Expression<bool> feedNewsRefs(
-      Expression<bool> Function($$FeedNewsTableFilterComposer f) f) {
+    Expression<bool> Function($$FeedNewsTableFilterComposer f) f,
+  ) {
     final $$FeedNewsTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.feedNews,
-        getReferencedColumn: (t) => t.isinId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$FeedNewsTableFilterComposer(
-              $db: $db,
-              $table: $db.feedNews,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.feedNews,
+      getReferencedColumn: (t) => t.isinId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FeedNewsTableFilterComposer(
+            $db: $db,
+            $table: $db.feedNews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -2578,20 +3060,29 @@ class $$IsinsTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get isinCode => $composableBuilder(
-      column: $table.isinCode, builder: (column) => ColumnOrderings(column));
+    column: $table.isinCode,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get altName => $composableBuilder(
-      column: $table.altName, builder: (column) => ColumnOrderings(column));
+    column: $table.altName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get registeredNames => $composableBuilder(
-      column: $table.registeredNames,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.registeredNames,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get shortName => $composableBuilder(
-      column: $table.shortName, builder: (column) => ColumnOrderings(column));
+    column: $table.shortName,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$IsinsTableAnnotationComposer
@@ -2614,68 +3105,82 @@ class $$IsinsTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<List<String>, String> get registeredNames =>
       $composableBuilder(
-          column: $table.registeredNames, builder: (column) => column);
+        column: $table.registeredNames,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<String> get shortName =>
       $composableBuilder(column: $table.shortName, builder: (column) => column);
 
   Expression<T> tickersRefs<T extends Object>(
-      Expression<T> Function($$TickersTableAnnotationComposer a) f) {
+    Expression<T> Function($$TickersTableAnnotationComposer a) f,
+  ) {
     final $$TickersTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.tickers,
-        getReferencedColumn: (t) => t.isinId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TickersTableAnnotationComposer(
-              $db: $db,
-              $table: $db.tickers,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.tickers,
+      getReferencedColumn: (t) => t.isinId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TickersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tickers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 
   Expression<T> feedNewsRefs<T extends Object>(
-      Expression<T> Function($$FeedNewsTableAnnotationComposer a) f) {
+    Expression<T> Function($$FeedNewsTableAnnotationComposer a) f,
+  ) {
     final $$FeedNewsTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.feedNews,
-        getReferencedColumn: (t) => t.isinId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$FeedNewsTableAnnotationComposer(
-              $db: $db,
-              $table: $db.feedNews,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.feedNews,
+      getReferencedColumn: (t) => t.isinId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FeedNewsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.feedNews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
 
-class $$IsinsTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $IsinsTable,
-    IsinData,
-    $$IsinsTableFilterComposer,
-    $$IsinsTableOrderingComposer,
-    $$IsinsTableAnnotationComposer,
-    $$IsinsTableCreateCompanionBuilder,
-    $$IsinsTableUpdateCompanionBuilder,
-    (IsinData, $$IsinsTableReferences),
-    IsinData,
-    PrefetchHooks Function({bool tickersRefs, bool feedNewsRefs})> {
+class $$IsinsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $IsinsTable,
+          IsinData,
+          $$IsinsTableFilterComposer,
+          $$IsinsTableOrderingComposer,
+          $$IsinsTableAnnotationComposer,
+          $$IsinsTableCreateCompanionBuilder,
+          $$IsinsTableUpdateCompanionBuilder,
+          (IsinData, $$IsinsTableReferences),
+          IsinData,
+          PrefetchHooks Function({bool tickersRefs, bool feedNewsRefs})
+        > {
   $$IsinsTableTableManager(_$AppDatabase db, $IsinsTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -2684,153 +3189,177 @@ class $$IsinsTableTableManager extends RootTableManager<
               $$IsinsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$IsinsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String?> isinCode = const Value.absent(),
-            Value<String?> altName = const Value.absent(),
-            Value<List<String>> registeredNames = const Value.absent(),
-            Value<String?> shortName = const Value.absent(),
-          }) =>
-              IsinsCompanion(
-            id: id,
-            isinCode: isinCode,
-            altName: altName,
-            registeredNames: registeredNames,
-            shortName: shortName,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String?> isinCode = const Value.absent(),
-            Value<String?> altName = const Value.absent(),
-            Value<List<String>> registeredNames = const Value.absent(),
-            Value<String?> shortName = const Value.absent(),
-          }) =>
-              IsinsCompanion.insert(
-            id: id,
-            isinCode: isinCode,
-            altName: altName,
-            registeredNames: registeredNames,
-            shortName: shortName,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String?> isinCode = const Value.absent(),
+                Value<String?> altName = const Value.absent(),
+                Value<List<String>> registeredNames = const Value.absent(),
+                Value<String?> shortName = const Value.absent(),
+              }) => IsinsCompanion(
+                id: id,
+                isinCode: isinCode,
+                altName: altName,
+                registeredNames: registeredNames,
+                shortName: shortName,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String?> isinCode = const Value.absent(),
+                Value<String?> altName = const Value.absent(),
+                Value<List<String>> registeredNames = const Value.absent(),
+                Value<String?> shortName = const Value.absent(),
+              }) => IsinsCompanion.insert(
+                id: id,
+                isinCode: isinCode,
+                altName: altName,
+                registeredNames: registeredNames,
+                shortName: shortName,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$IsinsTableReferences(db, table, e)))
+              .map(
+                (e) =>
+                    (e.readTable(table), $$IsinsTableReferences(db, table, e)),
+              )
               .toList(),
           prefetchHooksCallback: ({tickersRefs = false, feedNewsRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (tickersRefs) db.tickers,
-                if (feedNewsRefs) db.feedNews
+                if (feedNewsRefs) db.feedNews,
               ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (tickersRefs)
-                    await $_getPrefetchedData<IsinData, $IsinsTable,
-                            TickerData>(
-                        currentTable: table,
-                        referencedTable:
-                            $$IsinsTableReferences._tickersRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$IsinsTableReferences(db, table, p0).tickersRefs,
-                        referencedItemsForCurrentItem: (item,
-                                referencedItems) =>
-                            referencedItems.where((e) => e.isinId == item.id),
-                        typedResults: items),
+                    await $_getPrefetchedData<
+                      IsinData,
+                      $IsinsTable,
+                      TickerData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$IsinsTableReferences._tickersRefsTable(
+                        db,
+                      ),
+                      managerFromTypedResult: (p0) =>
+                          $$IsinsTableReferences(db, table, p0).tickersRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.isinId == item.id),
+                      typedResults: items,
+                    ),
                   if (feedNewsRefs)
-                    await $_getPrefetchedData<IsinData, $IsinsTable,
-                            FeedNewsData>(
-                        currentTable: table,
-                        referencedTable:
-                            $$IsinsTableReferences._feedNewsRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$IsinsTableReferences(db, table, p0).feedNewsRefs,
-                        referencedItemsForCurrentItem: (item,
-                                referencedItems) =>
-                            referencedItems.where((e) => e.isinId == item.id),
-                        typedResults: items)
+                    await $_getPrefetchedData<
+                      IsinData,
+                      $IsinsTable,
+                      FeedNewsData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$IsinsTableReferences
+                          ._feedNewsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$IsinsTableReferences(db, table, p0).feedNewsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.isinId == item.id),
+                      typedResults: items,
+                    ),
                 ];
               },
             );
           },
-        ));
+        ),
+      );
 }
 
-typedef $$IsinsTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $IsinsTable,
-    IsinData,
-    $$IsinsTableFilterComposer,
-    $$IsinsTableOrderingComposer,
-    $$IsinsTableAnnotationComposer,
-    $$IsinsTableCreateCompanionBuilder,
-    $$IsinsTableUpdateCompanionBuilder,
-    (IsinData, $$IsinsTableReferences),
-    IsinData,
-    PrefetchHooks Function({bool tickersRefs, bool feedNewsRefs})>;
-typedef $$TickersTableCreateCompanionBuilder = TickersCompanion Function({
-  Value<int> id,
-  required String symbol,
-  required String exchange,
-  Value<String?> currency,
-  Value<String?> quoteType,
-  Value<int?> regularMarketStart,
-  Value<int?> regularMarketEnd,
-  Value<int?> preMarketStart,
-  Value<int?> preMarketEnd,
-  Value<int?> postMarketStart,
-  Value<int?> postMarketEnd,
-  required int isinId,
-});
-typedef $$TickersTableUpdateCompanionBuilder = TickersCompanion Function({
-  Value<int> id,
-  Value<String> symbol,
-  Value<String> exchange,
-  Value<String?> currency,
-  Value<String?> quoteType,
-  Value<int?> regularMarketStart,
-  Value<int?> regularMarketEnd,
-  Value<int?> preMarketStart,
-  Value<int?> preMarketEnd,
-  Value<int?> postMarketStart,
-  Value<int?> postMarketEnd,
-  Value<int> isinId,
-});
+typedef $$IsinsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $IsinsTable,
+      IsinData,
+      $$IsinsTableFilterComposer,
+      $$IsinsTableOrderingComposer,
+      $$IsinsTableAnnotationComposer,
+      $$IsinsTableCreateCompanionBuilder,
+      $$IsinsTableUpdateCompanionBuilder,
+      (IsinData, $$IsinsTableReferences),
+      IsinData,
+      PrefetchHooks Function({bool tickersRefs, bool feedNewsRefs})
+    >;
+typedef $$TickersTableCreateCompanionBuilder =
+    TickersCompanion Function({
+      Value<int> id,
+      required String symbol,
+      required String exchange,
+      Value<String?> currency,
+      Value<String?> quoteType,
+      Value<int?> regularMarketStart,
+      Value<int?> regularMarketEnd,
+      Value<int?> preMarketStart,
+      Value<int?> preMarketEnd,
+      Value<int?> postMarketStart,
+      Value<int?> postMarketEnd,
+      required int isinId,
+    });
+typedef $$TickersTableUpdateCompanionBuilder =
+    TickersCompanion Function({
+      Value<int> id,
+      Value<String> symbol,
+      Value<String> exchange,
+      Value<String?> currency,
+      Value<String?> quoteType,
+      Value<int?> regularMarketStart,
+      Value<int?> regularMarketEnd,
+      Value<int?> preMarketStart,
+      Value<int?> preMarketEnd,
+      Value<int?> postMarketStart,
+      Value<int?> postMarketEnd,
+      Value<int> isinId,
+    });
 
 final class $$TickersTableReferences
     extends BaseReferences<_$AppDatabase, $TickersTable, TickerData> {
   $$TickersTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $IsinsTable _isinIdTable(_$AppDatabase db) => db.isins
-      .createAlias($_aliasNameGenerator(db.tickers.isinId, db.isins.id));
+  static $IsinsTable _isinIdTable(_$AppDatabase db) => db.isins.createAlias(
+    $_aliasNameGenerator(db.tickers.isinId, db.isins.id),
+  );
 
   $$IsinsTableProcessedTableManager get isinId {
     final $_column = $_itemColumn<int>('isin_id')!;
 
-    final manager = $$IsinsTableTableManager($_db, $_db.isins)
-        .filter((f) => f.id.sqlEquals($_column));
+    final manager = $$IsinsTableTableManager(
+      $_db,
+      $_db.isins,
+    ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_isinIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
   }
 
   static MultiTypedResultKey<$MarketDataCachesTable, List<MarketDataCacheData>>
-      _marketDataCachesRefsTable(_$AppDatabase db) =>
-          MultiTypedResultKey.fromTable(db.marketDataCaches,
-              aliasName: $_aliasNameGenerator(
-                  db.tickers.id, db.marketDataCaches.tickerId));
+  _marketDataCachesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.marketDataCaches,
+    aliasName: $_aliasNameGenerator(
+      db.tickers.id,
+      db.marketDataCaches.tickerId,
+    ),
+  );
 
   $$MarketDataCachesTableProcessedTableManager get marketDataCachesRefs {
-    final manager =
-        $$MarketDataCachesTableTableManager($_db, $_db.marketDataCaches)
-            .filter((f) => f.tickerId.id.sqlEquals($_itemColumn<int>('id')!));
+    final manager = $$MarketDataCachesTableTableManager(
+      $_db,
+      $_db.marketDataCaches,
+    ).filter((f) => f.tickerId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache =
-        $_typedResult.readTableOrNull(_marketDataCachesRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(
+      _marketDataCachesRefsTable($_db),
+    );
     return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
+      manager.$state.copyWith(prefetchedData: cache),
+    );
   }
 }
 
@@ -2844,80 +3373,105 @@ class $$TickersTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get symbol => $composableBuilder(
-      column: $table.symbol, builder: (column) => ColumnFilters(column));
+    column: $table.symbol,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get exchange => $composableBuilder(
-      column: $table.exchange, builder: (column) => ColumnFilters(column));
+    column: $table.exchange,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get currency => $composableBuilder(
-      column: $table.currency, builder: (column) => ColumnFilters(column));
+    column: $table.currency,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get quoteType => $composableBuilder(
-      column: $table.quoteType, builder: (column) => ColumnFilters(column));
+    column: $table.quoteType,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get regularMarketStart => $composableBuilder(
-      column: $table.regularMarketStart,
-      builder: (column) => ColumnFilters(column));
+    column: $table.regularMarketStart,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get regularMarketEnd => $composableBuilder(
-      column: $table.regularMarketEnd,
-      builder: (column) => ColumnFilters(column));
+    column: $table.regularMarketEnd,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get preMarketStart => $composableBuilder(
-      column: $table.preMarketStart,
-      builder: (column) => ColumnFilters(column));
+    column: $table.preMarketStart,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get preMarketEnd => $composableBuilder(
-      column: $table.preMarketEnd, builder: (column) => ColumnFilters(column));
+    column: $table.preMarketEnd,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get postMarketStart => $composableBuilder(
-      column: $table.postMarketStart,
-      builder: (column) => ColumnFilters(column));
+    column: $table.postMarketStart,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get postMarketEnd => $composableBuilder(
-      column: $table.postMarketEnd, builder: (column) => ColumnFilters(column));
+    column: $table.postMarketEnd,
+    builder: (column) => ColumnFilters(column),
+  );
 
   $$IsinsTableFilterComposer get isinId {
     final $$IsinsTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.isinId,
-        referencedTable: $db.isins,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$IsinsTableFilterComposer(
-              $db: $db,
-              $table: $db.isins,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.isinId,
+      referencedTable: $db.isins,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IsinsTableFilterComposer(
+            $db: $db,
+            $table: $db.isins,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 
   Expression<bool> marketDataCachesRefs(
-      Expression<bool> Function($$MarketDataCachesTableFilterComposer f) f) {
+    Expression<bool> Function($$MarketDataCachesTableFilterComposer f) f,
+  ) {
     final $$MarketDataCachesTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.marketDataCaches,
-        getReferencedColumn: (t) => t.tickerId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$MarketDataCachesTableFilterComposer(
-              $db: $db,
-              $table: $db.marketDataCaches,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.marketDataCaches,
+      getReferencedColumn: (t) => t.tickerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MarketDataCachesTableFilterComposer(
+            $db: $db,
+            $table: $db.marketDataCaches,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -2932,61 +3486,80 @@ class $$TickersTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get symbol => $composableBuilder(
-      column: $table.symbol, builder: (column) => ColumnOrderings(column));
+    column: $table.symbol,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get exchange => $composableBuilder(
-      column: $table.exchange, builder: (column) => ColumnOrderings(column));
+    column: $table.exchange,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get currency => $composableBuilder(
-      column: $table.currency, builder: (column) => ColumnOrderings(column));
+    column: $table.currency,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get quoteType => $composableBuilder(
-      column: $table.quoteType, builder: (column) => ColumnOrderings(column));
+    column: $table.quoteType,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get regularMarketStart => $composableBuilder(
-      column: $table.regularMarketStart,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.regularMarketStart,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get regularMarketEnd => $composableBuilder(
-      column: $table.regularMarketEnd,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.regularMarketEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get preMarketStart => $composableBuilder(
-      column: $table.preMarketStart,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.preMarketStart,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get preMarketEnd => $composableBuilder(
-      column: $table.preMarketEnd,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.preMarketEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get postMarketStart => $composableBuilder(
-      column: $table.postMarketStart,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.postMarketStart,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get postMarketEnd => $composableBuilder(
-      column: $table.postMarketEnd,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.postMarketEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   $$IsinsTableOrderingComposer get isinId {
     final $$IsinsTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.isinId,
-        referencedTable: $db.isins,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$IsinsTableOrderingComposer(
-              $db: $db,
-              $table: $db.isins,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.isinId,
+      referencedTable: $db.isins,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IsinsTableOrderingComposer(
+            $db: $db,
+            $table: $db.isins,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 }
@@ -3016,79 +3589,102 @@ class $$TickersTableAnnotationComposer
       $composableBuilder(column: $table.quoteType, builder: (column) => column);
 
   GeneratedColumn<int> get regularMarketStart => $composableBuilder(
-      column: $table.regularMarketStart, builder: (column) => column);
+    column: $table.regularMarketStart,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get regularMarketEnd => $composableBuilder(
-      column: $table.regularMarketEnd, builder: (column) => column);
+    column: $table.regularMarketEnd,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get preMarketStart => $composableBuilder(
-      column: $table.preMarketStart, builder: (column) => column);
+    column: $table.preMarketStart,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get preMarketEnd => $composableBuilder(
-      column: $table.preMarketEnd, builder: (column) => column);
+    column: $table.preMarketEnd,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get postMarketStart => $composableBuilder(
-      column: $table.postMarketStart, builder: (column) => column);
+    column: $table.postMarketStart,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get postMarketEnd => $composableBuilder(
-      column: $table.postMarketEnd, builder: (column) => column);
+    column: $table.postMarketEnd,
+    builder: (column) => column,
+  );
 
   $$IsinsTableAnnotationComposer get isinId {
     final $$IsinsTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.isinId,
-        referencedTable: $db.isins,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$IsinsTableAnnotationComposer(
-              $db: $db,
-              $table: $db.isins,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.isinId,
+      referencedTable: $db.isins,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IsinsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.isins,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 
   Expression<T> marketDataCachesRefs<T extends Object>(
-      Expression<T> Function($$MarketDataCachesTableAnnotationComposer a) f) {
+    Expression<T> Function($$MarketDataCachesTableAnnotationComposer a) f,
+  ) {
     final $$MarketDataCachesTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.marketDataCaches,
-        getReferencedColumn: (t) => t.tickerId,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$MarketDataCachesTableAnnotationComposer(
-              $db: $db,
-              $table: $db.marketDataCaches,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.marketDataCaches,
+      getReferencedColumn: (t) => t.tickerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MarketDataCachesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.marketDataCaches,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
 
-class $$TickersTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $TickersTable,
-    TickerData,
-    $$TickersTableFilterComposer,
-    $$TickersTableOrderingComposer,
-    $$TickersTableAnnotationComposer,
-    $$TickersTableCreateCompanionBuilder,
-    $$TickersTableUpdateCompanionBuilder,
-    (TickerData, $$TickersTableReferences),
-    TickerData,
-    PrefetchHooks Function({bool isinId, bool marketDataCachesRefs})> {
+class $$TickersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TickersTable,
+          TickerData,
+          $$TickersTableFilterComposer,
+          $$TickersTableOrderingComposer,
+          $$TickersTableAnnotationComposer,
+          $$TickersTableCreateCompanionBuilder,
+          $$TickersTableUpdateCompanionBuilder,
+          (TickerData, $$TickersTableReferences),
+          TickerData,
+          PrefetchHooks Function({bool isinId, bool marketDataCachesRefs})
+        > {
   $$TickersTableTableManager(_$AppDatabase db, $TickersTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -3097,185 +3693,219 @@ class $$TickersTableTableManager extends RootTableManager<
               $$TickersTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$TickersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> symbol = const Value.absent(),
-            Value<String> exchange = const Value.absent(),
-            Value<String?> currency = const Value.absent(),
-            Value<String?> quoteType = const Value.absent(),
-            Value<int?> regularMarketStart = const Value.absent(),
-            Value<int?> regularMarketEnd = const Value.absent(),
-            Value<int?> preMarketStart = const Value.absent(),
-            Value<int?> preMarketEnd = const Value.absent(),
-            Value<int?> postMarketStart = const Value.absent(),
-            Value<int?> postMarketEnd = const Value.absent(),
-            Value<int> isinId = const Value.absent(),
-          }) =>
-              TickersCompanion(
-            id: id,
-            symbol: symbol,
-            exchange: exchange,
-            currency: currency,
-            quoteType: quoteType,
-            regularMarketStart: regularMarketStart,
-            regularMarketEnd: regularMarketEnd,
-            preMarketStart: preMarketStart,
-            preMarketEnd: preMarketEnd,
-            postMarketStart: postMarketStart,
-            postMarketEnd: postMarketEnd,
-            isinId: isinId,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String symbol,
-            required String exchange,
-            Value<String?> currency = const Value.absent(),
-            Value<String?> quoteType = const Value.absent(),
-            Value<int?> regularMarketStart = const Value.absent(),
-            Value<int?> regularMarketEnd = const Value.absent(),
-            Value<int?> preMarketStart = const Value.absent(),
-            Value<int?> preMarketEnd = const Value.absent(),
-            Value<int?> postMarketStart = const Value.absent(),
-            Value<int?> postMarketEnd = const Value.absent(),
-            required int isinId,
-          }) =>
-              TickersCompanion.insert(
-            id: id,
-            symbol: symbol,
-            exchange: exchange,
-            currency: currency,
-            quoteType: quoteType,
-            regularMarketStart: regularMarketStart,
-            regularMarketEnd: regularMarketEnd,
-            preMarketStart: preMarketStart,
-            preMarketEnd: preMarketEnd,
-            postMarketStart: postMarketStart,
-            postMarketEnd: postMarketEnd,
-            isinId: isinId,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> symbol = const Value.absent(),
+                Value<String> exchange = const Value.absent(),
+                Value<String?> currency = const Value.absent(),
+                Value<String?> quoteType = const Value.absent(),
+                Value<int?> regularMarketStart = const Value.absent(),
+                Value<int?> regularMarketEnd = const Value.absent(),
+                Value<int?> preMarketStart = const Value.absent(),
+                Value<int?> preMarketEnd = const Value.absent(),
+                Value<int?> postMarketStart = const Value.absent(),
+                Value<int?> postMarketEnd = const Value.absent(),
+                Value<int> isinId = const Value.absent(),
+              }) => TickersCompanion(
+                id: id,
+                symbol: symbol,
+                exchange: exchange,
+                currency: currency,
+                quoteType: quoteType,
+                regularMarketStart: regularMarketStart,
+                regularMarketEnd: regularMarketEnd,
+                preMarketStart: preMarketStart,
+                preMarketEnd: preMarketEnd,
+                postMarketStart: postMarketStart,
+                postMarketEnd: postMarketEnd,
+                isinId: isinId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String symbol,
+                required String exchange,
+                Value<String?> currency = const Value.absent(),
+                Value<String?> quoteType = const Value.absent(),
+                Value<int?> regularMarketStart = const Value.absent(),
+                Value<int?> regularMarketEnd = const Value.absent(),
+                Value<int?> preMarketStart = const Value.absent(),
+                Value<int?> preMarketEnd = const Value.absent(),
+                Value<int?> postMarketStart = const Value.absent(),
+                Value<int?> postMarketEnd = const Value.absent(),
+                required int isinId,
+              }) => TickersCompanion.insert(
+                id: id,
+                symbol: symbol,
+                exchange: exchange,
+                currency: currency,
+                quoteType: quoteType,
+                regularMarketStart: regularMarketStart,
+                regularMarketEnd: regularMarketEnd,
+                preMarketStart: preMarketStart,
+                preMarketEnd: preMarketEnd,
+                postMarketStart: postMarketStart,
+                postMarketEnd: postMarketEnd,
+                isinId: isinId,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$TickersTableReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TickersTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: (
-              {isinId = false, marketDataCachesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (marketDataCachesRefs) db.marketDataCaches
-              ],
-              addJoins: <
-                  T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic>>(state) {
-                if (isinId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.isinId,
-                    referencedTable: $$TickersTableReferences._isinIdTable(db),
-                    referencedColumn:
-                        $$TickersTableReferences._isinIdTable(db).id,
-                  ) as T;
-                }
+          prefetchHooksCallback:
+              ({isinId = false, marketDataCachesRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (marketDataCachesRefs) db.marketDataCaches,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (isinId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.isinId,
+                                    referencedTable: $$TickersTableReferences
+                                        ._isinIdTable(db),
+                                    referencedColumn: $$TickersTableReferences
+                                        ._isinIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
 
-                return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (marketDataCachesRefs)
+                        await $_getPrefetchedData<
+                          TickerData,
+                          $TickersTable,
+                          MarketDataCacheData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TickersTableReferences
+                              ._marketDataCachesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TickersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).marketDataCachesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.tickerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (marketDataCachesRefs)
-                    await $_getPrefetchedData<TickerData, $TickersTable,
-                            MarketDataCacheData>(
-                        currentTable: table,
-                        referencedTable: $$TickersTableReferences
-                            ._marketDataCachesRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$TickersTableReferences(db, table, p0)
-                                .marketDataCachesRefs,
-                        referencedItemsForCurrentItem: (item,
-                                referencedItems) =>
-                            referencedItems.where((e) => e.tickerId == item.id),
-                        typedResults: items)
-                ];
-              },
-            );
-          },
-        ));
+        ),
+      );
 }
 
-typedef $$TickersTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $TickersTable,
-    TickerData,
-    $$TickersTableFilterComposer,
-    $$TickersTableOrderingComposer,
-    $$TickersTableAnnotationComposer,
-    $$TickersTableCreateCompanionBuilder,
-    $$TickersTableUpdateCompanionBuilder,
-    (TickerData, $$TickersTableReferences),
-    TickerData,
-    PrefetchHooks Function({bool isinId, bool marketDataCachesRefs})>;
-typedef $$MarketDataCachesTableCreateCompanionBuilder
-    = MarketDataCachesCompanion Function({
-  Value<int> id,
-  required String symbol,
-  required DateTime lastUpdated,
-  Value<double> regularMarketPrice,
-  Value<double> chartPreviousClose,
-  Value<List<double>> intradayPrices,
-  Value<List<int>> intradayTimestamps,
-  Value<int?> regularMarketStart,
-  Value<int?> regularMarketEnd,
-  Value<int?> preMarketStart,
-  Value<int?> preMarketEnd,
-  Value<int?> postMarketStart,
-  Value<int?> postMarketEnd,
-  required int tickerId,
-});
-typedef $$MarketDataCachesTableUpdateCompanionBuilder
-    = MarketDataCachesCompanion Function({
-  Value<int> id,
-  Value<String> symbol,
-  Value<DateTime> lastUpdated,
-  Value<double> regularMarketPrice,
-  Value<double> chartPreviousClose,
-  Value<List<double>> intradayPrices,
-  Value<List<int>> intradayTimestamps,
-  Value<int?> regularMarketStart,
-  Value<int?> regularMarketEnd,
-  Value<int?> preMarketStart,
-  Value<int?> preMarketEnd,
-  Value<int?> postMarketStart,
-  Value<int?> postMarketEnd,
-  Value<int> tickerId,
-});
+typedef $$TickersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TickersTable,
+      TickerData,
+      $$TickersTableFilterComposer,
+      $$TickersTableOrderingComposer,
+      $$TickersTableAnnotationComposer,
+      $$TickersTableCreateCompanionBuilder,
+      $$TickersTableUpdateCompanionBuilder,
+      (TickerData, $$TickersTableReferences),
+      TickerData,
+      PrefetchHooks Function({bool isinId, bool marketDataCachesRefs})
+    >;
+typedef $$MarketDataCachesTableCreateCompanionBuilder =
+    MarketDataCachesCompanion Function({
+      Value<int> id,
+      required String symbol,
+      required DateTime lastUpdated,
+      Value<double> regularMarketPrice,
+      Value<double> chartPreviousClose,
+      Value<List<double>> intradayPrices,
+      Value<List<int>> intradayTimestamps,
+      Value<int?> regularMarketStart,
+      Value<int?> regularMarketEnd,
+      Value<int?> preMarketStart,
+      Value<int?> preMarketEnd,
+      Value<int?> postMarketStart,
+      Value<int?> postMarketEnd,
+      required int tickerId,
+    });
+typedef $$MarketDataCachesTableUpdateCompanionBuilder =
+    MarketDataCachesCompanion Function({
+      Value<int> id,
+      Value<String> symbol,
+      Value<DateTime> lastUpdated,
+      Value<double> regularMarketPrice,
+      Value<double> chartPreviousClose,
+      Value<List<double>> intradayPrices,
+      Value<List<int>> intradayTimestamps,
+      Value<int?> regularMarketStart,
+      Value<int?> regularMarketEnd,
+      Value<int?> preMarketStart,
+      Value<int?> preMarketEnd,
+      Value<int?> postMarketStart,
+      Value<int?> postMarketEnd,
+      Value<int> tickerId,
+    });
 
-final class $$MarketDataCachesTableReferences extends BaseReferences<
-    _$AppDatabase, $MarketDataCachesTable, MarketDataCacheData> {
+final class $$MarketDataCachesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MarketDataCachesTable,
+          MarketDataCacheData
+        > {
   $$MarketDataCachesTableReferences(
-      super.$_db, super.$_table, super.$_typedResult);
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
 
   static $TickersTable _tickerIdTable(_$AppDatabase db) =>
       db.tickers.createAlias(
-          $_aliasNameGenerator(db.marketDataCaches.tickerId, db.tickers.id));
+        $_aliasNameGenerator(db.marketDataCaches.tickerId, db.tickers.id),
+      );
 
   $$TickersTableProcessedTableManager get tickerId {
     final $_column = $_itemColumn<int>('ticker_id')!;
 
-    final manager = $$TickersTableTableManager($_db, $_db.tickers)
-        .filter((f) => f.id.sqlEquals($_column));
+    final manager = $$TickersTableTableManager(
+      $_db,
+      $_db.tickers,
+    ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_tickerIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
   }
 }
 
@@ -3289,71 +3919,92 @@ class $$MarketDataCachesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get symbol => $composableBuilder(
-      column: $table.symbol, builder: (column) => ColumnFilters(column));
+    column: $table.symbol,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get lastUpdated => $composableBuilder(
-      column: $table.lastUpdated, builder: (column) => ColumnFilters(column));
+    column: $table.lastUpdated,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<double> get regularMarketPrice => $composableBuilder(
-      column: $table.regularMarketPrice,
-      builder: (column) => ColumnFilters(column));
+    column: $table.regularMarketPrice,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<double> get chartPreviousClose => $composableBuilder(
-      column: $table.chartPreviousClose,
-      builder: (column) => ColumnFilters(column));
+    column: $table.chartPreviousClose,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnWithTypeConverterFilters<List<double>, List<double>, String>
-      get intradayPrices => $composableBuilder(
-          column: $table.intradayPrices,
-          builder: (column) => ColumnWithTypeConverterFilters(column));
+  get intradayPrices => $composableBuilder(
+    column: $table.intradayPrices,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnWithTypeConverterFilters<List<int>, List<int>, String>
-      get intradayTimestamps => $composableBuilder(
-          column: $table.intradayTimestamps,
-          builder: (column) => ColumnWithTypeConverterFilters(column));
+  get intradayTimestamps => $composableBuilder(
+    column: $table.intradayTimestamps,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnFilters<int> get regularMarketStart => $composableBuilder(
-      column: $table.regularMarketStart,
-      builder: (column) => ColumnFilters(column));
+    column: $table.regularMarketStart,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get regularMarketEnd => $composableBuilder(
-      column: $table.regularMarketEnd,
-      builder: (column) => ColumnFilters(column));
+    column: $table.regularMarketEnd,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get preMarketStart => $composableBuilder(
-      column: $table.preMarketStart,
-      builder: (column) => ColumnFilters(column));
+    column: $table.preMarketStart,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get preMarketEnd => $composableBuilder(
-      column: $table.preMarketEnd, builder: (column) => ColumnFilters(column));
+    column: $table.preMarketEnd,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get postMarketStart => $composableBuilder(
-      column: $table.postMarketStart,
-      builder: (column) => ColumnFilters(column));
+    column: $table.postMarketStart,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get postMarketEnd => $composableBuilder(
-      column: $table.postMarketEnd, builder: (column) => ColumnFilters(column));
+    column: $table.postMarketEnd,
+    builder: (column) => ColumnFilters(column),
+  );
 
   $$TickersTableFilterComposer get tickerId {
     final $$TickersTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.tickerId,
-        referencedTable: $db.tickers,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TickersTableFilterComposer(
-              $db: $db,
-              $table: $db.tickers,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.tickerId,
+      referencedTable: $db.tickers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TickersTableFilterComposer(
+            $db: $db,
+            $table: $db.tickers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 }
@@ -3368,71 +4019,90 @@ class $$MarketDataCachesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get symbol => $composableBuilder(
-      column: $table.symbol, builder: (column) => ColumnOrderings(column));
+    column: $table.symbol,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get lastUpdated => $composableBuilder(
-      column: $table.lastUpdated, builder: (column) => ColumnOrderings(column));
+    column: $table.lastUpdated,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<double> get regularMarketPrice => $composableBuilder(
-      column: $table.regularMarketPrice,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.regularMarketPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<double> get chartPreviousClose => $composableBuilder(
-      column: $table.chartPreviousClose,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.chartPreviousClose,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get intradayPrices => $composableBuilder(
-      column: $table.intradayPrices,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.intradayPrices,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get intradayTimestamps => $composableBuilder(
-      column: $table.intradayTimestamps,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.intradayTimestamps,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get regularMarketStart => $composableBuilder(
-      column: $table.regularMarketStart,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.regularMarketStart,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get regularMarketEnd => $composableBuilder(
-      column: $table.regularMarketEnd,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.regularMarketEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get preMarketStart => $composableBuilder(
-      column: $table.preMarketStart,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.preMarketStart,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get preMarketEnd => $composableBuilder(
-      column: $table.preMarketEnd,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.preMarketEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get postMarketStart => $composableBuilder(
-      column: $table.postMarketStart,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.postMarketStart,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get postMarketEnd => $composableBuilder(
-      column: $table.postMarketEnd,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.postMarketEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   $$TickersTableOrderingComposer get tickerId {
     final $$TickersTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.tickerId,
-        referencedTable: $db.tickers,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TickersTableOrderingComposer(
-              $db: $db,
-              $table: $db.tickers,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.tickerId,
+      referencedTable: $db.tickers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TickersTableOrderingComposer(
+            $db: $db,
+            $table: $db.tickers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 }
@@ -3453,76 +4123,106 @@ class $$MarketDataCachesTableAnnotationComposer
       $composableBuilder(column: $table.symbol, builder: (column) => column);
 
   GeneratedColumn<DateTime> get lastUpdated => $composableBuilder(
-      column: $table.lastUpdated, builder: (column) => column);
+    column: $table.lastUpdated,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<double> get regularMarketPrice => $composableBuilder(
-      column: $table.regularMarketPrice, builder: (column) => column);
+    column: $table.regularMarketPrice,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<double> get chartPreviousClose => $composableBuilder(
-      column: $table.chartPreviousClose, builder: (column) => column);
+    column: $table.chartPreviousClose,
+    builder: (column) => column,
+  );
 
   GeneratedColumnWithTypeConverter<List<double>, String> get intradayPrices =>
       $composableBuilder(
-          column: $table.intradayPrices, builder: (column) => column);
+        column: $table.intradayPrices,
+        builder: (column) => column,
+      );
 
   GeneratedColumnWithTypeConverter<List<int>, String> get intradayTimestamps =>
       $composableBuilder(
-          column: $table.intradayTimestamps, builder: (column) => column);
+        column: $table.intradayTimestamps,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<int> get regularMarketStart => $composableBuilder(
-      column: $table.regularMarketStart, builder: (column) => column);
+    column: $table.regularMarketStart,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get regularMarketEnd => $composableBuilder(
-      column: $table.regularMarketEnd, builder: (column) => column);
+    column: $table.regularMarketEnd,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get preMarketStart => $composableBuilder(
-      column: $table.preMarketStart, builder: (column) => column);
+    column: $table.preMarketStart,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get preMarketEnd => $composableBuilder(
-      column: $table.preMarketEnd, builder: (column) => column);
+    column: $table.preMarketEnd,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get postMarketStart => $composableBuilder(
-      column: $table.postMarketStart, builder: (column) => column);
+    column: $table.postMarketStart,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get postMarketEnd => $composableBuilder(
-      column: $table.postMarketEnd, builder: (column) => column);
+    column: $table.postMarketEnd,
+    builder: (column) => column,
+  );
 
   $$TickersTableAnnotationComposer get tickerId {
     final $$TickersTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.tickerId,
-        referencedTable: $db.tickers,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TickersTableAnnotationComposer(
-              $db: $db,
-              $table: $db.tickers,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.tickerId,
+      referencedTable: $db.tickers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TickersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tickers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 }
 
-class $$MarketDataCachesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $MarketDataCachesTable,
-    MarketDataCacheData,
-    $$MarketDataCachesTableFilterComposer,
-    $$MarketDataCachesTableOrderingComposer,
-    $$MarketDataCachesTableAnnotationComposer,
-    $$MarketDataCachesTableCreateCompanionBuilder,
-    $$MarketDataCachesTableUpdateCompanionBuilder,
-    (MarketDataCacheData, $$MarketDataCachesTableReferences),
-    MarketDataCacheData,
-    PrefetchHooks Function({bool tickerId})> {
+class $$MarketDataCachesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MarketDataCachesTable,
+          MarketDataCacheData,
+          $$MarketDataCachesTableFilterComposer,
+          $$MarketDataCachesTableOrderingComposer,
+          $$MarketDataCachesTableAnnotationComposer,
+          $$MarketDataCachesTableCreateCompanionBuilder,
+          $$MarketDataCachesTableUpdateCompanionBuilder,
+          (MarketDataCacheData, $$MarketDataCachesTableReferences),
+          MarketDataCacheData,
+          PrefetchHooks Function({bool tickerId})
+        > {
   $$MarketDataCachesTableTableManager(
-      _$AppDatabase db, $MarketDataCachesTable table)
-      : super(TableManagerState(
+    _$AppDatabase db,
+    $MarketDataCachesTable table,
+  ) : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -3531,82 +4231,85 @@ class $$MarketDataCachesTableTableManager extends RootTableManager<
               $$MarketDataCachesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$MarketDataCachesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> symbol = const Value.absent(),
-            Value<DateTime> lastUpdated = const Value.absent(),
-            Value<double> regularMarketPrice = const Value.absent(),
-            Value<double> chartPreviousClose = const Value.absent(),
-            Value<List<double>> intradayPrices = const Value.absent(),
-            Value<List<int>> intradayTimestamps = const Value.absent(),
-            Value<int?> regularMarketStart = const Value.absent(),
-            Value<int?> regularMarketEnd = const Value.absent(),
-            Value<int?> preMarketStart = const Value.absent(),
-            Value<int?> preMarketEnd = const Value.absent(),
-            Value<int?> postMarketStart = const Value.absent(),
-            Value<int?> postMarketEnd = const Value.absent(),
-            Value<int> tickerId = const Value.absent(),
-          }) =>
-              MarketDataCachesCompanion(
-            id: id,
-            symbol: symbol,
-            lastUpdated: lastUpdated,
-            regularMarketPrice: regularMarketPrice,
-            chartPreviousClose: chartPreviousClose,
-            intradayPrices: intradayPrices,
-            intradayTimestamps: intradayTimestamps,
-            regularMarketStart: regularMarketStart,
-            regularMarketEnd: regularMarketEnd,
-            preMarketStart: preMarketStart,
-            preMarketEnd: preMarketEnd,
-            postMarketStart: postMarketStart,
-            postMarketEnd: postMarketEnd,
-            tickerId: tickerId,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String symbol,
-            required DateTime lastUpdated,
-            Value<double> regularMarketPrice = const Value.absent(),
-            Value<double> chartPreviousClose = const Value.absent(),
-            Value<List<double>> intradayPrices = const Value.absent(),
-            Value<List<int>> intradayTimestamps = const Value.absent(),
-            Value<int?> regularMarketStart = const Value.absent(),
-            Value<int?> regularMarketEnd = const Value.absent(),
-            Value<int?> preMarketStart = const Value.absent(),
-            Value<int?> preMarketEnd = const Value.absent(),
-            Value<int?> postMarketStart = const Value.absent(),
-            Value<int?> postMarketEnd = const Value.absent(),
-            required int tickerId,
-          }) =>
-              MarketDataCachesCompanion.insert(
-            id: id,
-            symbol: symbol,
-            lastUpdated: lastUpdated,
-            regularMarketPrice: regularMarketPrice,
-            chartPreviousClose: chartPreviousClose,
-            intradayPrices: intradayPrices,
-            intradayTimestamps: intradayTimestamps,
-            regularMarketStart: regularMarketStart,
-            regularMarketEnd: regularMarketEnd,
-            preMarketStart: preMarketStart,
-            preMarketEnd: preMarketEnd,
-            postMarketStart: postMarketStart,
-            postMarketEnd: postMarketEnd,
-            tickerId: tickerId,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> symbol = const Value.absent(),
+                Value<DateTime> lastUpdated = const Value.absent(),
+                Value<double> regularMarketPrice = const Value.absent(),
+                Value<double> chartPreviousClose = const Value.absent(),
+                Value<List<double>> intradayPrices = const Value.absent(),
+                Value<List<int>> intradayTimestamps = const Value.absent(),
+                Value<int?> regularMarketStart = const Value.absent(),
+                Value<int?> regularMarketEnd = const Value.absent(),
+                Value<int?> preMarketStart = const Value.absent(),
+                Value<int?> preMarketEnd = const Value.absent(),
+                Value<int?> postMarketStart = const Value.absent(),
+                Value<int?> postMarketEnd = const Value.absent(),
+                Value<int> tickerId = const Value.absent(),
+              }) => MarketDataCachesCompanion(
+                id: id,
+                symbol: symbol,
+                lastUpdated: lastUpdated,
+                regularMarketPrice: regularMarketPrice,
+                chartPreviousClose: chartPreviousClose,
+                intradayPrices: intradayPrices,
+                intradayTimestamps: intradayTimestamps,
+                regularMarketStart: regularMarketStart,
+                regularMarketEnd: regularMarketEnd,
+                preMarketStart: preMarketStart,
+                preMarketEnd: preMarketEnd,
+                postMarketStart: postMarketStart,
+                postMarketEnd: postMarketEnd,
+                tickerId: tickerId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String symbol,
+                required DateTime lastUpdated,
+                Value<double> regularMarketPrice = const Value.absent(),
+                Value<double> chartPreviousClose = const Value.absent(),
+                Value<List<double>> intradayPrices = const Value.absent(),
+                Value<List<int>> intradayTimestamps = const Value.absent(),
+                Value<int?> regularMarketStart = const Value.absent(),
+                Value<int?> regularMarketEnd = const Value.absent(),
+                Value<int?> preMarketStart = const Value.absent(),
+                Value<int?> preMarketEnd = const Value.absent(),
+                Value<int?> postMarketStart = const Value.absent(),
+                Value<int?> postMarketEnd = const Value.absent(),
+                required int tickerId,
+              }) => MarketDataCachesCompanion.insert(
+                id: id,
+                symbol: symbol,
+                lastUpdated: lastUpdated,
+                regularMarketPrice: regularMarketPrice,
+                chartPreviousClose: chartPreviousClose,
+                intradayPrices: intradayPrices,
+                intradayTimestamps: intradayTimestamps,
+                regularMarketStart: regularMarketStart,
+                regularMarketEnd: regularMarketEnd,
+                preMarketStart: preMarketStart,
+                preMarketEnd: preMarketEnd,
+                postMarketStart: postMarketStart,
+                postMarketEnd: postMarketEnd,
+                tickerId: tickerId,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable(table),
-                    $$MarketDataCachesTableReferences(db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MarketDataCachesTableReferences(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: ({tickerId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
-              addJoins: <
-                  T extends TableManagerState<
+              addJoins:
+                  <
+                    T extends TableManagerState<
                       dynamic,
                       dynamic,
                       dynamic,
@@ -3617,81 +4320,97 @@ class $$MarketDataCachesTableTableManager extends RootTableManager<
                       dynamic,
                       dynamic,
                       dynamic,
-                      dynamic>>(state) {
-                if (tickerId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.tickerId,
-                    referencedTable:
-                        $$MarketDataCachesTableReferences._tickerIdTable(db),
-                    referencedColumn:
-                        $$MarketDataCachesTableReferences._tickerIdTable(db).id,
-                  ) as T;
-                }
+                      dynamic
+                    >
+                  >(state) {
+                    if (tickerId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.tickerId,
+                                referencedTable:
+                                    $$MarketDataCachesTableReferences
+                                        ._tickerIdTable(db),
+                                referencedColumn:
+                                    $$MarketDataCachesTableReferences
+                                        ._tickerIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
 
-                return state;
-              },
+                    return state;
+                  },
               getPrefetchedDataCallback: (items) async {
                 return [];
               },
             );
           },
-        ));
+        ),
+      );
 }
 
-typedef $$MarketDataCachesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $MarketDataCachesTable,
-    MarketDataCacheData,
-    $$MarketDataCachesTableFilterComposer,
-    $$MarketDataCachesTableOrderingComposer,
-    $$MarketDataCachesTableAnnotationComposer,
-    $$MarketDataCachesTableCreateCompanionBuilder,
-    $$MarketDataCachesTableUpdateCompanionBuilder,
-    (MarketDataCacheData, $$MarketDataCachesTableReferences),
-    MarketDataCacheData,
-    PrefetchHooks Function({bool tickerId})>;
-typedef $$FeedNewsTableCreateCompanionBuilder = FeedNewsCompanion Function({
-  Value<int> id,
-  required int isinId,
-  required String title,
-  required String link,
-  required String sourceUrl,
-  required String sourceName,
-  required DateTime pubDate,
-  required int round,
-  required int subround,
-  Value<int?> relevanceScore,
-});
-typedef $$FeedNewsTableUpdateCompanionBuilder = FeedNewsCompanion Function({
-  Value<int> id,
-  Value<int> isinId,
-  Value<String> title,
-  Value<String> link,
-  Value<String> sourceUrl,
-  Value<String> sourceName,
-  Value<DateTime> pubDate,
-  Value<int> round,
-  Value<int> subround,
-  Value<int?> relevanceScore,
-});
+typedef $$MarketDataCachesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MarketDataCachesTable,
+      MarketDataCacheData,
+      $$MarketDataCachesTableFilterComposer,
+      $$MarketDataCachesTableOrderingComposer,
+      $$MarketDataCachesTableAnnotationComposer,
+      $$MarketDataCachesTableCreateCompanionBuilder,
+      $$MarketDataCachesTableUpdateCompanionBuilder,
+      (MarketDataCacheData, $$MarketDataCachesTableReferences),
+      MarketDataCacheData,
+      PrefetchHooks Function({bool tickerId})
+    >;
+typedef $$FeedNewsTableCreateCompanionBuilder =
+    FeedNewsCompanion Function({
+      Value<int> id,
+      required int isinId,
+      required String title,
+      required String link,
+      required String sourceUrl,
+      required String sourceName,
+      required DateTime pubDate,
+      required int round,
+      required int subround,
+      Value<int?> relevanceScore,
+    });
+typedef $$FeedNewsTableUpdateCompanionBuilder =
+    FeedNewsCompanion Function({
+      Value<int> id,
+      Value<int> isinId,
+      Value<String> title,
+      Value<String> link,
+      Value<String> sourceUrl,
+      Value<String> sourceName,
+      Value<DateTime> pubDate,
+      Value<int> round,
+      Value<int> subround,
+      Value<int?> relevanceScore,
+    });
 
 final class $$FeedNewsTableReferences
     extends BaseReferences<_$AppDatabase, $FeedNewsTable, FeedNewsData> {
   $$FeedNewsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $IsinsTable _isinIdTable(_$AppDatabase db) => db.isins
-      .createAlias($_aliasNameGenerator(db.feedNews.isinId, db.isins.id));
+  static $IsinsTable _isinIdTable(_$AppDatabase db) => db.isins.createAlias(
+    $_aliasNameGenerator(db.feedNews.isinId, db.isins.id),
+  );
 
   $$IsinsTableProcessedTableManager get isinId {
     final $_column = $_itemColumn<int>('isin_id')!;
 
-    final manager = $$IsinsTableTableManager($_db, $_db.isins)
-        .filter((f) => f.id.sqlEquals($_column));
+    final manager = $$IsinsTableTableManager(
+      $_db,
+      $_db.isins,
+    ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_isinIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
   }
 }
 
@@ -3705,50 +4424,70 @@ class $$FeedNewsTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnFilters(column));
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get link => $composableBuilder(
-      column: $table.link, builder: (column) => ColumnFilters(column));
+    column: $table.link,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get sourceUrl => $composableBuilder(
-      column: $table.sourceUrl, builder: (column) => ColumnFilters(column));
+    column: $table.sourceUrl,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get sourceName => $composableBuilder(
-      column: $table.sourceName, builder: (column) => ColumnFilters(column));
+    column: $table.sourceName,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get pubDate => $composableBuilder(
-      column: $table.pubDate, builder: (column) => ColumnFilters(column));
+    column: $table.pubDate,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get round => $composableBuilder(
-      column: $table.round, builder: (column) => ColumnFilters(column));
+    column: $table.round,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get subround => $composableBuilder(
-      column: $table.subround, builder: (column) => ColumnFilters(column));
+    column: $table.subround,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get relevanceScore => $composableBuilder(
-      column: $table.relevanceScore,
-      builder: (column) => ColumnFilters(column));
+    column: $table.relevanceScore,
+    builder: (column) => ColumnFilters(column),
+  );
 
   $$IsinsTableFilterComposer get isinId {
     final $$IsinsTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.isinId,
-        referencedTable: $db.isins,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$IsinsTableFilterComposer(
-              $db: $db,
-              $table: $db.isins,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.isinId,
+      referencedTable: $db.isins,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IsinsTableFilterComposer(
+            $db: $db,
+            $table: $db.isins,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 }
@@ -3763,50 +4502,70 @@ class $$FeedNewsTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnOrderings(column));
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get link => $composableBuilder(
-      column: $table.link, builder: (column) => ColumnOrderings(column));
+    column: $table.link,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get sourceUrl => $composableBuilder(
-      column: $table.sourceUrl, builder: (column) => ColumnOrderings(column));
+    column: $table.sourceUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get sourceName => $composableBuilder(
-      column: $table.sourceName, builder: (column) => ColumnOrderings(column));
+    column: $table.sourceName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get pubDate => $composableBuilder(
-      column: $table.pubDate, builder: (column) => ColumnOrderings(column));
+    column: $table.pubDate,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get round => $composableBuilder(
-      column: $table.round, builder: (column) => ColumnOrderings(column));
+    column: $table.round,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get subround => $composableBuilder(
-      column: $table.subround, builder: (column) => ColumnOrderings(column));
+    column: $table.subround,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get relevanceScore => $composableBuilder(
-      column: $table.relevanceScore,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.relevanceScore,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   $$IsinsTableOrderingComposer get isinId {
     final $$IsinsTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.isinId,
-        referencedTable: $db.isins,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$IsinsTableOrderingComposer(
-              $db: $db,
-              $table: $db.isins,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.isinId,
+      referencedTable: $db.isins,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IsinsTableOrderingComposer(
+            $db: $db,
+            $table: $db.isins,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 }
@@ -3833,7 +4592,9 @@ class $$FeedNewsTableAnnotationComposer
       $composableBuilder(column: $table.sourceUrl, builder: (column) => column);
 
   GeneratedColumn<String> get sourceName => $composableBuilder(
-      column: $table.sourceName, builder: (column) => column);
+    column: $table.sourceName,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get pubDate =>
       $composableBuilder(column: $table.pubDate, builder: (column) => column);
@@ -3845,43 +4606,52 @@ class $$FeedNewsTableAnnotationComposer
       $composableBuilder(column: $table.subround, builder: (column) => column);
 
   GeneratedColumn<int> get relevanceScore => $composableBuilder(
-      column: $table.relevanceScore, builder: (column) => column);
+    column: $table.relevanceScore,
+    builder: (column) => column,
+  );
 
   $$IsinsTableAnnotationComposer get isinId {
     final $$IsinsTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.isinId,
-        referencedTable: $db.isins,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$IsinsTableAnnotationComposer(
-              $db: $db,
-              $table: $db.isins,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
+      composer: this,
+      getCurrentColumn: (t) => t.isinId,
+      referencedTable: $db.isins,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IsinsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.isins,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return composer;
   }
 }
 
-class $$FeedNewsTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $FeedNewsTable,
-    FeedNewsData,
-    $$FeedNewsTableFilterComposer,
-    $$FeedNewsTableOrderingComposer,
-    $$FeedNewsTableAnnotationComposer,
-    $$FeedNewsTableCreateCompanionBuilder,
-    $$FeedNewsTableUpdateCompanionBuilder,
-    (FeedNewsData, $$FeedNewsTableReferences),
-    FeedNewsData,
-    PrefetchHooks Function({bool isinId})> {
+class $$FeedNewsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FeedNewsTable,
+          FeedNewsData,
+          $$FeedNewsTableFilterComposer,
+          $$FeedNewsTableOrderingComposer,
+          $$FeedNewsTableAnnotationComposer,
+          $$FeedNewsTableCreateCompanionBuilder,
+          $$FeedNewsTableUpdateCompanionBuilder,
+          (FeedNewsData, $$FeedNewsTableReferences),
+          FeedNewsData,
+          PrefetchHooks Function({bool isinId})
+        > {
   $$FeedNewsTableTableManager(_$AppDatabase db, $FeedNewsTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -3890,64 +4660,69 @@ class $$FeedNewsTableTableManager extends RootTableManager<
               $$FeedNewsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$FeedNewsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> isinId = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<String> link = const Value.absent(),
-            Value<String> sourceUrl = const Value.absent(),
-            Value<String> sourceName = const Value.absent(),
-            Value<DateTime> pubDate = const Value.absent(),
-            Value<int> round = const Value.absent(),
-            Value<int> subround = const Value.absent(),
-            Value<int?> relevanceScore = const Value.absent(),
-          }) =>
-              FeedNewsCompanion(
-            id: id,
-            isinId: isinId,
-            title: title,
-            link: link,
-            sourceUrl: sourceUrl,
-            sourceName: sourceName,
-            pubDate: pubDate,
-            round: round,
-            subround: subround,
-            relevanceScore: relevanceScore,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required int isinId,
-            required String title,
-            required String link,
-            required String sourceUrl,
-            required String sourceName,
-            required DateTime pubDate,
-            required int round,
-            required int subround,
-            Value<int?> relevanceScore = const Value.absent(),
-          }) =>
-              FeedNewsCompanion.insert(
-            id: id,
-            isinId: isinId,
-            title: title,
-            link: link,
-            sourceUrl: sourceUrl,
-            sourceName: sourceName,
-            pubDate: pubDate,
-            round: round,
-            subround: subround,
-            relevanceScore: relevanceScore,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> isinId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> link = const Value.absent(),
+                Value<String> sourceUrl = const Value.absent(),
+                Value<String> sourceName = const Value.absent(),
+                Value<DateTime> pubDate = const Value.absent(),
+                Value<int> round = const Value.absent(),
+                Value<int> subround = const Value.absent(),
+                Value<int?> relevanceScore = const Value.absent(),
+              }) => FeedNewsCompanion(
+                id: id,
+                isinId: isinId,
+                title: title,
+                link: link,
+                sourceUrl: sourceUrl,
+                sourceName: sourceName,
+                pubDate: pubDate,
+                round: round,
+                subround: subround,
+                relevanceScore: relevanceScore,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int isinId,
+                required String title,
+                required String link,
+                required String sourceUrl,
+                required String sourceName,
+                required DateTime pubDate,
+                required int round,
+                required int subround,
+                Value<int?> relevanceScore = const Value.absent(),
+              }) => FeedNewsCompanion.insert(
+                id: id,
+                isinId: isinId,
+                title: title,
+                link: link,
+                sourceUrl: sourceUrl,
+                sourceName: sourceName,
+                pubDate: pubDate,
+                round: round,
+                subround: subround,
+                relevanceScore: relevanceScore,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$FeedNewsTableReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FeedNewsTableReferences(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: ({isinId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
-              addJoins: <
-                  T extends TableManagerState<
+              addJoins:
+                  <
+                    T extends TableManagerState<
                       dynamic,
                       dynamic,
                       dynamic,
@@ -3958,53 +4733,62 @@ class $$FeedNewsTableTableManager extends RootTableManager<
                       dynamic,
                       dynamic,
                       dynamic,
-                      dynamic>>(state) {
-                if (isinId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.isinId,
-                    referencedTable: $$FeedNewsTableReferences._isinIdTable(db),
-                    referencedColumn:
-                        $$FeedNewsTableReferences._isinIdTable(db).id,
-                  ) as T;
-                }
+                      dynamic
+                    >
+                  >(state) {
+                    if (isinId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.isinId,
+                                referencedTable: $$FeedNewsTableReferences
+                                    ._isinIdTable(db),
+                                referencedColumn: $$FeedNewsTableReferences
+                                    ._isinIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
 
-                return state;
-              },
+                    return state;
+                  },
               getPrefetchedDataCallback: (items) async {
                 return [];
               },
             );
           },
-        ));
+        ),
+      );
 }
 
-typedef $$FeedNewsTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $FeedNewsTable,
-    FeedNewsData,
-    $$FeedNewsTableFilterComposer,
-    $$FeedNewsTableOrderingComposer,
-    $$FeedNewsTableAnnotationComposer,
-    $$FeedNewsTableCreateCompanionBuilder,
-    $$FeedNewsTableUpdateCompanionBuilder,
-    (FeedNewsData, $$FeedNewsTableReferences),
-    FeedNewsData,
-    PrefetchHooks Function({bool isinId})>;
-typedef $$ChatMessagesTableCreateCompanionBuilder = ChatMessagesCompanion
-    Function({
-  Value<int> id,
-  required String role,
-  required String content,
-  required DateTime timestamp,
-});
-typedef $$ChatMessagesTableUpdateCompanionBuilder = ChatMessagesCompanion
-    Function({
-  Value<int> id,
-  Value<String> role,
-  Value<String> content,
-  Value<DateTime> timestamp,
-});
+typedef $$FeedNewsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FeedNewsTable,
+      FeedNewsData,
+      $$FeedNewsTableFilterComposer,
+      $$FeedNewsTableOrderingComposer,
+      $$FeedNewsTableAnnotationComposer,
+      $$FeedNewsTableCreateCompanionBuilder,
+      $$FeedNewsTableUpdateCompanionBuilder,
+      (FeedNewsData, $$FeedNewsTableReferences),
+      FeedNewsData,
+      PrefetchHooks Function({bool isinId})
+    >;
+typedef $$ChatMessagesTableCreateCompanionBuilder =
+    ChatMessagesCompanion Function({
+      Value<int> id,
+      required String role,
+      required String content,
+      required DateTime timestamp,
+    });
+typedef $$ChatMessagesTableUpdateCompanionBuilder =
+    ChatMessagesCompanion Function({
+      Value<int> id,
+      Value<String> role,
+      Value<String> content,
+      Value<DateTime> timestamp,
+    });
 
 class $$ChatMessagesTableFilterComposer
     extends Composer<_$AppDatabase, $ChatMessagesTable> {
@@ -4016,16 +4800,24 @@ class $$ChatMessagesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get role => $composableBuilder(
-      column: $table.role, builder: (column) => ColumnFilters(column));
+    column: $table.role,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get content => $composableBuilder(
-      column: $table.content, builder: (column) => ColumnFilters(column));
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get timestamp => $composableBuilder(
-      column: $table.timestamp, builder: (column) => ColumnFilters(column));
+    column: $table.timestamp,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ChatMessagesTableOrderingComposer
@@ -4038,16 +4830,24 @@ class $$ChatMessagesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get role => $composableBuilder(
-      column: $table.role, builder: (column) => ColumnOrderings(column));
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get content => $composableBuilder(
-      column: $table.content, builder: (column) => ColumnOrderings(column));
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get timestamp => $composableBuilder(
-      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
+    column: $table.timestamp,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChatMessagesTableAnnotationComposer
@@ -4072,23 +4872,27 @@ class $$ChatMessagesTableAnnotationComposer
       $composableBuilder(column: $table.timestamp, builder: (column) => column);
 }
 
-class $$ChatMessagesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $ChatMessagesTable,
-    ChatMessageData,
-    $$ChatMessagesTableFilterComposer,
-    $$ChatMessagesTableOrderingComposer,
-    $$ChatMessagesTableAnnotationComposer,
-    $$ChatMessagesTableCreateCompanionBuilder,
-    $$ChatMessagesTableUpdateCompanionBuilder,
-    (
-      ChatMessageData,
-      BaseReferences<_$AppDatabase, $ChatMessagesTable, ChatMessageData>
-    ),
-    ChatMessageData,
-    PrefetchHooks Function()> {
+class $$ChatMessagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ChatMessagesTable,
+          ChatMessageData,
+          $$ChatMessagesTableFilterComposer,
+          $$ChatMessagesTableOrderingComposer,
+          $$ChatMessagesTableAnnotationComposer,
+          $$ChatMessagesTableCreateCompanionBuilder,
+          $$ChatMessagesTableUpdateCompanionBuilder,
+          (
+            ChatMessageData,
+            BaseReferences<_$AppDatabase, $ChatMessagesTable, ChatMessageData>,
+          ),
+          ChatMessageData,
+          PrefetchHooks Function()
+        > {
   $$ChatMessagesTableTableManager(_$AppDatabase db, $ChatMessagesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -4097,52 +4901,55 @@ class $$ChatMessagesTableTableManager extends RootTableManager<
               $$ChatMessagesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ChatMessagesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> role = const Value.absent(),
-            Value<String> content = const Value.absent(),
-            Value<DateTime> timestamp = const Value.absent(),
-          }) =>
-              ChatMessagesCompanion(
-            id: id,
-            role: role,
-            content: content,
-            timestamp: timestamp,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String role,
-            required String content,
-            required DateTime timestamp,
-          }) =>
-              ChatMessagesCompanion.insert(
-            id: id,
-            role: role,
-            content: content,
-            timestamp: timestamp,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> role = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<DateTime> timestamp = const Value.absent(),
+              }) => ChatMessagesCompanion(
+                id: id,
+                role: role,
+                content: content,
+                timestamp: timestamp,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String role,
+                required String content,
+                required DateTime timestamp,
+              }) => ChatMessagesCompanion.insert(
+                id: id,
+                role: role,
+                content: content,
+                timestamp: timestamp,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$ChatMessagesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $ChatMessagesTable,
-    ChatMessageData,
-    $$ChatMessagesTableFilterComposer,
-    $$ChatMessagesTableOrderingComposer,
-    $$ChatMessagesTableAnnotationComposer,
-    $$ChatMessagesTableCreateCompanionBuilder,
-    $$ChatMessagesTableUpdateCompanionBuilder,
-    (
+typedef $$ChatMessagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ChatMessagesTable,
       ChatMessageData,
-      BaseReferences<_$AppDatabase, $ChatMessagesTable, ChatMessageData>
-    ),
-    ChatMessageData,
-    PrefetchHooks Function()>;
+      $$ChatMessagesTableFilterComposer,
+      $$ChatMessagesTableOrderingComposer,
+      $$ChatMessagesTableAnnotationComposer,
+      $$ChatMessagesTableCreateCompanionBuilder,
+      $$ChatMessagesTableUpdateCompanionBuilder,
+      (
+        ChatMessageData,
+        BaseReferences<_$AppDatabase, $ChatMessagesTable, ChatMessageData>,
+      ),
+      ChatMessageData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
