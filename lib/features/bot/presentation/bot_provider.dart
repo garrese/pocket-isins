@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/ai/ai_service.dart';
+import '../../../core/network/market_data_service.dart';
 import '../../../core/database/drift/app_database.dart';
 import '../data/bot_repository.dart';
 
@@ -28,8 +29,9 @@ class BotState {
 class BotController extends StateNotifier<BotState> {
   final BotRepository _repository;
   final AiService _aiService;
+  final MarketDataService _marketDataService;
 
-  BotController(this._repository, this._aiService)
+  BotController(this._repository, this._aiService, this._marketDataService)
       : super(BotState(messages: [])) {
     loadHistory();
   }
@@ -76,6 +78,18 @@ The user currently has the following ISINs saved in their portfolio:
 ${jsonEncode(isinsJson)}
 
 Respond to the user's queries accurately. You can search the web if needed.
+
+You have the ability to execute special actions by returning a specific syntax in your response. When you want to execute an action, output the following exactly:
+
+1. To fetch market data for a symbol:
+[\$ACTION:MARKET_DATA symbol="SYMBOL" interval="INTERVAL" range="RANGE"]
+Example: [\$ACTION:MARKET_DATA symbol="AAPL" interval="1d" range="1mo"]
+(When you output this, the system will fetch the data and provide it to you in the next message so you can formulate your answer).
+
+2. To offer the user a quick way to create an ISIN:
+[\$ACTION:CREATE_ISIN isinCode="ISIN" name="NAME"]
+Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
+(When you output this, the user will see a button to automatically create the ISIN).
 ''';
 
       // Prepare conversation history for the AI
@@ -89,14 +103,90 @@ Respond to the user's queries accurately. You can search the web if needed.
         webSearch: true,
       );
 
-      // Save AI response
-      await _repository.saveMessage('assistant', response);
-
-      final finalMessages = await _repository.getChatHistory();
-      state = state.copyWith(messages: finalMessages, isTyping: false);
+      await _handleAiResponse(response, systemPrompt);
     } catch (e) {
       state = state.copyWith(isTyping: false, error: e.toString());
     }
+  }
+
+  Future<void> _handleAiResponse(String response, String systemPrompt) async {
+    // Save the AI response first
+    await _repository.saveMessage('assistant', response);
+
+    // Check if there's a market data action
+    final marketDataRegExp = RegExp(
+        r'\[\$ACTION:MARKET_DATA\s+symbol="([^"]+)"\s+interval="([^"]+)"\s+range="([^"]+)"\]');
+    final match = marketDataRegExp.firstMatch(response);
+
+    if (match != null) {
+      final symbol = match.group(1)!;
+      final interval = match.group(2)!;
+      final range = match.group(3)!;
+
+      try {
+        final data = await _marketDataService.fetchHistoricalData(
+            symbol, interval, range);
+        if (data != null) {
+          // Remove the actual chart array to save context window, keep meta, timestamp, and indicators
+          final filteredData = Map<String, dynamic>.from(data);
+
+          // Remove actual timestamps to save a lot of space
+          if (filteredData.containsKey('timestamp')) {
+            filteredData.remove('timestamp');
+          }
+          // Remove chart indicators (open/high/low/close/volume arrays) which take up massive space
+          if (filteredData.containsKey('indicators')) {
+            filteredData.remove('indicators');
+          }
+
+          final systemMessage = jsonEncode(filteredData);
+          await _repository.saveMessage(
+              'system', 'Market data for $symbol: $systemMessage');
+
+          // Re-fetch history and call AI again
+          final newHistory = await _repository.getChatHistory();
+          final historyMaps = newHistory
+              .map((m) => {'role': m.role, 'content': m.content})
+              .toList();
+
+          final newResponse = await _aiService.getGenericCompletion(
+            systemPrompt: systemPrompt,
+            messages: historyMaps,
+            webSearch: true,
+          );
+
+          await _handleAiResponse(newResponse, systemPrompt);
+          return;
+        } else {
+          await _repository.saveMessage(
+              'system', 'Failed to fetch market data for $symbol.');
+
+          // Re-fetch history and call AI again
+          final newHistory = await _repository.getChatHistory();
+          final historyMaps = newHistory
+              .map((m) => {'role': m.role, 'content': m.content})
+              .toList();
+
+          final newResponse = await _aiService.getGenericCompletion(
+            systemPrompt: systemPrompt,
+            messages: historyMaps,
+            webSearch: true,
+          );
+
+          await _handleAiResponse(newResponse, systemPrompt);
+          return;
+        }
+      } catch (e) {
+        await _repository.saveMessage(
+            'system', 'Error fetching market data: $e');
+      }
+    }
+
+    // Check for ISIN creation action is handled entirely in UI
+
+    // Update state when all actions and recursive calls are done
+    final finalMessages = await _repository.getChatHistory();
+    state = state.copyWith(messages: finalMessages, isTyping: false);
   }
 }
 
@@ -106,5 +196,6 @@ final botControllerProvider = StateNotifierProvider<BotController, BotState>((
   return BotController(
     ref.watch(botRepositoryProvider),
     ref.watch(aiServiceProvider),
+    ref.watch(marketDataServiceProvider),
   );
 });
