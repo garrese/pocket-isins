@@ -18,8 +18,8 @@ class AppDrawer extends StatelessWidget {
             child: Text(
               'Pocket ISINs',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
             ),
           ),
           ListTile(

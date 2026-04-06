@@ -69,9 +69,11 @@ class _BotScreenState extends ConsumerState<BotScreen> {
 
                 // Check for action commands
                 final createIsinRegExp = RegExp(
-                    r'\[\$ACTION:CREATE_ISIN\s+isinCode="([^"]+)"\s+name="([^"]+)"\]');
+                  r'\[\$ACTION:CREATE_ISIN\s+isinCode="([^"]+)"\s+name="([^"]+)"\]',
+                );
                 final marketDataRegExp = RegExp(
-                    r'\[\$ACTION:MARKET_DATA\s+symbol="([^"]+)"\s+interval="([^"]+)"\s+range="([^"]+)"\]');
+                  r'\[\$ACTION:MARKET_DATA\s+symbol="([^"]+)"\s+interval="([^"]+)"\s+range="([^"]+)"\]',
+                );
 
                 String displayContent = message.content;
                 Widget? actionWidget;
@@ -84,8 +86,9 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                     final name = isinMatch.group(2)!;
 
                     // Replace the raw command with empty string for rendering
-                    displayContent =
-                        displayContent.replaceAll(createIsinRegExp, '').trim();
+                    displayContent = displayContent
+                        .replaceAll(createIsinRegExp, '')
+                        .trim();
 
                     actionWidget = Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -93,29 +96,33 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                         icon: const Icon(Icons.add_circle_outline),
                         label: Text('Create ISIN: $name'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
                         ),
                         onPressed: () {
                           // Navigate to ISIN wizard with prefilled data
-                          context.go('/isins/wizard', extra: {
-                            'isinCode': isinCode,
-                            'name': name,
-                          });
+                          context.go(
+                            '/isins/wizard',
+                            extra: {'isinCode': isinCode, 'name': name},
+                          );
                         },
                       ),
                     );
                   }
 
                   // Handle MARKET_DATA (just hide the raw command)
-                  final marketMatch =
-                      marketDataRegExp.firstMatch(displayContent);
+                  final marketMatch = marketDataRegExp.firstMatch(
+                    displayContent,
+                  );
                   if (marketMatch != null) {
                     final symbol = marketMatch.group(1)!;
-                    displayContent =
-                        displayContent.replaceAll(marketDataRegExp, '').trim();
+                    displayContent = displayContent
+                        .replaceAll(marketDataRegExp, '')
+                        .trim();
 
                     actionWidget ??= Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -137,8 +144,9 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                 }
 
                 return Align(
-                  alignment:
-                      isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: isUser
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 4.0),
                     padding: const EdgeInsets.all(12.0),
@@ -161,18 +169,18 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                               ? Text(
                                   displayContent,
                                   style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryContainer,
                                   ),
                                 )
                               : MarkdownBody(
                                   data: displayContent,
                                   styleSheet: MarkdownStyleSheet(
                                     p: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ),

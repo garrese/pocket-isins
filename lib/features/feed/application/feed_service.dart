@@ -62,17 +62,16 @@ class FeedService {
         // Fetch news for this ISIN, passing the global sets to filter duplicates efficiently
         final newsList = await _repository.fetchNewsForIsin(
           isinId: isin.id,
-          isinName: (isin.shortName != null &&
-                  isin.shortName!.trim().isNotEmpty)
+          isinName:
+              (isin.shortName != null && isin.shortName!.trim().isNotEmpty)
               ? isin.shortName!
               : (isin.registeredNames.isNotEmpty)
-                  ? isin.registeredNames.first
-                  : (isin.altName != null && isin.altName!.trim().isNotEmpty)
-                      ? isin.altName!
-                      : (isin.isinCode != null &&
-                              isin.isinCode!.trim().isNotEmpty)
-                          ? isin.isinCode!
-                          : 'Unknown ISIN',
+              ? isin.registeredNames.first
+              : (isin.altName != null && isin.altName!.trim().isNotEmpty)
+              ? isin.altName!
+              : (isin.isinCode != null && isin.isinCode!.trim().isNotEmpty)
+              ? isin.isinCode!
+              : 'Unknown ISIN',
           round: newRound,
           subround: subround,
           existingLinks: globalExistingLinks,
@@ -109,8 +108,7 @@ class FeedService {
           newRound - 9; // e.g. if newRound=15, keep 6 to 15 (10 rounds)
       await (db.delete(
         db.feedNews,
-      )..where((tbl) => tbl.round.isSmallerThanValue(minRoundToKeep)))
-          .go();
+      )..where((tbl) => tbl.round.isSmallerThanValue(minRoundToKeep))).go();
     } catch (e, st) {
       _log.handle(e, st, 'Error during feed round');
     }
@@ -132,7 +130,8 @@ class FeedService {
       }
 
       _log.info(
-          'Starting AI rating analysis for ${unratedNews.length} news items');
+        'Starting AI rating analysis for ${unratedNews.length} news items',
+      );
 
       // Process in batches of 10
       const batchSize = 10;
@@ -142,18 +141,21 @@ class FeedService {
             : unratedNews.length;
         final batch = unratedNews.sublist(i, end);
 
-        final newsBatchPayload =
-            batch.map((news) => {'id': news.id, 'title': news.title}).toList();
+        final newsBatchPayload = batch
+            .map((news) => {'id': news.id, 'title': news.title})
+            .toList();
 
         _log.debug(
-            'AI Feed Analysis Prompt (Batch ${i ~/ batchSize + 1}):\n${newsBatchPayload.toString()}');
+          'AI Feed Analysis Prompt (Batch ${i ~/ batchSize + 1}):\n${newsBatchPayload.toString()}',
+        );
 
         final results = await _aiService.rateNewsRelevanceBatch(
           newsBatchPayload,
         );
 
         _log.debug(
-            'AI Feed Analysis Response (Batch ${i ~/ batchSize + 1}):\n${results.toString()}');
+          'AI Feed Analysis Response (Batch ${i ~/ batchSize + 1}):\n${results.toString()}',
+        );
 
         if (results.isNotEmpty) {
           await db.batch((batchWriter) {

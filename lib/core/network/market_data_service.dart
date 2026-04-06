@@ -20,7 +20,8 @@ class MarketDataService {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=1d&range=1d';
       _log.info(
-          'Fetching ticker data for $symbol (interval=1d, range=1d)\nURL: $url');
+        'Fetching ticker data for $symbol (interval=1d, range=1d)\nURL: $url',
+      );
       final response = await _dio.get(url);
       _log.debug('Response for $symbol:\n${response.data}');
 
@@ -50,7 +51,8 @@ class MarketDataService {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=$interval&range=$range';
       _log.info(
-          'Fetching historical data for $symbol (interval=$interval, range=$range)\nURL: $url');
+        'Fetching historical data for $symbol (interval=$interval, range=$range)\nURL: $url',
+      );
       final response = await _dio.get(url);
       _log.debug('Historical response for $symbol:\n${response.data}');
 
@@ -76,7 +78,8 @@ class MarketDataService {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=5m&range=1d';
       _log.info(
-          'Fetching intraday data for $symbol (interval=5m, range=1d)\nURL: $url');
+        'Fetching intraday data for $symbol (interval=5m, range=1d)\nURL: $url',
+      );
       final response = await _dio.get(url);
       _log.debug('Intraday response for $symbol:\n${response.data}');
 
@@ -104,12 +107,7 @@ class MarketDataService {
       final response = await _dio.get(
         url,
         queryParameters: {'newsCount': 0, 'q': query},
-        options: Options(
-          headers: {
-            'User-Agent': 'yaak',
-            'Accept': '*/*',
-          },
-        ),
+        options: Options(headers: {'User-Agent': 'yaak', 'Accept': '*/*'}),
       );
       _log.debug('Search response for $query:\n${response.data}');
 
@@ -118,8 +116,10 @@ class MarketDataService {
         return quotes;
       }
 
-      _log.warning('No search results found for query: $query',
-          'Status code: ${response.statusCode}');
+      _log.warning(
+        'No search results found for query: $query',
+        'Status code: ${response.statusCode}',
+      );
       return [];
     } catch (e, stackTrace) {
       _log.handle(e, stackTrace, 'Failed to search symbol for $query');

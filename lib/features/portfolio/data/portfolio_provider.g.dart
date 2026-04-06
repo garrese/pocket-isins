@@ -12,13 +12,14 @@ String _$portfolioHash() => r'e43639e097e4d67d8afb21e26ec028aa5c0236ff';
 @ProviderFor(Portfolio)
 final portfolioProvider =
     AutoDisposeAsyncNotifierProvider<Portfolio, List<Isin>>.internal(
-  Portfolio.new,
-  name: r'portfolioProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$portfolioHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      Portfolio.new,
+      name: r'portfolioProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$portfolioHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$Portfolio = AutoDisposeAsyncNotifier<List<Isin>>;
 // ignore_for_file: type=lint

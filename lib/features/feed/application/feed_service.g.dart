@@ -13,8 +13,9 @@ String _$feedServiceHash() => r'5147c1e109b8cd77dfbfa65b679e96897acd7879';
 final feedServiceProvider = AutoDisposeProvider<FeedService>.internal(
   feedService,
   name: r'feedServiceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$feedServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$feedServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

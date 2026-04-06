@@ -47,22 +47,30 @@ class AppDatabase extends _$AppDatabase {
         if (from < 6) {
           try {
             await m.addColumn(
-                marketDataCaches, marketDataCaches.regularMarketStart);
+              marketDataCaches,
+              marketDataCaches.regularMarketStart,
+            );
           } catch (_) {}
           try {
             await m.addColumn(
-                marketDataCaches, marketDataCaches.regularMarketEnd);
+              marketDataCaches,
+              marketDataCaches.regularMarketEnd,
+            );
           } catch (_) {}
           try {
             await m.addColumn(
-                marketDataCaches, marketDataCaches.preMarketStart);
+              marketDataCaches,
+              marketDataCaches.preMarketStart,
+            );
           } catch (_) {}
           try {
             await m.addColumn(marketDataCaches, marketDataCaches.preMarketEnd);
           } catch (_) {}
           try {
             await m.addColumn(
-                marketDataCaches, marketDataCaches.postMarketStart);
+              marketDataCaches,
+              marketDataCaches.postMarketStart,
+            );
           } catch (_) {}
           try {
             await m.addColumn(marketDataCaches, marketDataCaches.postMarketEnd);
