@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import '../../../core/services/log/talker_provider.dart';
+import '../../../core/settings/presentation/developer_options_screen.dart';
 
 class LogScreen extends ConsumerWidget {
   const LogScreen({super.key});
@@ -12,14 +13,17 @@ class LogScreen extends ConsumerWidget {
 
     return TalkerScreen(
       talker: talker,
-      appBarTitle: 'Logs',
+      appBarTitle: '',
       isLogsExpanded: false,
       isLogOrderReversed: true,
       appBarLeading: IconButton(
-        icon: const Icon(Icons.menu),
+        icon: const Icon(Icons.developer_mode),
         onPressed: () {
-          // Open the root Scaffold's drawer (which belongs to MainScreen)
-          Scaffold.maybeOf(context)?.openDrawer();
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const DeveloperOptionsScreen(),
+            ),
+          );
         },
       ),
       theme: TalkerScreenTheme(
