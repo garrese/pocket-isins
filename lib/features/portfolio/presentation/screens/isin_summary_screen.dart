@@ -46,13 +46,18 @@ class IsinSummaryScreen extends ConsumerWidget {
 
   String _formatTimeUtc(int? timestamp) {
     if (timestamp == null) return 'N/A';
-    final dt =
-        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
+    final dt = DateTime.fromMillisecondsSinceEpoch(
+      timestamp * 1000,
+      isUtc: true,
+    );
     return DateFormat('HH:mm').format(dt);
   }
 
-  Widget _buildCopyableText(BuildContext context, String text,
-      {TextStyle? style}) {
+  Widget _buildCopyableText(
+    BuildContext context,
+    String text, {
+    TextStyle? style,
+  }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -84,7 +89,8 @@ class IsinSummaryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isinsAsync = ref.watch(portfolioProvider);
-    final currentIsin = isinsAsync.whenOrNull(
+    final currentIsin =
+        isinsAsync.whenOrNull(
           data: (isins) =>
               isins.firstWhere((i) => i.id == isin.id, orElse: () => isin),
         ) ??
@@ -145,13 +151,20 @@ class IsinSummaryScreen extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
                         child: _buildCopyableText(
-                            context, currentIsin.isinCode!,
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
+                          context,
+                          currentIsin.isinCode!,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     if (currentIsin.altName?.isNotEmpty == true)
-                      _buildCopyableText(context, currentIsin.altName!,
-                          style: const TextStyle(fontSize: 16)),
+                      _buildCopyableText(
+                        context,
+                        currentIsin.altName!,
+                        style: const TextStyle(fontSize: 16),
+                      ),
                   ],
                 ),
                 onEdit: () {
@@ -174,16 +187,23 @@ class IsinSummaryScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: currentIsin.registeredNames.isEmpty
                       ? [
-                          const Text('No registered names selected',
-                              style: TextStyle(fontStyle: FontStyle.italic))
+                          const Text(
+                            'No registered names selected',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          ),
                         ]
                       : currentIsin.registeredNames
-                          .map((name) => Padding(
+                            .map(
+                              (name) => Padding(
                                 padding: const EdgeInsets.only(bottom: 4.0),
-                                child: _buildCopyableText(context, name,
-                                    style: const TextStyle(fontSize: 16)),
-                              ))
-                          .toList(),
+                                child: _buildCopyableText(
+                                  context,
+                                  name,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            )
+                            .toList(),
                 ),
                 onEdit: () {
                   final formData = _createFormData(currentIsin);
@@ -211,41 +231,51 @@ class IsinSummaryScreen extends ConsumerWidget {
                           ),
                         ]
                       : currentIsin.tickers
-                          .map(
-                            (t) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: _buildCopyableText(
-                                            context, t.symbol,
+                            .map(
+                              (t) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: _buildCopyableText(
+                                            context,
+                                            t.symbol,
                                             style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16)),
-                                      ),
-                                      Text(' (${t.currency ?? "N/A"})',
-                                          style: const TextStyle(fontSize: 16)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text('Exchange: ${t.exchange}',
-                                      style: const TextStyle(fontSize: 14)),
-                                  if (t.quoteType?.isNotEmpty == true)
-                                    Text('Type: ${t.quoteType}',
-                                        style: const TextStyle(fontSize: 14)),
-                                  if (t.regularMarketStart != null &&
-                                      t.regularMarketEnd != null)
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          ' (${t.currency ?? "N/A"})',
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
                                     Text(
+                                      'Exchange: ${t.exchange}',
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                    if (t.quoteType?.isNotEmpty == true)
+                                      Text(
+                                        'Type: ${t.quoteType}',
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    if (t.regularMarketStart != null &&
+                                        t.regularMarketEnd != null)
+                                      Text(
                                         'Hours: ${_formatTimeUtc(t.regularMarketStart)} - ${_formatTimeUtc(t.regularMarketEnd)} (UTC)',
-                                        style: const TextStyle(fontSize: 14)),
-                                ],
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                          .toList(),
+                            )
+                            .toList(),
                 ),
                 onEdit: () {
                   final formData = _createFormData(currentIsin);
@@ -266,8 +296,10 @@ class IsinSummaryScreen extends ConsumerWidget {
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Short Name:',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    const Text(
+                      'Short Name:',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                     const SizedBox(height: 2),
                     Text(
                       currentIsin.shortName?.isNotEmpty == true

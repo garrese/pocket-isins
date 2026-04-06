@@ -14,16 +14,16 @@ class BotRepository {
   BotRepository(this._db);
 
   Future<List<ChatMessageData>> getChatHistory() async {
-    return await (_db.select(_db.chatMessages)
-          ..orderBy([
-            (t) =>
-                OrderingTerm(expression: t.timestamp, mode: OrderingMode.asc),
-          ]))
+    return await (_db.select(_db.chatMessages)..orderBy([
+          (t) => OrderingTerm(expression: t.timestamp, mode: OrderingMode.asc),
+        ]))
         .get();
   }
 
   Future<void> saveMessage(String role, String content) async {
-    await _db.into(_db.chatMessages).insert(
+    await _db
+        .into(_db.chatMessages)
+        .insert(
           ChatMessagesCompanion.insert(
             role: role,
             content: content,

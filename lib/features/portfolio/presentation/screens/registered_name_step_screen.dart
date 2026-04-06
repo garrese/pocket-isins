@@ -124,8 +124,9 @@ class _RegisteredNameStepScreenState
       }
 
       if (widget.formData.altName.isNotEmpty) {
-        altNameQuotes =
-            await marketService.searchSymbol(widget.formData.altName);
+        altNameQuotes = await marketService.searchSymbol(
+          widget.formData.altName,
+        );
       }
 
       final Set<String> foundNames = {};
@@ -225,9 +226,7 @@ class _RegisteredNameStepScreenState
           title: const Text('Add Manually'),
           content: TextField(
             controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-            ),
+            decoration: const InputDecoration(labelText: 'Name'),
             autofocus: true,
           ),
           actions: [
@@ -281,7 +280,9 @@ class _RegisteredNameStepScreenState
                         const Text(
                           'Select Registered Names:',
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         TextButton.icon(
                           onPressed: _addManualName,
@@ -293,7 +294,8 @@ class _RegisteredNameStepScreenState
                     const SizedBox(height: 8),
                     if (_isLoading)
                       const Expanded(
-                          child: Center(child: CircularProgressIndicator()))
+                        child: Center(child: CircularProgressIndicator()),
+                      )
                     else if (_uniqueNames.isEmpty)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.0),

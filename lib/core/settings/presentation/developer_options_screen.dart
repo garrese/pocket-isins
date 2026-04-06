@@ -47,9 +47,7 @@ class DeveloperOptionsScreen extends ConsumerWidget {
           ),
           CheckboxListTile(
             title: const Text('Enable long log details'),
-            subtitle: const Text(
-              'Show full log details without truncating',
-            ),
+            subtitle: const Text('Show full log details without truncating'),
             value: settings.enableLongLogDetails,
             onChanged: (value) {
               if (value != null) {
@@ -71,14 +69,20 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                       .setLogLevel(newValue);
                 }
               },
-              items: LogLevel.values.map<DropdownMenuItem<LogLevel>>((
-                LogLevel level,
-              ) {
-                return DropdownMenuItem<LogLevel>(
-                  value: level,
-                  child: Text(level.name.toUpperCase()),
-                );
-              }).toList(),
+              items:
+                  [
+                    LogLevel.critical,
+                    LogLevel.error,
+                    LogLevel.warning,
+                    LogLevel.info,
+                    LogLevel.debug,
+                    LogLevel.verbose,
+                  ].map<DropdownMenuItem<LogLevel>>((LogLevel level) {
+                    return DropdownMenuItem<LogLevel>(
+                      value: level,
+                      child: Text(level.name.toUpperCase()),
+                    );
+                  }).toList(),
             ),
           ),
           const Divider(),
@@ -100,25 +104,46 @@ class DeveloperOptionsScreen extends ConsumerWidget {
           const Divider(),
           ListTile(
             title: const Text('Test Logs'),
-            subtitle:
-                const Text('Generate dummy logs to test logging functionality'),
+            subtitle: const Text(
+              'Generate dummy logs to test logging functionality',
+            ),
             leading: const Icon(Icons.bug_report),
             onTap: () {
               final talker = ref.read(talkerProvider);
+
+              talker.critical(
+                'Test Critical log\nSystem failure or critical event.',
+              );
+              talker.error(
+                'Test Error log\nAn error occurred while processing.',
+              );
+              talker.warning(
+                'Test Warning log\nSomething unexpected happened.',
+              );
               talker.info('Test Info log\nSummary of action...');
               talker.debug(
-                  'Test Debug log\nDetails of the action with some data:\n{"key": "value", "status": "ok"}');
+                'Test Debug log\nDetails of the action with some data:\n{"key": "value", "status": "ok"}',
+              );
               talker.verbose(
-                  'Test Verbose log\nFull context and very detailed trace for a specific event.');
-              talker.handle(Exception('Test Exception'), StackTrace.current,
-                  'Test Exception occurred');
+                'Test Verbose log\nFull context and very detailed trace for a specific event.',
+              );
+
+              talker.handle(
+                Exception('Test Exception'),
+                StackTrace.current,
+                'Test Exception occurred',
+              );
 
               // Generate long log
               final random = Random();
               const chars =
                   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ';
-              final longString = String.fromCharCodes(Iterable.generate(
-                  5200, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
+              final longString = String.fromCharCodes(
+                Iterable.generate(
+                  5200,
+                  (_) => chars.codeUnitAt(random.nextInt(chars.length)),
+                ),
+              );
               talker.verbose('Test Long Log (>5000 chars)\n$longString');
 
               ScaffoldMessenger.of(context).showSnackBar(

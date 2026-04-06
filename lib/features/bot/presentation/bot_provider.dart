@@ -35,8 +35,11 @@ class BotController extends StateNotifier<BotState> {
   final Talker _log;
 
   BotController(
-      this._repository, this._aiService, this._marketDataService, this._log)
-      : super(BotState(messages: [])) {
+    this._repository,
+    this._aiService,
+    this._marketDataService,
+    this._log,
+  ) : super(BotState(messages: [])) {
     loadHistory();
   }
 
@@ -71,15 +74,18 @@ class BotController extends StateNotifier<BotState> {
       // Fetch ISINs and generate system prompt
       final isins = await _repository.getAllIsins();
       final isinsJson = isins
-          .map((i) => {
-                'isinCode': i.isinCode,
-                'name': i.registeredNames.isNotEmpty
-                    ? i.registeredNames.first
-                    : i.altName
-              })
+          .map(
+            (i) => {
+              'isinCode': i.isinCode,
+              'name': i.registeredNames.isNotEmpty
+                  ? i.registeredNames.first
+                  : i.altName,
+            },
+          )
           .toList();
 
-      final systemPrompt = '''
+      final systemPrompt =
+          '''
 You are a helpful financial AI assistant.
 The user currently has the following ISINs saved in their portfolio:
 ${jsonEncode(isinsJson)}
@@ -104,17 +110,11 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
           .map((m) => {'role': m.role, 'content': m.content})
           .toList();
 
-      _log.verbose(
-          'Bot AI Request Context:\nSystem Prompt: $systemPrompt\nMessages Context: ${jsonEncode(historyMaps)}');
-
       final response = await _aiService.getGenericCompletion(
         systemPrompt: systemPrompt,
         messages: historyMaps,
         webSearch: true,
       );
-
-      _log.debug('Assistant Response:\n$response');
-      _log.verbose('Bot AI Full Response:\n$response');
 
       await _handleAiResponse(response, systemPrompt);
     } catch (e) {
@@ -128,7 +128,8 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
 
     // Check if there's a market data action
     final marketDataRegExp = RegExp(
-        r'\[\$ACTION:MARKET_DATA\s+symbol="([^"]+)"\s+interval="([^"]+)"\s+range="([^"]+)"\]');
+      r'\[\$ACTION:MARKET_DATA\s+symbol="([^"]+)"\s+interval="([^"]+)"\s+range="([^"]+)"\]',
+    );
     final match = marketDataRegExp.firstMatch(response);
 
     if (match != null) {
@@ -138,7 +139,10 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
 
       try {
         final data = await _marketDataService.fetchHistoricalData(
-            symbol, interval, range);
+          symbol,
+          interval,
+          range,
+        );
         if (data != null) {
           // Remove the actual chart array to save context window, keep meta, timestamp, and indicators
           final filteredData = Map<String, dynamic>.from(data);
@@ -154,7 +158,9 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
 
           final systemMessage = jsonEncode(filteredData);
           await _repository.saveMessage(
-              'system', 'Market data for $symbol: $systemMessage');
+            'system',
+            'Market data for $symbol: $systemMessage',
+          );
 
           // Re-fetch history and call AI again
           final newHistory = await _repository.getChatHistory();
@@ -172,7 +178,9 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
           return;
         } else {
           await _repository.saveMessage(
-              'system', 'Failed to fetch market data for $symbol.');
+            'system',
+            'Failed to fetch market data for $symbol.',
+          );
 
           // Re-fetch history and call AI again
           final newHistory = await _repository.getChatHistory();
@@ -191,7 +199,9 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
         }
       } catch (e) {
         await _repository.saveMessage(
-            'system', 'Error fetching market data: $e');
+          'system',
+          'Error fetching market data: $e',
+        );
       }
     }
 

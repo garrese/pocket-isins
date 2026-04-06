@@ -105,8 +105,10 @@ class FeedRepository {
 
         return newsList;
       } else {
-        _log.warning('Feed API Error: ${response.statusCode}',
-            'Response: ${response.data}');
+        _log.warning(
+          'Feed API Error: ${response.statusCode}',
+          'Response: ${response.data}',
+        );
         return [];
       }
     } catch (e, stackTrace) {

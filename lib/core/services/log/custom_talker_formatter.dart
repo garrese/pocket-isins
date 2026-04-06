@@ -1,11 +1,17 @@
 import 'package:talker_flutter/talker_flutter.dart';
 
 class CustomTalkerFormatter implements LoggerFormatter {
-  const CustomTalkerFormatter();
+  final bool Function() getEnableLongLogDetails;
+
+  const CustomTalkerFormatter(this.getEnableLongLogDetails);
 
   @override
   String fmt(LogDetails details, TalkerLoggerSettings settings) {
     String msg = details.message.toString();
+
+    if (!getEnableLongLogDetails() && msg.length > 5000) {
+      msg = '${msg.substring(0, 5000)}...';
+    }
 
     // Check if it's an HTTP request or response log by matching the title.
     if (msg.contains('[http-request]') || msg.contains('[http-response]')) {

@@ -87,8 +87,8 @@ class IsinFormData {
     List<String>? registeredNames,
     this.shortName,
     List<TickerFormData>? tickers,
-  })  : registeredNames = registeredNames ?? [],
-        tickers = tickers ?? [];
+  }) : registeredNames = registeredNames ?? [],
+       tickers = tickers ?? [];
 
   IsinFormData clone() {
     return IsinFormData(
