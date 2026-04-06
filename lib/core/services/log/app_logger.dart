@@ -6,27 +6,31 @@ class AppLogger {
 
   AppLogger(this._talker, this._getEnableLongLogDetails);
 
-  // Truncation is now handled globally by CustomTalkerFormatter.
-  // We can just pass the messages directly to talker.
+  String _truncateMessage(String message) {
+    if (!_getEnableLongLogDetails() && message.length > 5000) {
+      return '${message.substring(0, 5000)}...';
+    }
+    return message;
+  }
 
   void info(String message) {
-    _talker.info(message);
+    _talker.info(_truncateMessage(message));
   }
 
   void debug(String message) {
-    _talker.debug(message);
+    _talker.debug(_truncateMessage(message));
   }
 
   void verbose(String message) {
-    _talker.verbose(message);
+    _talker.verbose(_truncateMessage(message));
   }
 
   void warning(String message, [String? exception, StackTrace? stackTrace]) {
-    _talker.warning(message, exception, stackTrace);
+    _talker.warning(_truncateMessage(message), exception, stackTrace);
   }
 
   void handle(Object exception, [StackTrace? stackTrace, String? msg]) {
-    _talker.handle(exception, stackTrace, msg);
+    _talker.handle(exception, stackTrace, msg != null ? _truncateMessage(msg) : null);
   }
 
   // Allow access to underlying Talker if strictly necessary (e.g., TalkerScreen)
