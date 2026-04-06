@@ -34,12 +34,19 @@ class ConstrainedWidth extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: _maxWidth),
-        child: child,
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: _maxWidth,
+              maxHeight: constraints.maxHeight,
+            ),
+            child: child,
+          ),
+        );
+      },
     );
   }
 }
