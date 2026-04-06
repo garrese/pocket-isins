@@ -8,6 +8,12 @@ class MarketDataCache {
   double chartPreviousClose;
   List<double> intradayPrices;
   List<int> intradayTimestamps;
+  int? regularMarketStart;
+  int? regularMarketEnd;
+  int? preMarketStart;
+  int? preMarketEnd;
+  int? postMarketStart;
+  int? postMarketEnd;
 
   Ticker? ticker;
 
@@ -19,6 +25,12 @@ class MarketDataCache {
     this.chartPreviousClose = 0.0,
     this.intradayPrices = const [],
     this.intradayTimestamps = const [],
+    this.regularMarketStart,
+    this.regularMarketEnd,
+    this.preMarketStart,
+    this.preMarketEnd,
+    this.postMarketStart,
+    this.postMarketEnd,
     this.ticker,
   });
 

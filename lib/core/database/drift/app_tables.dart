@@ -45,6 +45,13 @@ class MarketDataCaches extends Table {
   TextColumn get intradayTimestamps =>
       text().map(const IntListConverter()).withDefault(const Constant('[]'))();
 
+  IntColumn get regularMarketStart => integer().nullable()();
+  IntColumn get regularMarketEnd => integer().nullable()();
+  IntColumn get preMarketStart => integer().nullable()();
+  IntColumn get preMarketEnd => integer().nullable()();
+  IntColumn get postMarketStart => integer().nullable()();
+  IntColumn get postMarketEnd => integer().nullable()();
+
   IntColumn get tickerId => integer().references(Tickers, #id)();
 }
 

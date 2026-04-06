@@ -12,7 +12,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(impl.connect());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -43,6 +43,14 @@ class AppDatabase extends _$AppDatabase {
 
           // Tickers modifications
           await m.alterTable(TableMigration(tickers));
+        }
+        if (from < 6) {
+          await m.addColumn(marketDataCaches, marketDataCaches.regularMarketStart);
+          await m.addColumn(marketDataCaches, marketDataCaches.regularMarketEnd);
+          await m.addColumn(marketDataCaches, marketDataCaches.preMarketStart);
+          await m.addColumn(marketDataCaches, marketDataCaches.preMarketEnd);
+          await m.addColumn(marketDataCaches, marketDataCaches.postMarketStart);
+          await m.addColumn(marketDataCaches, marketDataCaches.postMarketEnd);
         }
       },
     );
