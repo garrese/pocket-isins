@@ -147,7 +147,7 @@ class PortfolioScreen extends ConsumerWidget {
                     isin.displayName,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -162,9 +162,9 @@ class PortfolioScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.shortName!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade400,
                               ),
                             ),
                           ),
@@ -173,9 +173,9 @@ class PortfolioScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.isinCode!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade400,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),

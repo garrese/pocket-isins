@@ -48,16 +48,18 @@ class WizardBottomActions extends StatelessWidget {
           Widget buildCancel() {
             return SizedBox(
               height: buttonHeight,
-              child: TextButton.icon(
+              child: OutlinedButton.icon(
                 onPressed: onCancel,
                 icon: const Icon(Icons.close),
                 label: const Text('Cancel'),
-                style: TextButton.styleFrom(
+                style: OutlinedButton.styleFrom(
                   shape: squareShape,
                   foregroundColor: Theme.of(context).colorScheme.error,
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.surface, // Gives it a button look vs background
+                  side: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                 ),
               ),
             );
