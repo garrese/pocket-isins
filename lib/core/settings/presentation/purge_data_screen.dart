@@ -5,6 +5,7 @@ import '../../../core/database/drift_service.dart';
 import '../application/developer_settings_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class PurgeDataScreen extends ConsumerStatefulWidget {
   const PurgeDataScreen({super.key});
@@ -82,19 +83,12 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Selected data successfully purged.')),
-        );
+        ToastUtils.show(context, 'Selected data successfully purged.');
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to purge data: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        ToastUtils.show(context, 'Failed to purge data: $e');
       }
     }
   }

@@ -11,6 +11,7 @@ import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class MarketsStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -174,13 +175,9 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
       if (mergedResults.isEmpty) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
+          ToastUtils.show(context,
                 'No tickers found automatically. You can add them manually.',
-              ),
-            ),
-          );
+              );
           setState(() {
             _isLoading = false;
           });
@@ -193,9 +190,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     } catch (e, stack) {
       if (mounted) {
         ref.read(talkerProvider).handle(e, stack, 'Error searching tickers');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error searching tickers: $e')));
+          ToastUtils.show(context, 'Error searching tickers: $e');
       }
     } finally {
       if (mounted) {
@@ -310,20 +305,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           ),
         );
         if (showSnackbar) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Added ticker: $symbol'),
-              duration: const Duration(seconds: 1),
-            ),
-          );
+          ToastUtils.show(context, 'Added ticker: $symbol');
         }
       } else if (showSnackbar) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ticker $symbol is already in the list.'),
-            duration: const Duration(seconds: 1),
-          ),
-        );
+        ToastUtils.show(context, 'Ticker $symbol is already in the list.');
       }
     });
   }
@@ -423,11 +408,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           _addMarketFromSearch(foundQuote);
         } else {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Could not find ticker data for symbol: $symbol'),
-              ),
-            );
+            ToastUtils.show(context, 'Could not find ticker data for symbol: $symbol');
           }
         }
       } catch (e, stack) {
@@ -435,9 +416,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           ref
               .read(talkerProvider)
               .handle(e, stack, 'Error manually adding ticker');
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error finding ticker: $e')));
+          ToastUtils.show(context, 'Error finding ticker: $e');
         }
       } finally {
         if (mounted) {
@@ -451,11 +430,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
   Future<void> _saveTransaction() async {
     if (widget.formData.tickers.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please add at least one ticker before saving.'),
-        ),
-      );
+      ToastUtils.show(context, 'Please add at least one ticker before saving.');
       return;
     }
 
@@ -472,9 +447,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ISIN saved successfully!')),
-        );
+        ToastUtils.show(context, 'ISIN saved successfully!');
         if (widget.isEditing) {
           Navigator.of(context).pop('SAVED');
         } else {
@@ -486,9 +459,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         ref
             .read(talkerProvider)
             .handle(e, stack, 'Error saving ISIN from Tickers step');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error saving: $e')));
+          ToastUtils.show(context, 'Error saving: $e');
       }
     }
   }
