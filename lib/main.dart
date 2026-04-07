@@ -106,37 +106,43 @@ class MainScreen extends ConsumerWidget {
         color:
             Theme.of(context).bottomNavigationBarTheme.backgroundColor ??
             Theme.of(context).colorScheme.surface,
-        child: ConstrainedWidth.wide(
-          child: BottomNavigationBar(
-            currentIndex: activeIndex,
-            type: BottomNavigationBarType.fixed,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            onTap: (index) =>
-                ref.read(currentTabProvider.notifier).state = index,
-            items: [
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.list_alt),
-                label: 'ISINs',
+        child: SafeArea(
+          child: Center(
+            heightFactor: 1.0,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200.0),
+              child: BottomNavigationBar(
+                currentIndex: activeIndex,
+                type: BottomNavigationBarType.fixed,
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                onTap: (index) =>
+                    ref.read(currentTabProvider.notifier).state = index,
+                items: [
+                  const BottomNavigationBarItem(
+                    icon: Icon(Icons.list_alt),
+                    label: 'ISINs',
+                  ),
+                  const BottomNavigationBarItem(
+                    icon: Icon(Icons.show_chart),
+                    label: 'Market',
+                  ),
+                  const BottomNavigationBarItem(
+                    icon: Icon(Icons.feed),
+                    label: 'Feed',
+                  ),
+                  const BottomNavigationBarItem(
+                    icon: Icon(Icons.psychology),
+                    label: 'Bot',
+                  ),
+                  if (developerSettings.showLogConsole)
+                    const BottomNavigationBarItem(
+                      icon: Icon(Icons.receipt_long),
+                      label: 'Logs',
+                    ),
+                ],
               ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.show_chart),
-                label: 'Market',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.feed),
-                label: 'Feed',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.psychology),
-                label: 'Bot',
-              ),
-              if (developerSettings.showLogConsole)
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.receipt_long),
-                  label: 'Logs',
-                ),
-            ],
+            ),
           ),
         ),
       ),
