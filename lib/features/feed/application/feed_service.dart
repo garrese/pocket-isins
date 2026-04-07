@@ -185,7 +185,7 @@ class FeedService {
       final db = _driftService.db;
       await db.delete(db.feedNews).go();
     } catch (e, st) {
-      debugPrint('Error clearing feed: $e\n$st');
+      _log.handle(e, st, 'Error clearing feed');
     }
   }
 }

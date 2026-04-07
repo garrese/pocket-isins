@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
@@ -40,15 +43,49 @@ void main() async {
     ),
   );
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        driftServiceProvider.overrideWithValue(driftServiceInstance),
-        talkerProvider.overrideWithValue(talker),
-      ],
-      child: const PocketIsinsApp(),
-    ),
-  );
+  FlutterError.onError = (details) {
+    talker.handle(details.exception, details.stack, 'Uncaught Flutter Error');
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    talker.handle(error, stack, 'Uncaught Platform Error');
+    return true;
+  };
+
+  runZonedGuarded(() {
+    runApp(
+      ProviderScope(
+        observers: [RiverpodErrorObserver(talker)],
+        overrides: [
+          driftServiceProvider.overrideWithValue(driftServiceInstance),
+          talkerProvider.overrideWithValue(talker),
+        ],
+        child: const PocketIsinsApp(),
+      ),
+    );
+  }, (error, stack) {
+    talker.handle(error, stack, 'Uncaught App Error');
+  });
+}
+
+class RiverpodErrorObserver extends ProviderObserver {
+  final Talker talker;
+
+  RiverpodErrorObserver(this.talker);
+
+  @override
+  void providerDidFail(
+    ProviderBase<Object?> provider,
+    Object error,
+    StackTrace stackTrace,
+    ProviderContainer container,
+  ) {
+    talker.handle(
+      error,
+      stackTrace,
+      'Riverpod Provider Error: ${provider.name ?? provider.runtimeType}',
+    );
+  }
 }
 
 // Simple StateProvider for the active tab index
