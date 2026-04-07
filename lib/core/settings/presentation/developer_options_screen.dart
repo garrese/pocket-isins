@@ -19,20 +19,6 @@ class DeveloperOptionsScreen extends ConsumerWidget {
       body: ListView(
         children: [
           CheckboxListTile(
-            title: const Text('Debug labels'),
-            subtitle: const Text(
-              'Show technical labels like "Round" on Feed cards',
-            ),
-            value: settings.debugLabelsEnabled,
-            onChanged: (value) {
-              if (value != null) {
-                ref
-                    .read(developerSettingsProvider.notifier)
-                    .setDebugLabelsEnabled(value);
-              }
-            },
-          ),
-          CheckboxListTile(
             title: const Text('Show Log Console'),
             subtitle: const Text('Enable the Logs tab in the main navigation'),
             value: settings.showLogConsole,

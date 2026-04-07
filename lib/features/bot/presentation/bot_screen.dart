@@ -100,9 +100,7 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                           backgroundColor: Theme.of(
                             context,
                           ).colorScheme.primaryContainer,
-                          foregroundColor: Theme.of(
-                            context,
-                          ).colorScheme.onPrimaryContainer,
+                          foregroundColor: Colors.amber,
                         ),
                         onPressed: () {
                           // Navigate to ISIN wizard with prefilled data
@@ -138,10 +136,10 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                         'Fetching market data for $symbol ($interval, $range)...',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontStyle: FontStyle.italic,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Colors.amber,
                         ),
                       ),
                     );
