@@ -70,10 +70,13 @@ class FeedNewsCard extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    news.sourceName,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.secondary,
+                  Flexible(
+                    child: Text(
+                      news.sourceName,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.secondary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Row(
