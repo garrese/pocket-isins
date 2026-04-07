@@ -12,6 +12,7 @@ import 'screens/isin_summary_screen.dart';
 import '../domain/portfolio_form_data.dart';
 import '../../../core/theme/app_drawer.dart';
 import '../../../core/theme/app_theme_extension.dart';
+import '../../../core/widgets/constrained_width.dart';
 
 class PortfolioScreen extends ConsumerWidget {
   const PortfolioScreen({super.key});
@@ -117,10 +118,11 @@ class PortfolioScreen extends ConsumerWidget {
               child: Text('You have no ISINs yet. Add some!'),
             );
           }
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-            itemCount: isins.length,
-            itemBuilder: (context, index) {
+          return ConstrainedWidth.narrow(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+              itemCount: isins.length,
+              itemBuilder: (context, index) {
               final isin = isins[index];
 
               String tickersList = isin.tickers.map((t) => t.symbol).join(', ');
@@ -189,8 +191,9 @@ class PortfolioScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),

@@ -9,6 +9,7 @@ import '../../data/portfolio_provider.dart';
 import 'additional_data_step_screen.dart';
 import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
+import '../../../../core/widgets/constrained_width.dart';
 
 class MarketsStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -561,11 +562,12 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+              child: ConstrainedWidth.narrow(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                     Wrap(
                       alignment: WrapAlignment.spaceBetween,
                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -677,9 +679,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                                 child: CircularProgressIndicator(),
                               ),
                           ],
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

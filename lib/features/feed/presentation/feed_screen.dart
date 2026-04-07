@@ -5,6 +5,7 @@ import 'providers/feed_provider.dart';
 import '../application/feed_service.dart';
 import 'widgets/feed_news_card.dart';
 import '../../../core/theme/app_drawer.dart';
+import '../../../core/widgets/constrained_width.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
@@ -214,9 +215,10 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 // For simplicity and since user wants it simple, let's use ListView.builder and
                 // maintainScrollPositionForThisScrollDirection if possible, or just standard for now.
 
-                return CustomScrollView(
-                  controller: _scrollController,
-                  // In flutter 3.x, if we want to anchor to bottom when inserting top, we'd use a special package or key.
+                return ConstrainedWidth.medium(
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    // In flutter 3.x, if we want to anchor to bottom when inserting top, we'd use a special package or key.
                   // For now, we keep it simple. If we want it to not move when reading, one trick is reverse list but we want newest on top.
                   physics: const BouncingScrollPhysics(),
                   slivers: [
@@ -238,11 +240,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                               (n) => n.id == id,
                             );
                             return index == -1 ? null : index;
-                          },
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),
