@@ -173,7 +173,10 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .secondary
+                      .withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -238,11 +241,6 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'At least one of them must be provided to continue.',
-                        style: TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
