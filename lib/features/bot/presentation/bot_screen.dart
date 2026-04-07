@@ -176,7 +176,7 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                       children: [
                         if (displayContent.isNotEmpty)
                           isUser
-                              ? Text(
+                              ? SelectableText(
                                   displayContent,
                                   style: TextStyle(
                                     color: Theme.of(
@@ -185,6 +185,7 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                                   ),
                                 )
                               : MarkdownBody(
+                                  selectable: true,
                                   data: displayContent,
                                   styleSheet: MarkdownStyleSheet(
                                     p: TextStyle(
