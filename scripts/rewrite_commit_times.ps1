@@ -13,7 +13,7 @@ Write-Host "Iniciando reescritura de GIT_AUTHOR_DATE y GIT_COMMITTER_DATE a las 
 $scriptPath = (Resolve-Path "scripts\filter.sh").Path -replace '\\', '/'
 
 # Ejecutamos filter-branch suministrando la carga útil en un archivo para evitar errores de comillas
-git filter-branch -f --env-filter ". `"$scriptPath`"" -- --all
+git filter-branch -f --env-filter ". `"$scriptPath`"" --tag-name-filter cat -- --all
 
 Write-Host ""
 Write-Host "¡Completado!"
