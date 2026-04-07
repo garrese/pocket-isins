@@ -232,6 +232,7 @@ class Markets extends _$Markets {
                       postMarketEnd: Value(postEnd),
                       tickerId: ticker.id,
                     ),
+                    mode: InsertMode.insertOrReplace,
                   );
 
               updatedCache = MarketDataCache(
