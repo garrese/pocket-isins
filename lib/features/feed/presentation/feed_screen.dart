@@ -122,6 +122,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       drawer: const AppDrawer(),
       appBar: CustomAppBar(appBar: AppBar(
         actions: [
+          if (_showScrollToTop)
+            IconButton(
+              icon: const Icon(Icons.arrow_upward),
+              tooltip: 'Scroll to top',
+              onPressed: _scrollToTop,
+            ),
           PopupMenuButton<FeedSortOrder>(
             icon: const Icon(Icons.sort),
             tooltip: 'Sort Options',
@@ -180,14 +186,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             tooltip: 'Analyze ratings with AI',
             onPressed: isLoading ? null : _analyzeRatings,
           ),
-          if (_showScrollToTop)
-            IconButton(
-              icon: const Icon(Icons.arrow_upward),
-              tooltip: 'Scroll to top',
-              onPressed: _scrollToTop,
-            ),
           IconButton(
-            icon: const Icon(Icons.delete_sweep),
+            icon: const Icon(Icons.delete),
             tooltip: 'Clear feed',
             onPressed: isLoading ? null : _confirmAndClearFeed,
           ),
