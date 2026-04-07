@@ -46,7 +46,7 @@ class _BotScreenState extends ConsumerState<BotScreen> {
       appBar: CustomAppBar(appBar: AppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.delete),
             tooltip: 'Restart Conversation',
             onPressed: () {
               ref.read(botControllerProvider.notifier).clearHistory();
