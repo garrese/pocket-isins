@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../domain/portfolio_form_data.dart';
 import '../../../../core/network/market_data_service.dart';
-import 'package:talker_flutter/talker_flutter.dart';
+
 import '../../../../core/services/log/talker_provider.dart';
 import '../../data/portfolio_provider.dart';
 import 'additional_data_step_screen.dart';
 import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 
 class MarketsStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -554,10 +555,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: AppBar(
+        appBar: CustomAppBar(appBar: AppBar(
           automaticallyImplyLeading: false,
           title: const Text('Tickers'),
-        ),
+        )),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

@@ -22,6 +22,7 @@ class AppTheme {
         backgroundColor: Color(0xFF1E1E2C),
         elevation: 0,
         centerTitle: true,
+        surfaceTintColor: Colors.transparent,
       ),
       cardTheme: const CardThemeData(
         color: Color(0xFF1E1E2C),
