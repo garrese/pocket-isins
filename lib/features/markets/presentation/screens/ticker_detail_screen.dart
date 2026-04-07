@@ -426,23 +426,32 @@ class TickerDetailScreen extends ConsumerWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        _buildMetaRow(
-          'Prev Close',
-          meta['chartPreviousClose'],
-          'Volume',
-          _formatVolume(meta['regularMarketVolume']),
-        ),
-        _buildMetaRow(
-          'Day Low',
-          meta['regularMarketDayLow'],
-          'Day High',
-          meta['regularMarketDayHigh'],
-        ),
-        _buildMetaRow(
-          '52w Low',
-          meta['fiftyTwoWeekLow'],
-          '52w High',
-          meta['fiftyTwoWeekHigh'],
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: Column(
+              children: [
+                _buildMetaRow(
+                  'Prev Close',
+                  meta['chartPreviousClose'],
+                  'Volume',
+                  _formatVolume(meta['regularMarketVolume']),
+                ),
+                _buildMetaRow(
+                  'Day Low',
+                  meta['regularMarketDayLow'],
+                  'Day High',
+                  meta['regularMarketDayHigh'],
+                ),
+                _buildMetaRow(
+                  '52w Low',
+                  meta['fiftyTwoWeekLow'],
+                  '52w High',
+                  meta['fiftyTwoWeekHigh'],
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
