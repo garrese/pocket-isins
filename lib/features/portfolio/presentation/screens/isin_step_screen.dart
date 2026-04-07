@@ -135,19 +135,19 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                 _buildStep(
                   icon: Icons.search,
                   title: 'Search',
-                  description: 'Enter the ISIN or asset name.',
+                  description: 'Enter the asset ISIN and/or Name.',
                   isLast: false,
                 ),
                 _buildStep(
                   icon: Icons.checklist,
                   title: 'Filter',
-                  description: 'Select the registered names.',
+                  description: 'Select the valid Registered Names.',
                   isLast: false,
                 ),
                 _buildStep(
                   icon: Icons.show_chart,
                   title: 'Save',
-                  description: 'Choose the definitive market tickers.',
+                  description: 'Choose the definitive Market Tickers.',
                   isLast: true,
                 ),
               ],
@@ -173,13 +173,13 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
                   size: 20,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
               if (!isLast)
