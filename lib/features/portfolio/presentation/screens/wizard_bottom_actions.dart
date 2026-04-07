@@ -27,11 +27,20 @@ class WizardBottomActions extends StatelessWidget {
         builder: (context, constraints) {
           final isNarrow = constraints.maxWidth < 600;
 
+          int leftItems = 1; // cancel is always there
+          if (!isFirstStep && onPrevious != null) leftItems++;
+
+          int rightItems = 0;
+          if (onContinue != null) rightItems++;
+          if (onSave != null) rightItems++;
+
+          final maxItemsCount = isNarrow ? math.max(leftItems, rightItems) : 1;
+          final buttonHeight = (isNarrow && maxItemsCount > 1) ? 42.0 : 56.0;
+
           // Common style for all buttons: square edges, no margin
           final squareShape = RoundedRectangleBorder(
             borderRadius: BorderRadius.zero,
           );
-          final buttonHeight = 56.0;
 
           Widget buildCancel() {
             return SizedBox(
@@ -121,8 +130,7 @@ class WizardBottomActions extends StatelessWidget {
             if (saveButton != null)
               rightWidgets.add(Expanded(child: saveButton));
 
-            final maxItems = math.max(leftWidgets.length, rightWidgets.length);
-            final totalHeight = maxItems * buttonHeight;
+            final totalHeight = maxItemsCount * buttonHeight;
 
             return SizedBox(
               height: totalHeight,
