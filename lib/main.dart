@@ -52,20 +52,16 @@ void main() async {
     return true;
   };
 
-  runZonedGuarded(() {
-    runApp(
-      ProviderScope(
-        observers: [RiverpodErrorObserver(talker)],
-        overrides: [
-          driftServiceProvider.overrideWithValue(driftServiceInstance),
-          talkerProvider.overrideWithValue(talker),
-        ],
-        child: const PocketIsinsApp(),
-      ),
-    );
-  }, (error, stack) {
-    talker.handle(error, stack, 'Uncaught App Error');
-  });
+  runApp(
+    ProviderScope(
+      observers: [RiverpodErrorObserver(talker)],
+      overrides: [
+        driftServiceProvider.overrideWithValue(driftServiceInstance),
+        talkerProvider.overrideWithValue(talker),
+      ],
+      child: const PocketIsinsApp(),
+    ),
+  );
 }
 
 class RiverpodErrorObserver extends ProviderObserver {
