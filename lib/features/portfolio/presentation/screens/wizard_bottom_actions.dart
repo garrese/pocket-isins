@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/constrained_width.dart';
+import '../../../../core/widgets/constrained_width.dart';
 
 class WizardBottomActions extends StatelessWidget {
   final VoidCallback onCancel;
