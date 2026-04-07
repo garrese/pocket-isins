@@ -100,41 +100,6 @@ class IsinSummaryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('${currentIsin.displayName} Details'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Delete ISIN'),
-                  content: Text(
-                    'Are you sure you want to delete ${currentIsin.displayName}?',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Delete'),
-                    ),
-                  ],
-                ),
-              );
-
-              if (confirm == true) {
-                await ref
-                    .read(portfolioProvider.notifier)
-                    .removeIsin(currentIsin.id);
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              }
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
@@ -317,6 +282,50 @@ class IsinSummaryScreen extends ConsumerWidget {
                     ),
                   );
                 },
+              ),
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    label: const Text(
+                      'Delete ISIN',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Delete ISIN'),
+                          content: Text(
+                            'Are you sure you want to delete ${currentIsin.displayName}?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true) {
+                        await ref
+                            .read(portfolioProvider.notifier)
+                            .removeIsin(currentIsin.id);
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
+                      }
+                    },
+                  ),
+                ),
               ),
             ],
           ),
