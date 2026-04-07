@@ -276,11 +276,18 @@ class Markets extends _$Markets {
 
   /// Forces a refresh by updating all tickers in the background
   Future<void> forceRefresh() async {
-    if (!state.hasValue || state.value == null) return;
+    // Before forcing refresh, ensure we have the latest base data from DB/Portfolio
+    // In case the DB was purged, this will reload the empty state properly.
+    final latestIsins = await _loadFromDb();
 
-    // Just trigger updates for all tickers ignoring cache rules
-    final currentIsins = state.value!;
-    for (var isin in currentIsins) {
+    // Update our base state immediately so UI drops removed tickers instantly
+    state = AsyncData(latestIsins);
+
+    // If there's nothing to refresh, we are done
+    if (latestIsins.isEmpty) return;
+
+    // Trigger updates for all active tickers ignoring cache rules
+    for (var isin in latestIsins) {
       for (var ticker in isin.tickers) {
         _updateTickerData(ticker);
       }
