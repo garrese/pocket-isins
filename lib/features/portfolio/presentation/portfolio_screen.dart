@@ -145,8 +145,9 @@ class PortfolioScreen extends ConsumerWidget {
                   },
                   title: Text(
                     isin.displayName,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -161,9 +162,9 @@ class PortfolioScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.shortName!,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: appThemeExt?.mainTitleColor ?? Colors.white,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
                               ),
                             ),
                           ),
@@ -172,9 +173,9 @@ class PortfolioScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.isinCode!,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: appThemeExt?.mainTitleColor ?? Colors.white,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -184,8 +185,7 @@ class PortfolioScreen extends ConsumerWidget {
                             tickersList,
                             style: TextStyle(
                               fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Colors.grey.shade400,
                             ),
                           ),
                       ],
@@ -204,16 +204,25 @@ class PortfolioScreen extends ConsumerWidget {
           return Center(child: Text('Error: $err'));
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => IsinStepScreen(formData: IsinFormData()),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: ConstrainedWidth.narrow(
+        child: Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => IsinStepScreen(formData: IsinFormData()),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add),
             ),
-          );
-        },
-        child: const Icon(Icons.add),
+          ),
+        ),
       ),
     );
   }

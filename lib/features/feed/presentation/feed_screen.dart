@@ -180,11 +180,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             tooltip: 'Analyze ratings with AI',
             onPressed: isLoading ? null : _analyzeRatings,
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Search news',
-            onPressed: isLoading ? null : _startSearch,
-          ),
+          if (_showScrollToTop)
+            IconButton(
+              icon: const Icon(Icons.arrow_upward),
+              tooltip: 'Scroll to top',
+              onPressed: _scrollToTop,
+            ),
           IconButton(
             icon: const Icon(Icons.delete_sweep),
             tooltip: 'Clear feed',
@@ -253,13 +254,20 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           ),
         ],
       ),
-      floatingActionButton: _showScrollToTop
-          ? FloatingActionButton(
-              mini: true,
-              onPressed: _scrollToTop,
-              child: const Icon(Icons.arrow_upward),
-            )
-          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: ConstrainedWidth.medium(
+        child: Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: FloatingActionButton(
+              onPressed: isLoading ? null : _startSearch,
+              tooltip: 'Search news',
+              child: const Icon(Icons.refresh),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
