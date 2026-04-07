@@ -28,7 +28,7 @@ Write-Host "===========================================================" -Foregr
 try {
     .\scripts\rewrite_commit_times.ps1
 } catch {
-    Write-Host "Hubo un error crítico durante filter-branch." -ForegroundColor Red
+    Write-Host "Hubo un error critico durante filter-branch." -ForegroundColor Red
     exit 1
 }
 
@@ -36,18 +36,18 @@ Write-Host ""
 Write-Host "===========================================================" -ForegroundColor Cyan
 Write-Host "Paso 3: Subida forzada (Push Force) al servidor (origin)" -ForegroundColor Cyan
 Write-Host "===========================================================" -ForegroundColor Cyan
-Write-Host "⚠️  ATENCIÓN: Se va a aplastar la historia del repositorio remoto." -ForegroundColor Yellow
-Write-Host "Si continuas, tus ramas web serán reemplazadas por las nuevas forzadas." -ForegroundColor Yellow
+Write-Host "ATENCION: Se va a aplastar la historia del repositorio remoto." -ForegroundColor Yellow
+Write-Host "Si continuas, tus ramas web seran reemplazadas por las nuevas forzadas." -ForegroundColor Yellow
 
-$response = Read-Host "¿Deseas ejecutar git push --all --force y git push --tags --force ahora? (S/N)"
+$response = Read-Host "Deseas ejecutar git push --all --force y git push --tags --force ahora? (S/N)"
 if ($response -match "^[sS]") {
     Write-Host "Ejecutando Push de ramas..."
     git push --all --force
     Write-Host "Ejecutando Push de etiquetas (tags)..."
     git push --tags --force
-    Write-Host "¡Subida completada!" -ForegroundColor Green
+    Write-Host "Subida completada!" -ForegroundColor Green
 } else {
-    Write-Host "Has cancelado la subida forzada. Los cambios solo están en tu equipo local." -ForegroundColor Yellow
+    Write-Host "Has cancelado la subida forzada. Los cambios solo estan en tu equipo local." -ForegroundColor Yellow
 }
 
 Write-Host ""
