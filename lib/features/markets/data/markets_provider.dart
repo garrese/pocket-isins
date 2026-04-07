@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -19,8 +20,18 @@ class Markets extends _$Markets {
     // 1. Fetch initial state from DB without waiting for network updates
     final isins = await _loadFromDb();
 
-    // 2. Trigger async refresh for outdated tickers
-    // We don't await this so the UI renders immediately with cached data
+    // 2. Setup periodic timer for checking 5-minute threshold
+    final timer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (state.hasValue && state.value != null) {
+        _triggerBackgroundUpdates(state.value!);
+      }
+    });
+
+    ref.onDispose(() {
+      timer.cancel();
+    });
+
+    // 3. Trigger async refresh for outdated tickers right away
     _triggerBackgroundUpdates(isins);
 
     return isins;
@@ -28,7 +39,7 @@ class Markets extends _$Markets {
 
   Future<List<Isin>> _loadFromDb() async {
     final db = ref.read(driftServiceProvider).db;
-    final isins = await ref.read(portfolioProvider.future);
+    final isins = await ref.watch(portfolioProvider.future);
 
     // Create a new list of Isin to avoid modifying the portfolioProvider state directly
     final List<Isin> localIsins = [];
