@@ -55,21 +55,16 @@ void main() async {
     return true;
   };
 
-  runZonedGuarded(() {
-    runApp(
-      ProviderScope(
-        observers: [RiverpodErrorObserver(talker)],
-        overrides: [
-          driftServiceProvider.overrideWithValue(driftServiceInstance),
-          talkerProvider.overrideWithValue(talker),
-        ],
-        child: const PocketIsinsApp(),
-      ),
-    );
-  }, (error, stack) {
-    talker.handle(error, stack, 'Uncaught App Error');
-    ToastUtils.show(null, 'An unexpected error occurred. Please check the logs.');
-  });
+  runApp(
+    ProviderScope(
+      observers: [RiverpodErrorObserver(talker)],
+      overrides: [
+        driftServiceProvider.overrideWithValue(driftServiceInstance),
+        talkerProvider.overrideWithValue(talker),
+      ],
+      child: const PocketIsinsApp(),
+    ),
+  );
 }
 
 class RiverpodErrorObserver extends ProviderObserver {
