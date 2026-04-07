@@ -114,6 +114,106 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
     }
   }
 
+  Widget _buildGuideCard() {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'How it works',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 24),
+                _buildStep(
+                  icon: Icons.search,
+                  title: 'Search',
+                  description: 'Enter the ISIN or asset name.',
+                  isLast: false,
+                ),
+                _buildStep(
+                  icon: Icons.checklist,
+                  title: 'Filter',
+                  description: 'Select the registered names.',
+                  isLast: false,
+                ),
+                _buildStep(
+                  icon: Icons.show_chart,
+                  title: 'Save',
+                  description: 'Choose the definitive market tickers.',
+                  isLast: true,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStep({
+    required IconData icon,
+    required String title,
+    required String description,
+    required bool isLast,
+  }) {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: Theme.of(context).dividerColor,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 24.0, top: 6.0),
+              child: RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  children: [
+                    TextSpan(
+                      text: '$title: ',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(text: description),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -174,6 +274,8 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 24),
+                      _buildGuideCard(),
                     ],
                   ),
                 ),
