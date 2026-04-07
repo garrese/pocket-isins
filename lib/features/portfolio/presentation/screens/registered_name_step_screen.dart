@@ -9,6 +9,7 @@ import 'markets_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class RegisteredNameStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -152,13 +153,9 @@ class _RegisteredNameStepScreenState
         });
 
         if (_uniqueNames.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
+          ToastUtils.show(context,
                 'No registered names found. You can enter them manually.',
-              ),
-            ),
-          );
+              );
         }
       }
     } catch (e, stack) {
@@ -166,9 +163,7 @@ class _RegisteredNameStepScreenState
         ref
             .read(talkerProvider)
             .handle(e, stack, 'Error searching registered names');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error searching: $e')));
+          ToastUtils.show(context, 'Error searching: $e');
       }
     } finally {
       if (mounted) {

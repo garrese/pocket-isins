@@ -8,6 +8,7 @@ import 'purge_data_screen.dart';
 import '../../../core/services/log/talker_provider.dart';
 import '../../widgets/constrained_width.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class DeveloperOptionsScreen extends ConsumerWidget {
   const DeveloperOptionsScreen({super.key});
@@ -134,9 +135,7 @@ class DeveloperOptionsScreen extends ConsumerWidget {
               );
               talker.verbose('Test Long Log (>5000 chars)\n$longString');
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Test logs generated!')),
-              );
+              ToastUtils.show(context, 'Test logs generated!');
             },
           ),
         ],
