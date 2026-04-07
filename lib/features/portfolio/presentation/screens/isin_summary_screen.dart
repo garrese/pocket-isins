@@ -209,9 +209,9 @@ class IsinSummaryScreen extends ConsumerWidget {
                                           child: _buildCopyableText(
                                             context,
                                             t.symbol,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                            style: TextStyle(
                                               fontSize: 16,
+                                              color: Theme.of(context).colorScheme.secondary,
                                             ),
                                           ),
                                         ),
@@ -354,7 +354,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: appThemeExt?.mainTitleColor ?? Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               IconButton(
