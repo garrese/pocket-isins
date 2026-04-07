@@ -258,21 +258,9 @@ class IsinSummaryScreen extends ConsumerWidget {
               _buildSection(
                 context,
                 title: 'Additional Data',
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Short Name:',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      currentIsin.shortName?.isNotEmpty == true
-                          ? currentIsin.shortName!
-                          : 'Not set',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
+                content: Text(
+                  'Short Name: ${currentIsin.shortName?.isNotEmpty == true ? currentIsin.shortName! : "Not set"}',
+                  style: const TextStyle(fontSize: 14),
                 ),
                 onEdit: () {
                   final formData = _createFormData(currentIsin);
@@ -294,7 +282,7 @@ class IsinSummaryScreen extends ConsumerWidget {
                   child: TextButton.icon(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     label: const Text(
-                      'Delete ISIN',
+                      'Delete',
                       style: TextStyle(color: Colors.red),
                     ),
                     onPressed: () async {
