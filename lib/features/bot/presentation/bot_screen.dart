@@ -93,14 +93,12 @@ class _BotScreenState extends ConsumerState<BotScreen> {
 
                     actionWidget = Padding(
                       padding: const EdgeInsets.only(top: 8.0),
-                      child: ElevatedButton.icon(
+                      child: OutlinedButton.icon(
                         icon: const Icon(Icons.add_circle_outline),
                         label: Text('Create ISIN: $name'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primaryContainer,
-                          foregroundColor: Colors.amber,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.secondary,
+                          side: BorderSide(color: Theme.of(context).colorScheme.secondary),
                         ),
                         onPressed: () {
                           // Navigate to ISIN wizard with prefilled data
@@ -136,10 +134,10 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                         'Fetching market data for $symbol ($interval, $range)...',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontStyle: FontStyle.italic,
-                          color: Colors.amber,
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
                       ),
                     );
