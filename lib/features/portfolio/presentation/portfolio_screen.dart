@@ -13,6 +13,7 @@ import '../domain/portfolio_form_data.dart';
 import '../../../core/theme/app_drawer.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import '../../../core/widgets/constrained_width.dart';
+import '../../../core/widgets/custom_app_bar.dart';
 
 class PortfolioScreen extends ConsumerWidget {
   const PortfolioScreen({super.key});
@@ -23,7 +24,7 @@ class PortfolioScreen extends ConsumerWidget {
 
     return Scaffold(
       drawer: const AppDrawer(),
-      appBar: AppBar(
+      appBar: CustomAppBar(appBar: AppBar(
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download),
@@ -110,7 +111,7 @@ class PortfolioScreen extends ConsumerWidget {
             },
           ),
         ],
-      ),
+      )),
       body: portfolioAsync.when(
         data: (isins) {
           if (isins.isEmpty) {
@@ -145,7 +146,6 @@ class PortfolioScreen extends ConsumerWidget {
                   title: Text(
                     isin.displayName,
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     overflow: TextOverflow.ellipsis,

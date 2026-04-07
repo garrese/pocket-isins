@@ -6,6 +6,7 @@ import '../application/feed_service.dart';
 import 'widgets/feed_news_card.dart';
 import '../../../core/theme/app_drawer.dart';
 import '../../../core/widgets/constrained_width.dart';
+import '../../../core/widgets/custom_app_bar.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
@@ -119,7 +120,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
     return Scaffold(
       drawer: const AppDrawer(),
-      appBar: AppBar(
+      appBar: CustomAppBar(appBar: AppBar(
         actions: [
           PopupMenuButton<FeedSortOrder>(
             icon: const Icon(Icons.sort),
@@ -190,7 +191,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             onPressed: isLoading ? null : _confirmAndClearFeed,
           ),
         ],
-      ),
+      )),
       body: Column(
         children: [
           if (isLoading) const LinearProgressIndicator(),

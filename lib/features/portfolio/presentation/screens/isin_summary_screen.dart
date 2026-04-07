@@ -12,6 +12,7 @@ import 'registered_name_step_screen.dart';
 import 'markets_step_screen.dart';
 import 'additional_data_step_screen.dart';
 import '../../../../core/widgets/constrained_width.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 
 class IsinSummaryScreen extends ConsumerWidget {
   final Isin isin;
@@ -99,12 +100,12 @@ class IsinSummaryScreen extends ConsumerWidget {
         isin;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: CustomAppBar(appBar: AppBar(
         title: Text('${currentIsin.displayName} Details'),
-      ),
+      )),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
-        child: ConstrainedWidth.medium(
+        child: ConstrainedWidth.narrow(
           child: Card(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
