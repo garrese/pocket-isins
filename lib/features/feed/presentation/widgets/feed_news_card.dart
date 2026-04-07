@@ -47,7 +47,7 @@ class FeedNewsCard extends ConsumerWidget {
                     child: Text(
                       news.isinName,
                       style: theme.textTheme.labelMedium?.copyWith(
-                        color: appThemeExt?.mainTitleColor ?? theme.colorScheme.primary,
+                        color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
