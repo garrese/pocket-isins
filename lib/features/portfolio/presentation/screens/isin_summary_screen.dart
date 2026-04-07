@@ -11,6 +11,7 @@ import 'isin_step_screen.dart';
 import 'registered_name_step_screen.dart';
 import 'markets_step_screen.dart';
 import 'additional_data_step_screen.dart';
+import '../../../../core/widgets/constrained_width.dart';
 
 class IsinSummaryScreen extends ConsumerWidget {
   final Isin isin;
@@ -103,10 +104,11 @@ class IsinSummaryScreen extends ConsumerWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
-        child: Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+        child: ConstrainedWidth.medium(
+          child: Card(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               _buildSection(
                 context,
                 title: 'ISIN / Name',
@@ -327,7 +329,8 @@ class IsinSummaryScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
