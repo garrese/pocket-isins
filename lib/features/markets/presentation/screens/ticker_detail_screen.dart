@@ -33,7 +33,8 @@ class TickerDetailScreen extends ConsumerWidget {
     final detailState = ref.watch(tickerDetailProvider(symbol));
 
     return Scaffold(
-      appBar: CustomAppBar(appBar: AppBar(
+      appBar: CustomAppBar(
+          appBar: AppBar(
         title: Text(symbol),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -121,7 +122,7 @@ class TickerDetailScreen extends ConsumerWidget {
       final regularMarketPrice = (meta['regularMarketPrice'] as num).toDouble();
       final chartPreviousClose =
           (meta['chartPreviousClose'] as num?)?.toDouble() ??
-          regularMarketPrice;
+              regularMarketPrice;
       final variation = regularMarketPrice - chartPreviousClose;
       final variationPercent = (variation / chartPreviousClose) * 100;
       final isPositive = variation >= 0;
@@ -263,8 +264,8 @@ class TickerDetailScreen extends ConsumerWidget {
 
       String formatString =
           (timeRange == TimeRange.day || timeRange == TimeRange.week)
-          ? 'HH:mm'
-          : 'dd/MM/yy';
+              ? 'HH:mm'
+              : 'dd/MM/yy';
 
       if (firstTs > 0) {
         firstTime = DateFormat(
@@ -344,8 +345,7 @@ class TickerDetailScreen extends ConsumerWidget {
                       );
                       String timeStr = '';
                       if (point.timestamp > 0) {
-                        final formatString =
-                            (timeRange == TimeRange.day ||
+                        final formatString = (timeRange == TimeRange.day ||
                                 timeRange == TimeRange.week)
                             ? 'HH:mm'
                             : 'dd/MM/yy';
@@ -426,23 +426,32 @@ class TickerDetailScreen extends ConsumerWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        _buildMetaRow(
-          'Prev Close',
-          meta['chartPreviousClose'],
-          'Volume',
-          _formatVolume(meta['regularMarketVolume']),
-        ),
-        _buildMetaRow(
-          'Day Low',
-          meta['regularMarketDayLow'],
-          'Day High',
-          meta['regularMarketDayHigh'],
-        ),
-        _buildMetaRow(
-          '52w Low',
-          meta['fiftyTwoWeekLow'],
-          '52w High',
-          meta['fiftyTwoWeekHigh'],
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 300),
+            child: Column(
+              children: [
+                _buildMetaRow(
+                  'Prev Close',
+                  meta['chartPreviousClose'],
+                  'Volume',
+                  _formatVolume(meta['regularMarketVolume']),
+                ),
+                _buildMetaRow(
+                  'Day Low',
+                  meta['regularMarketDayLow'],
+                  'Day High',
+                  meta['regularMarketDayHigh'],
+                ),
+                _buildMetaRow(
+                  '52w Low',
+                  meta['fiftyTwoWeekLow'],
+                  '52w High',
+                  meta['fiftyTwoWeekHigh'],
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
