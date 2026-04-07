@@ -5,6 +5,7 @@ import '../../../core/database/drift_service.dart';
 import '../application/developer_settings_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 import '../../../features/portfolio/data/portfolio_provider.dart';
 import '../../../features/markets/data/markets_provider.dart';
 import '../../../features/bot/presentation/bot_provider.dart';
@@ -101,20 +102,13 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Selected data successfully purged.')),
-        );
+        ToastUtils.show(context, 'Selected data successfully purged.');
         Navigator.of(context).pop();
       }
     } catch (e, stack) {
       ref.read(talkerProvider).handle(e, stack, 'Failed to purge data');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to purge data: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        ToastUtils.show(context, 'Failed to purge data: $e');
       }
     }
   }

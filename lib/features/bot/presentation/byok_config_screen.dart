@@ -4,6 +4,7 @@ import '../../../core/widgets/constrained_width.dart';
 import '../data/ai_settings_repository.dart';
 import '../domain/ai_settings.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 final aiSettingsProvider = FutureProvider.autoDispose<AiSettings>((ref) async {
   final repo = ref.watch(aiSettingsRepositoryProvider);
@@ -63,16 +64,12 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
       ref.invalidate(aiSettingsProvider);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Settings saved successfully!')),
-        );
+        ToastUtils.show(context, 'Settings saved successfully!');
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error saving settings: \$e')));
+          ToastUtils.show(context, 'Error saving settings: \$e');
       }
     } finally {
       if (mounted) {
