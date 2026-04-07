@@ -45,16 +45,30 @@ class MarketDataService {
   Future<Map<String, dynamic>?> fetchHistoricalData(
     String symbol,
     String interval,
-    String range,
-  ) async {
+    String range, {
+    bool isBackgroundRefresh = false,
+  }) async {
     try {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=$interval&range=$range';
-      _log.info(
-        'Fetching historical data for $symbol (interval=$interval, range=$range)\nURL: $url',
-      );
+
+      if (isBackgroundRefresh) {
+        _log.debug(
+          'Fetching historical data for $symbol (interval=$interval, range=$range)\nURL: $url',
+        );
+      } else {
+        _log.info(
+          'Fetching historical data for $symbol (interval=$interval, range=$range)\nURL: $url',
+        );
+      }
+
       final response = await _dio.get(url);
-      _log.debug('Historical response for $symbol:\n${response.data}');
+
+      if (isBackgroundRefresh) {
+        _log.verbose('Historical response for $symbol:\n${response.data}');
+      } else {
+        _log.debug('Historical response for $symbol:\n${response.data}');
+      }
 
       if (response.statusCode == 200) {
         final result = response.data['chart']['result']?[0];
@@ -73,15 +87,28 @@ class MarketDataService {
     }
   }
 
-  Future<Map<String, dynamic>?> fetchIntradayData(String symbol) async {
+  Future<Map<String, dynamic>?> fetchIntradayData(String symbol, {bool isBackgroundRefresh = false}) async {
     try {
       final url =
           'https://query2.finance.yahoo.com/v8/finance/chart/$symbol?interval=5m&range=1d';
-      _log.info(
-        'Fetching intraday data for $symbol (interval=5m, range=1d)\nURL: $url',
-      );
+
+      if (isBackgroundRefresh) {
+        _log.debug(
+          'Fetching intraday data for $symbol (interval=5m, range=1d)\nURL: $url',
+        );
+      } else {
+        _log.info(
+          'Fetching intraday data for $symbol (interval=5m, range=1d)\nURL: $url',
+        );
+      }
+
       final response = await _dio.get(url);
-      _log.debug('Intraday response for $symbol:\n${response.data}');
+
+      if (isBackgroundRefresh) {
+        _log.verbose('Intraday response for $symbol:\n${response.data}');
+      } else {
+        _log.debug('Intraday response for $symbol:\n${response.data}');
+      }
 
       if (response.statusCode == 200) {
         final result = response.data['chart']['result']?[0];
