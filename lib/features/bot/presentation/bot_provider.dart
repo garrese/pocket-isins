@@ -69,8 +69,6 @@ class BotController extends StateNotifier<BotState> {
     );
 
     try {
-      _log.debug('User Message: $text');
-
       // Fetch ISINs and generate system prompt
       final isins = await _repository.getAllIsins();
       final isinsJson = isins
@@ -84,8 +82,7 @@ class BotController extends StateNotifier<BotState> {
           )
           .toList();
 
-      final systemPrompt =
-          '''
+      final systemPrompt = '''
 You are a helpful financial AI assistant.
 The user currently has the following ISINs saved in their portfolio:
 ${jsonEncode(isinsJson)}

@@ -11,7 +11,6 @@ import 'features/feed/presentation/feed_screen.dart';
 import 'features/bot/presentation/bot_screen.dart';
 import 'features/logs/presentation/log_screen.dart';
 import 'core/services/log/custom_talker_formatter.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 import '../../../core/services/log/talker_provider.dart';
 import 'core/theme/app_drawer.dart';
 

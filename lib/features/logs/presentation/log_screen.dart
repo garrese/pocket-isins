@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 import '../../../core/services/log/talker_provider.dart';
 import '../../../core/settings/presentation/developer_options_screen.dart';
 
@@ -31,6 +30,9 @@ class LogScreen extends ConsumerWidget {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         textColor: Theme.of(context).colorScheme.onSurface,
         cardColor: Theme.of(context).cardColor,
+        logColors: {
+          TalkerKey.debug: Colors.green,
+        },
       ),
     );
   }
