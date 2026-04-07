@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../data/ticker_detail_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
 
 class ChartPoint {
   final double close;
@@ -34,14 +33,13 @@ class TickerDetailScreen extends ConsumerWidget {
     final detailState = ref.watch(tickerDetailProvider(symbol));
 
     return Scaffold(
-      appBar: CustomAppBar(
-          appBar: AppBar(
+      appBar: AppBar(
         title: Text(symbol),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-      )),
+      ),
       body: Padding(
         padding: const EdgeInsets.only(
           left: 4.0,

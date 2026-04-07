@@ -12,7 +12,6 @@ import 'registered_name_step_screen.dart';
 import 'markets_step_screen.dart';
 import 'additional_data_step_screen.dart';
 import '../../../../core/widgets/constrained_width.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
 import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class IsinSummaryScreen extends ConsumerWidget {
@@ -95,9 +94,7 @@ class IsinSummaryScreen extends ConsumerWidget {
         isin;
 
     return Scaffold(
-      appBar: CustomAppBar(appBar: AppBar(
-        title: Text('${currentIsin.displayName} Details'),
-      )),
+      appBar: AppBar(title: Text('${currentIsin.displayName} Details')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
         child: ConstrainedWidth.narrow(
@@ -105,214 +102,217 @@ class IsinSummaryScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-              _buildSection(
-                context,
-                title: 'ISIN / Name',
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (currentIsin.isinCode?.isNotEmpty == true)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4.0),
-                        child: _buildCopyableText(
-                          context,
-                          currentIsin.isinCode!,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                _buildSection(
+                  context,
+                  title: 'ISIN / Name',
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (currentIsin.isinCode?.isNotEmpty == true)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: _buildCopyableText(
+                            context,
+                            currentIsin.isinCode!,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
+                      if (currentIsin.altName?.isNotEmpty == true)
+                        _buildCopyableText(
+                          context,
+                          currentIsin.altName!,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                    ],
+                  ),
+                  onEdit: () {
+                    final formData = _createFormData(currentIsin);
+                    _navigateToEdit(
+                      context,
+                      IsinStepScreen(
+                        formData: formData,
+                        isEditing: true,
+                        isEntryPoint: true,
                       ),
-                    if (currentIsin.altName?.isNotEmpty == true)
-                      _buildCopyableText(
-                        context,
-                        currentIsin.altName!,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                  ],
+                    );
+                  },
                 ),
-                onEdit: () {
-                  final formData = _createFormData(currentIsin);
-                  _navigateToEdit(
-                    context,
-                    IsinStepScreen(
-                      formData: formData,
-                      isEditing: true,
-                      isEntryPoint: true,
-                    ),
-                  );
-                },
-              ),
-              const Divider(height: 1),
-              _buildSection(
-                context,
-                title: 'Registered Names',
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: currentIsin.registeredNames.isEmpty
-                      ? [
-                          const Text(
-                            'No registered names selected',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ]
-                      : currentIsin.registeredNames
-                            .map(
-                              (name) => Padding(
-                                padding: const EdgeInsets.only(bottom: 4.0),
-                                child: _buildCopyableText(
-                                  context,
-                                  name,
-                                  style: const TextStyle(fontSize: 16),
+                const Divider(height: 1),
+                _buildSection(
+                  context,
+                  title: 'Registered Names',
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: currentIsin.registeredNames.isEmpty
+                        ? [
+                            const Text(
+                              'No registered names selected',
+                              style: TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ]
+                        : currentIsin.registeredNames
+                              .map(
+                                (name) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 4.0),
+                                  child: _buildCopyableText(
+                                    context,
+                                    name,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
                                 ),
-                              ),
-                            )
-                            .toList(),
+                              )
+                              .toList(),
+                  ),
+                  onEdit: () {
+                    final formData = _createFormData(currentIsin);
+                    _navigateToEdit(
+                      context,
+                      RegisteredNameStepScreen(
+                        formData: formData,
+                        isEditing: true,
+                        isEntryPoint: true,
+                      ),
+                    );
+                  },
                 ),
-                onEdit: () {
-                  final formData = _createFormData(currentIsin);
-                  _navigateToEdit(
-                    context,
-                    RegisteredNameStepScreen(
-                      formData: formData,
-                      isEditing: true,
-                      isEntryPoint: true,
-                    ),
-                  );
-                },
-              ),
-              const Divider(height: 1),
-              _buildSection(
-                context,
-                title: 'Tickers',
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: currentIsin.tickers.isEmpty
-                      ? [
-                          const Text(
-                            'No tickers configured.',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ]
-                      : currentIsin.tickers
-                            .map(
-                              (t) => Padding(
-                                padding: const EdgeInsets.only(bottom: 12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Flexible(
-                                          child: _buildCopyableText(
-                                            context,
-                                            t.symbol,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Theme.of(context).colorScheme.secondary,
+                const Divider(height: 1),
+                _buildSection(
+                  context,
+                  title: 'Tickers',
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: currentIsin.tickers.isEmpty
+                        ? [
+                            const Text(
+                              'No tickers configured.',
+                              style: TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ]
+                        : currentIsin.tickers
+                              .map(
+                                (t) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 12.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            child: _buildCopyableText(
+                                              context,
+                                              t.symbol,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.secondary,
+                                              ),
                                             ),
                                           ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Exchange: ${t.exchange} (${t.currency ?? "N/A"})',
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      if (t.quoteType?.isNotEmpty == true)
+                                        Text(
+                                          'Type: ${t.quoteType}',
+                                          style: const TextStyle(fontSize: 14),
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Exchange: ${t.exchange} (${t.currency ?? "N/A"})',
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                    if (t.quoteType?.isNotEmpty == true)
-                                      Text(
-                                        'Type: ${t.quoteType}',
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    if (t.regularMarketStart != null &&
-                                        t.regularMarketEnd != null)
-                                      Text(
-                                        'Hours: ${_formatTimeUtc(t.regularMarketStart)} - ${_formatTimeUtc(t.regularMarketEnd)} (UTC)',
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                  ],
+                                      if (t.regularMarketStart != null &&
+                                          t.regularMarketEnd != null)
+                                        Text(
+                                          'Hours: ${_formatTimeUtc(t.regularMarketStart)} - ${_formatTimeUtc(t.regularMarketEnd)} (UTC)',
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                    ],
+                                  ),
                                 ),
+                              )
+                              .toList(),
+                  ),
+                  onEdit: () {
+                    final formData = _createFormData(currentIsin);
+                    _navigateToEdit(
+                      context,
+                      MarketsStepScreen(
+                        formData: formData,
+                        isEditing: true,
+                        isEntryPoint: true,
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                _buildSection(
+                  context,
+                  title: 'Additional Data',
+                  content: Text(
+                    'Short Name: ${currentIsin.shortName?.isNotEmpty == true ? currentIsin.shortName! : "Not set"}',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  onEdit: () {
+                    final formData = _createFormData(currentIsin);
+                    _navigateToEdit(
+                      context,
+                      AdditionalDataStepScreen(
+                        formData: formData,
+                        isEditing: true,
+                        isEntryPoint: true,
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      label: const Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete ISIN'),
+                            content: Text(
+                              'Are you sure you want to delete ${currentIsin.displayName}?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel'),
                               ),
-                            )
-                            .toList(),
-                ),
-                onEdit: () {
-                  final formData = _createFormData(currentIsin);
-                  _navigateToEdit(
-                    context,
-                    MarketsStepScreen(
-                      formData: formData,
-                      isEditing: true,
-                      isEntryPoint: true,
-                    ),
-                  );
-                },
-              ),
-              const Divider(height: 1),
-              _buildSection(
-                context,
-                title: 'Additional Data',
-                content: Text(
-                  'Short Name: ${currentIsin.shortName?.isNotEmpty == true ? currentIsin.shortName! : "Not set"}',
-                  style: const TextStyle(fontSize: 14),
-                ),
-                onEdit: () {
-                  final formData = _createFormData(currentIsin);
-                  _navigateToEdit(
-                    context,
-                    AdditionalDataStepScreen(
-                      formData: formData,
-                      isEditing: true,
-                      isEntryPoint: true,
-                    ),
-                  );
-                },
-              ),
-              const Divider(height: 1),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    label: const Text(
-                      'Delete',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Delete ISIN'),
-                          content: Text(
-                            'Are you sure you want to delete ${currentIsin.displayName}?',
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Delete'),
+                              ),
+                            ],
                           ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Delete'),
-                            ),
-                          ],
-                        ),
-                      );
+                        );
 
-                      if (confirm == true) {
-                        await ref
-                            .read(portfolioProvider.notifier)
-                            .removeIsin(currentIsin.id);
-                        if (context.mounted) {
-                          Navigator.pop(context);
+                        if (confirm == true) {
+                          await ref
+                              .read(portfolioProvider.notifier)
+                              .removeIsin(currentIsin.id);
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
                         }
-                      }
-                    },
+                      },
+                    ),
                   ),
                 ),
-              ),
               ],
             ),
           ),

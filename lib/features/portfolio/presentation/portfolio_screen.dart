@@ -13,7 +13,6 @@ import '../domain/portfolio_form_data.dart';
 import '../../../core/theme/app_drawer.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import '../../../core/widgets/constrained_width.dart';
-import '../../../core/widgets/custom_app_bar.dart';
 import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class PortfolioScreen extends ConsumerWidget {
@@ -25,7 +24,7 @@ class PortfolioScreen extends ConsumerWidget {
 
     return Scaffold(
       drawer: const AppDrawer(),
-      appBar: CustomAppBar(appBar: AppBar(
+      appBar: AppBar(
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download),
@@ -79,7 +78,10 @@ class PortfolioScreen extends ConsumerWidget {
                     final file = File(outputFile);
                     await file.writeAsString(jsonString);
                     if (context.mounted) {
-                      ToastUtils.show(context, 'Portfolio exported successfully');
+                      ToastUtils.show(
+                        context,
+                        'Portfolio exported successfully',
+                      );
                     }
                   }
                 } else {
@@ -100,7 +102,7 @@ class PortfolioScreen extends ConsumerWidget {
             },
           ),
         ],
-      )),
+      ),
       body: portfolioAsync.when(
         data: (isins) {
           if (isins.isEmpty) {
@@ -110,84 +112,86 @@ class PortfolioScreen extends ConsumerWidget {
           }
           return ConstrainedWidth.narrow(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 8.0,
+              ),
               itemCount: isins.length,
               itemBuilder: (context, index) {
-              final isin = isins[index];
+                final isin = isins[index];
 
-              String tickersList = isin.tickers.map((t) => t.symbol).join(', ');
+                String tickersList = isin.tickers
+                    .map((t) => t.symbol)
+                    .join(', ');
 
-              final appThemeExt = Theme.of(
-                context,
-              ).extension<AppThemeExtension>();
+                final appThemeExt = Theme.of(
+                  context,
+                ).extension<AppThemeExtension>();
 
-              return Card(
-                margin: const EdgeInsets.only(bottom: 4.0),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => IsinSummaryScreen(isin: isin),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          isin.displayName,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: appThemeExt?.mainTitleColor,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 4.0),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => IsinSummaryScreen(isin: isin),
                         ),
-                        if ((isin.shortName != null && isin.shortName!.isNotEmpty) ||
-                            (isin.isinCode != null && isin.isinCode!.isNotEmpty) ||
-                            tickersList.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (isin.shortName != null &&
-                                    isin.shortName!.isNotEmpty)
-                                  Text(
-                                    isin.shortName!,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                if (isin.isinCode != null && isin.isinCode!.isNotEmpty)
-                                  Text(
-                                    isin.isinCode!,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                if (tickersList.isNotEmpty)
-                                  Text(
-                                    tickersList,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                              ],
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            isin.displayName,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: appThemeExt?.mainTitleColor,
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                      ],
+                          if ((isin.shortName != null &&
+                                  isin.shortName!.isNotEmpty) ||
+                              (isin.isinCode != null &&
+                                  isin.isinCode!.isNotEmpty) ||
+                              tickersList.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isin.shortName != null &&
+                                      isin.shortName!.isNotEmpty)
+                                    Text(
+                                      isin.shortName!,
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  if (isin.isinCode != null &&
+                                      isin.isinCode!.isNotEmpty)
+                                    Text(
+                                      isin.isinCode!,
+                                      style: const TextStyle(fontSize: 12),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  if (tickersList.isNotEmpty)
+                                    Text(
+                                      tickersList,
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
                 );
               },
             ),

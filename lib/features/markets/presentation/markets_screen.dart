@@ -11,7 +11,6 @@ import '../../../core/theme/app_drawer.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import '../../../core/utils/currency_formatter.dart';
 import 'models/ticker_view_model.dart';
-import '../../../core/widgets/custom_app_bar.dart';
 
 final sortGroupedByStateProvider = StateProvider<bool>((ref) => true);
 
@@ -25,7 +24,7 @@ class MarketsScreen extends ConsumerWidget {
 
     return Scaffold(
       drawer: const AppDrawer(),
-      appBar: CustomAppBar(appBar: AppBar(
+      appBar: AppBar(
         actions: [
           PopupMenuButton<bool>(
             icon: const Icon(Icons.sort),
@@ -54,7 +53,7 @@ class MarketsScreen extends ConsumerWidget {
             },
           ),
         ],
-      )),
+      ),
       body: marketsAsync.when(
         data: (isins) {
           if (isins.isEmpty) {
@@ -107,7 +106,9 @@ class MarketsScreen extends ConsumerWidget {
             builder: (context, constraints) {
               final double availableWidth =
                   constraints.maxWidth - 16; // 8 padding on each side
-              final appThemeExt = Theme.of(context).extension<AppThemeExtension>();
+              final appThemeExt = Theme.of(
+                context,
+              ).extension<AppThemeExtension>();
               int crossAxisCount =
                   (availableWidth + 8) ~/ 368; // 360 width + 8 spacing
               if (crossAxisCount < 1) crossAxisCount = 1;
@@ -193,7 +194,8 @@ class MarketsScreen extends ConsumerWidget {
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
-                                                  color: appThemeExt?.mainTitleColor,
+                                                  color: appThemeExt
+                                                      ?.mainTitleColor,
                                                 ),
                                                 maxWidth:
                                                     (availableWidth < 360

@@ -10,7 +10,6 @@ import 'additional_data_step_screen.dart';
 import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
 import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class MarketsStepScreen extends ConsumerStatefulWidget {
@@ -175,9 +174,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
 
       if (mergedResults.isEmpty) {
         if (mounted) {
-          ToastUtils.show(context,
-                'No tickers found automatically. You can add them manually.',
-              );
+          ToastUtils.show(
+            context,
+            'No tickers found automatically. You can add them manually.',
+          );
           setState(() {
             _isLoading = false;
           });
@@ -190,7 +190,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
     } catch (e, stack) {
       if (mounted) {
         ref.read(talkerProvider).handle(e, stack, 'Error searching tickers');
-          ToastUtils.show(context, 'Error searching tickers: $e');
+        ToastUtils.show(context, 'Error searching tickers: $e');
       }
     } finally {
       if (mounted) {
@@ -408,7 +408,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
           _addMarketFromSearch(foundQuote);
         } else {
           if (mounted) {
-            ToastUtils.show(context, 'Could not find ticker data for symbol: $symbol');
+            ToastUtils.show(
+              context,
+              'Could not find ticker data for symbol: $symbol',
+            );
           }
         }
       } catch (e, stack) {
@@ -459,7 +462,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         ref
             .read(talkerProvider)
             .handle(e, stack, 'Error saving ISIN from Tickers step');
-          ToastUtils.show(context, 'Error saving: $e');
+        ToastUtils.show(context, 'Error saving: $e');
       }
     }
   }
@@ -526,10 +529,10 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: CustomAppBar(appBar: AppBar(
+        appBar: AppBar(
           automaticallyImplyLeading: false,
           title: const Text('Tickers'),
-        )),
+        ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -540,117 +543,117 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        const Text(
-                          'Select Tickers:',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            'Select Tickers:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        TextButton.icon(
-                          onPressed: _showAddMarketDialog,
-                          icon: const Icon(Icons.add),
-                          label: const Text('Add Manually'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (_isLoading && _searchResults.isEmpty)
-                      const Expanded(
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (_searchResults.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
-                        child: Text(
-                          'No results found automatically.',
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      )
-                    else
-                      Expanded(
-                        child: Stack(
-                          children: [
-                            ListView.builder(
-                              itemCount: _searchResults.length,
-                              itemBuilder: (context, index) {
-                                final q = _searchResults[index];
-                                final name =
-                                    q['longname'] ??
-                                    q['shortname'] ??
-                                    'Unknown';
-                                final symbol = q['symbol'] ?? 'Unknown';
+                          TextButton.icon(
+                            onPressed: _showAddMarketDialog,
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add Manually'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      if (_isLoading && _searchResults.isEmpty)
+                        const Expanded(
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      else if (_searchResults.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          child: Text(
+                            'No results found automatically.',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        )
+                      else
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              ListView.builder(
+                                itemCount: _searchResults.length,
+                                itemBuilder: (context, index) {
+                                  final q = _searchResults[index];
+                                  final name =
+                                      q['longname'] ??
+                                      q['shortname'] ??
+                                      'Unknown';
+                                  final symbol = q['symbol'] ?? 'Unknown';
 
-                                final isDirect = _isinDirectSymbols.contains(
-                                  symbol.toString(),
-                                );
+                                  final isDirect = _isinDirectSymbols.contains(
+                                    symbol.toString(),
+                                  );
 
-                                final currency = q['currency'];
-                                final gmtOffset = q['gmtoffset'] as int?;
-                                final regStart =
-                                    q['regularMarketStart'] as int?;
-                                final regEnd = q['regularMarketEnd'] as int?;
-                                final timeStr = _formatTime(
-                                  regStart,
-                                  regEnd,
-                                  gmtOffset,
-                                );
+                                  final currency = q['currency'];
+                                  final gmtOffset = q['gmtoffset'] as int?;
+                                  final regStart =
+                                      q['regularMarketStart'] as int?;
+                                  final regEnd = q['regularMarketEnd'] as int?;
+                                  final timeStr = _formatTime(
+                                    regStart,
+                                    regEnd,
+                                    gmtOffset,
+                                  );
 
-                                final isAlreadyAdded = widget.formData.tickers
-                                    .any((t) => t.symbol == symbol);
+                                  final isAlreadyAdded = widget.formData.tickers
+                                      .any((t) => t.symbol == symbol);
 
-                                return CheckboxListTile(
-                                  title: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          name,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      if (isDirect)
-                                        const Icon(
-                                          Icons.star,
-                                          color: Colors.amber,
-                                          size: 16,
-                                        ),
-                                    ],
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${q['exchDisp'] ?? q['exchange'] ?? 'Unknown'} - $symbol',
-                                      ),
-                                      if (currency != null ||
-                                          timeStr.isNotEmpty)
-                                        Text(
-                                          '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey,
+                                  return CheckboxListTile(
+                                    title: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            name,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                    ],
-                                  ),
-                                  value: isAlreadyAdded,
-                                  onChanged: (bool? value) =>
-                                      _toggleMarketSelection(q, value),
-                                );
-                              },
-                            ),
-                            if (_isLoading)
-                              const Positioned(
-                                bottom: 16,
-                                right: 16,
-                                child: CircularProgressIndicator(),
+                                        if (isDirect)
+                                          const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                            size: 16,
+                                          ),
+                                      ],
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${q['exchDisp'] ?? q['exchange'] ?? 'Unknown'} - $symbol',
+                                        ),
+                                        if (currency != null ||
+                                            timeStr.isNotEmpty)
+                                          Text(
+                                            '${currency ?? ''}${currency != null && timeStr.isNotEmpty ? " • " : ""}$timeStr',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    value: isAlreadyAdded,
+                                    onChanged: (bool? value) =>
+                                        _toggleMarketSelection(q, value),
+                                  );
+                                },
                               ),
-                          ],
+                              if (_isLoading)
+                                const Positioned(
+                                  bottom: 16,
+                                  right: 16,
+                                  child: CircularProgressIndicator(),
+                                ),
+                            ],
                           ),
                         ),
                     ],
