@@ -49,13 +49,11 @@ class AiService {
       );
     } else {
       // By default use open ai compatible syntax (including OpenRouter)
-      final useOpenRouterWeb =
-          webSearch && settings.apiProvider == 'openrouter_web';
       return _generateOpenAICompatible(
         settings,
         systemPrompt,
         activeMessages,
-        openRouterWeb: useOpenRouterWeb,
+        webSearch: webSearch,
       );
     }
   }
@@ -256,7 +254,7 @@ Example format:
     AiSettings settings,
     String systemPrompt,
     List<Map<String, String>> messages, {
-    bool openRouterWeb = false,
+    bool webSearch = false,
   }) async {
     if (settings.apiKey.isEmpty && settings.baseUrl.contains('openai.com')) {
       _log.warning('API Key is missing for OpenAI.');
@@ -277,9 +275,9 @@ Example format:
         {'role': 'system', 'content': systemPrompt},
         ...messages,
       ],
-      if (openRouterWeb)
-        'plugins': [
-          {'id': 'web'},
+      if (webSearch)
+        'tools': [
+          {'type': 'web_search'},
         ],
     };
 
