@@ -9,6 +9,7 @@ import '../../../core/database/drift/app_database.dart' as drift;
 import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/market_data_cache.dart';
 import '../../../core/network/market_data_service.dart';
+import '../../../core/services/log/talker_provider.dart';
 import '../../portfolio/data/portfolio_provider.dart';
 
 part 'markets_provider.g.dart';
@@ -231,7 +232,7 @@ class Markets extends _$Markets {
                       postMarketEnd: Value(postEnd),
                       tickerId: ticker.id,
                     ),
-                    mode: drift.InsertMode.insertOrReplace,
+                    mode: InsertMode.insertOrReplace,
                   );
 
               updatedCache = MarketDataCache(
@@ -263,8 +264,10 @@ class Markets extends _$Markets {
         }
       }
     } catch (e, stack) {
-      debugPrint(
-        'MarketsProvider Error parsing data for ${ticker.symbol}: $e\n$stack',
+      ref.read(talkerProvider).handle(
+        e,
+        stack,
+        'MarketsProvider Error parsing data for ${ticker.symbol}',
       );
       // We don't rethrow here so that a single ticker failure doesn't crash everything,
       // it just won't update its cache.
