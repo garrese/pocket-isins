@@ -14,6 +14,7 @@ import '../../../core/theme/app_drawer.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import '../../../core/widgets/constrained_width.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class PortfolioScreen extends ConsumerWidget {
   const PortfolioScreen({super.key});
@@ -42,19 +43,13 @@ class PortfolioScreen extends ConsumerWidget {
                       .read(portfolioProvider.notifier)
                       .importPortfolio(jsonString);
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Portfolio imported successfully'),
-                      ),
-                    );
+                    ToastUtils.show(context, 'Portfolio imported successfully');
                   }
                 }
               } catch (e, st) {
                 debugPrint('Error importing portfolio: $e\n$st');
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error importing portfolio: $e')),
-                  );
+                  ToastUtils.show(context, 'Error importing portfolio: $e');
                 }
               }
             },
@@ -84,11 +79,7 @@ class PortfolioScreen extends ConsumerWidget {
                     final file = File(outputFile);
                     await file.writeAsString(jsonString);
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Portfolio exported successfully'),
-                        ),
-                      );
+                      ToastUtils.show(context, 'Portfolio exported successfully');
                     }
                   }
                 } else {
@@ -103,9 +94,7 @@ class PortfolioScreen extends ConsumerWidget {
               } catch (e, st) {
                 debugPrint('Error exporting portfolio: $e\n$st');
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error exporting portfolio: $e')),
-                  );
+                  ToastUtils.show(context, 'Error exporting portfolio: $e');
                 }
               }
             },

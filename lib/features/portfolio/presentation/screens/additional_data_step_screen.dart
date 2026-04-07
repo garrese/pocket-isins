@@ -8,6 +8,7 @@ import 'wizard_bottom_actions.dart';
 import 'markets_step_screen.dart';
 import '../../../../core/widgets/constrained_width.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class AdditionalDataStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
@@ -137,9 +138,7 @@ class _AdditionalDataStepScreenState
           );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ISIN saved successfully!')),
-        );
+        ToastUtils.show(context, 'ISIN saved successfully!');
         if (widget.isEditing) {
           Navigator.of(context).pop('SAVED');
         } else {
@@ -151,9 +150,7 @@ class _AdditionalDataStepScreenState
         ref
             .read(talkerProvider)
             .handle(e, stack, 'Error saving ISIN from Additional Data step');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error saving: $e')));
+          ToastUtils.show(context, 'Error saving: $e');
       }
     }
   }

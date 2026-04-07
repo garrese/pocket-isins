@@ -13,6 +13,7 @@ import 'markets_step_screen.dart';
 import 'additional_data_step_screen.dart';
 import '../../../../core/widgets/constrained_width.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class IsinSummaryScreen extends ConsumerWidget {
   final Isin isin;
@@ -69,13 +70,7 @@ class IsinSummaryScreen extends ConsumerWidget {
           onTap: () async {
             await Clipboard.setData(ClipboardData(text: text));
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Copied "$text" to clipboard'),
-                  duration: const Duration(seconds: 1),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              ToastUtils.show(context, 'Copied "$text" to clipboard');
             }
           },
           child: const Padding(
