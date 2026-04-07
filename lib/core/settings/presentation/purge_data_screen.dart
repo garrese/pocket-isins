@@ -5,6 +5,10 @@ import '../../../core/database/drift_service.dart';
 import '../application/developer_settings_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../../features/portfolio/data/portfolio_provider.dart';
+import '../../../features/markets/data/markets_provider.dart';
+import '../../../features/bot/presentation/bot_provider.dart';
+import '../../../core/services/log/talker_provider.dart';
 
 class PurgeDataScreen extends ConsumerStatefulWidget {
   const PurgeDataScreen({super.key});
@@ -74,6 +78,21 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
         }
       });
 
+      // Invalidate relevant providers to clear UI states from memory
+      if (_purgeIsins) {
+        ref.invalidate(portfolioProvider);
+        ref.invalidate(marketsProvider);
+      } else {
+        if (_purgeMarketData) {
+          ref.invalidate(marketsProvider);
+        }
+      }
+
+      if (_purgeChatMessages) {
+        // Clear history clears db and state. We already deleted db, but this will re-sync it
+        ref.read(botControllerProvider.notifier).clearHistory();
+      }
+
       if (_purgeConfiguration) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
@@ -87,7 +106,8 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
         );
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (e, stack) {
+      ref.read(talkerProvider).handle(e, stack, 'Failed to purge data');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
