@@ -8,7 +8,6 @@ import '../../../core/widgets/custom_app_bar.dart';
 import '../../../features/portfolio/data/portfolio_provider.dart';
 import '../../../features/markets/data/markets_provider.dart';
 import '../../../features/bot/presentation/bot_provider.dart';
-import '../../../features/feed/application/feed_service.dart';
 import '../../../core/services/log/talker_provider.dart';
 
 class PurgeDataScreen extends ConsumerStatefulWidget {
@@ -83,13 +82,9 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
       if (_purgeIsins) {
         ref.invalidate(portfolioProvider);
         ref.invalidate(marketsProvider);
-        ref.invalidate(feedProvider);
       } else {
         if (_purgeMarketData) {
           ref.invalidate(marketsProvider);
-        }
-        if (_purgeFeedNews) {
-          ref.invalidate(feedProvider);
         }
       }
 
