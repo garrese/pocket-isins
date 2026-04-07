@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/constrained_width.dart';
+
 class WizardBottomActions extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback? onPrevious;
@@ -23,9 +25,10 @@ class WizardBottomActions extends StatelessWidget {
     return Container(
       // Remove top padding here since it should stick to the bottom and be full bleed
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isNarrow = constraints.maxWidth < 600;
+      child: ConstrainedWidth.medium(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isNarrow = constraints.maxWidth < 600;
 
           int leftItems = 1; // cancel is always there
           if (!isFirstStep && onPrevious != null) leftItems++;
@@ -188,6 +191,7 @@ class WizardBottomActions extends StatelessWidget {
             );
           }
         },
+      ),
       ),
     );
   }
