@@ -231,6 +231,7 @@ class Markets extends _$Markets {
                       postMarketEnd: Value(postEnd),
                       tickerId: ticker.id,
                     ),
+                    mode: drift.InsertMode.insertOrReplace,
                   );
 
               updatedCache = MarketDataCache(
