@@ -9,6 +9,7 @@ import '../data/markets_provider.dart';
 import 'screens/ticker_detail_screen.dart';
 import '../../../core/theme/app_drawer.dart';
 import '../../../core/theme/app_theme_extension.dart';
+import '../../../core/utils/currency_formatter.dart';
 import 'models/ticker_view_model.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 
@@ -240,7 +241,7 @@ class MarketsScreen extends ConsumerWidget {
                                                     ),
                                                     _buildMarqueeText(
                                                       context,
-                                                      '${cache.regularMarketPrice.toStringAsFixed(2)} ${tickerVm.ticker.currency}',
+                                                      '${CurrencyFormatter.format(cache.regularMarketPrice)} ${tickerVm.ticker.currency}',
                                                       style: const TextStyle(
                                                         fontSize: 12,
                                                       ),
@@ -248,7 +249,7 @@ class MarketsScreen extends ConsumerWidget {
                                                     ),
                                                     _buildMarqueeText(
                                                       context,
-                                                      '${isPositive ? '+' : ''}${tickerVm.variation.toStringAsFixed(2)} (${tickerVm.variationPercent.toStringAsFixed(2)}%)',
+                                                      '${isPositive ? '+' : ''}${CurrencyFormatter.format(tickerVm.variation)} (${tickerVm.variationPercent.toStringAsFixed(2)}%)',
                                                       style: TextStyle(
                                                         fontSize: 12,
                                                         color: color,
