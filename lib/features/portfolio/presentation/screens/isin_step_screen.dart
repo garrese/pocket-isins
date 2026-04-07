@@ -3,6 +3,7 @@ import '../../domain/portfolio_form_data.dart';
 import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
 
 class IsinStepScreen extends StatefulWidget {
   final IsinFormData formData;
@@ -224,7 +225,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Add ISIN / Name')),
+        appBar: CustomAppBar(appBar: AppBar(title: const Text('Add ISIN / Name'))),
         body: Form(
           key: _formKey,
           child: Column(

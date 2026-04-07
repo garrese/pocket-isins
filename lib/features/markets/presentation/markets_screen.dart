@@ -10,6 +10,7 @@ import 'screens/ticker_detail_screen.dart';
 import '../../../core/theme/app_drawer.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import 'models/ticker_view_model.dart';
+import '../../../core/widgets/custom_app_bar.dart';
 
 final sortGroupedByStateProvider = StateProvider<bool>((ref) => true);
 
@@ -23,7 +24,7 @@ class MarketsScreen extends ConsumerWidget {
 
     return Scaffold(
       drawer: const AppDrawer(),
-      appBar: AppBar(
+      appBar: CustomAppBar(appBar: AppBar(
         actions: [
           PopupMenuButton<bool>(
             icon: const Icon(Icons.sort),
@@ -52,7 +53,7 @@ class MarketsScreen extends ConsumerWidget {
             },
           ),
         ],
-      ),
+      )),
       body: marketsAsync.when(
         data: (isins) {
           if (isins.isEmpty) {

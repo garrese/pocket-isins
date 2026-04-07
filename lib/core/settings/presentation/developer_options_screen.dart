@@ -6,6 +6,8 @@ import 'package:talker_flutter/talker_flutter.dart';
 import '../application/developer_settings_provider.dart';
 import 'purge_data_screen.dart';
 import '../../../core/services/log/talker_provider.dart';
+import '../../widgets/constrained_width.dart';
+import '../../../core/widgets/custom_app_bar.dart';
 
 class DeveloperOptionsScreen extends ConsumerWidget {
   const DeveloperOptionsScreen({super.key});
@@ -15,8 +17,9 @@ class DeveloperOptionsScreen extends ConsumerWidget {
     final settings = ref.watch(developerSettingsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Developer Options')),
-      body: ListView(
+      appBar: CustomAppBar(appBar: AppBar(title: const Text('Developer Options'))),
+      body: ConstrainedWidth.narrow(
+        child: ListView(
         children: [
           CheckboxListTile(
             title: const Text('Show Log Console'),
@@ -137,6 +140,7 @@ class DeveloperOptionsScreen extends ConsumerWidget {
             },
           ),
         ],
+      ),
       ),
     );
   }

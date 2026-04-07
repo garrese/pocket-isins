@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/models/feed_news_model.dart';
-import '../../../../core/settings/application/developer_settings_provider.dart';
+
 import '../../../../core/theme/app_theme_extension.dart';
 
 class FeedNewsCard extends ConsumerWidget {

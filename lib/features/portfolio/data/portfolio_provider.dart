@@ -6,7 +6,7 @@ import '../../../core/database/drift_service.dart';
 import '../../../core/database/drift/app_database.dart' as drift;
 import '../../../core/database/models/isin.dart';
 import '../../../core/database/models/ticker.dart';
-import 'package:talker_flutter/talker_flutter.dart';
+
 import '../../../core/services/log/talker_provider.dart';
 import '../domain/portfolio_form_data.dart';
 
