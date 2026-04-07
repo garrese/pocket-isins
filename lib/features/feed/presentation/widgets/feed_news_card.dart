@@ -26,9 +26,6 @@ class FeedNewsCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final appThemeExt = theme.extension<AppThemeExtension>();
     final formattedDate = DateFormat('MMM dd, HH:mm').format(news.pubDate);
-    final debugLabelsEnabled = ref
-        .watch(developerSettingsProvider)
-        .debugLabelsEnabled;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
@@ -91,16 +88,15 @@ class FeedNewsCard extends ConsumerWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        if (debugLabelsEnabled) const SizedBox(width: 8),
+                        const SizedBox(width: 8),
                       ],
-                      if (debugLabelsEnabled)
-                        Text(
-                          'Round ${news.round}',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.5),
-                          ),
+                      Text(
+                        'Feed ${news.round}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant
+                              .withValues(alpha: 0.5),
                         ),
+                      ),
                     ],
                   ),
                 ],
