@@ -62,8 +62,6 @@ class IsinSummaryScreen extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Flexible(child: Text(text, style: style)),
-        const SizedBox(width: 4),
         InkWell(
           borderRadius: BorderRadius.circular(4),
           onTap: () async {
@@ -83,6 +81,8 @@ class IsinSummaryScreen extends ConsumerWidget {
             child: Icon(Icons.copy, size: 16, color: Colors.grey),
           ),
         ),
+        const SizedBox(width: 4),
+        Flexible(child: Text(text, style: style)),
       ],
     );
   }
@@ -250,15 +250,11 @@ class IsinSummaryScreen extends ConsumerWidget {
                                             ),
                                           ),
                                         ),
-                                        Text(
-                                          ' (${t.currency ?? "N/A"})',
-                                          style: const TextStyle(fontSize: 16),
-                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      'Exchange: ${t.exchange}',
+                                      'Exchange: ${t.exchange} (${t.currency ?? "N/A"})',
                                       style: const TextStyle(fontSize: 14),
                                     ),
                                     if (t.quoteType?.isNotEmpty == true)
@@ -353,7 +349,11 @@ class IsinSummaryScreen extends ConsumerWidget {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.edit, size: 20, color: Colors.blue),
+                icon: Icon(
+                  Icons.edit,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 onPressed: onEdit,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
