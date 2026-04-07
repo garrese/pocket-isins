@@ -5,7 +5,6 @@ import 'package:talker_flutter/talker_flutter.dart';
 
 import '../application/developer_settings_provider.dart';
 import 'purge_data_screen.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 import '../../../core/services/log/talker_provider.dart';
 
 class DeveloperOptionsScreen extends ConsumerWidget {
