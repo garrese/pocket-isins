@@ -33,8 +33,7 @@ class AiService {
   }) async {
     final settings = await _settingsRepo.getSettings();
 
-    final activeMessages =
-        messages ??
+    final activeMessages = messages ??
         (userPrompt != null
             ? [
                 {'role': 'user', 'content': userPrompt},
@@ -229,13 +228,11 @@ Example format:
       );
 
       final responseJsonStr = jsonEncode(response.data);
-      _log.verbose('AI Response (Google):\n$responseJsonStr');
-      _log.debug('AI Turn Response (Google):\n$responseJsonStr');
+      _log.debug('AI Response (Google):\n$responseJsonStr');
 
       if (response.statusCode == 200) {
-        final reply =
-            response.data['candidates'][0]['content']['parts'][0]['text']
-                as String;
+        final reply = response.data['candidates'][0]['content']['parts'][0]
+            ['text'] as String;
         return reply;
       } else {
         _log.handle(
@@ -316,8 +313,7 @@ Example format:
       );
 
       final responseJsonStr = jsonEncode(response.data);
-      _log.verbose('AI Response (OpenAI):\n$responseJsonStr');
-      _log.debug('AI Turn Response (OpenAI):\n$responseJsonStr');
+      _log.debug('AI Response (OpenAI):\n$responseJsonStr');
 
       if (response.statusCode == 200) {
         final reply =
