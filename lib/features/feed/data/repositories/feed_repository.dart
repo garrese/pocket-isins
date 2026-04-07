@@ -125,7 +125,8 @@ class HttpDate {
       // Dart's core package can parse HTTP dates using format
       // Or we can manually try to parse it
       return _parseRfc1123(date);
-    } catch (_) {
+    } catch (e, stack) {
+      debugPrint('Error parsing HttpDate: $date\n$e\n$stack');
       return DateTime.now();
     }
   }

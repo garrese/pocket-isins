@@ -114,7 +114,8 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
       );
 
       await _handleAiResponse(response, systemPrompt);
-    } catch (e) {
+    } catch (e, stack) {
+      _log.handle(e, stack, 'Error in bot communication');
       state = state.copyWith(isTyping: false, error: e.toString());
     }
   }
@@ -194,7 +195,8 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
           await _handleAiResponse(newResponse, systemPrompt);
           return;
         }
-      } catch (e) {
+      } catch (e, stack) {
+        _log.handle(e, stack, 'Error handling market data action in bot');
         await _repository.saveMessage(
           'system',
           'Error fetching market data: $e',
