@@ -134,7 +134,7 @@ class PortfolioScreen extends ConsumerWidget {
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 4.0),
-                child: ListTile(
+                child: InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
@@ -143,49 +143,56 @@ class PortfolioScreen extends ConsumerWidget {
                       ),
                     );
                   },
-                  title: Text(
-                    isin.displayName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (isin.shortName != null &&
-                            isin.shortName!.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 2.0),
-                            child: Text(
-                              isin.shortName!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey.shade400,
-                              ),
-                            ),
+                        Text(
+                          isin.displayName,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: appThemeExt?.mainTitleColor,
                           ),
-                        if (isin.isinCode != null && isin.isinCode!.isNotEmpty)
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if ((isin.shortName != null && isin.shortName!.isNotEmpty) ||
+                            (isin.isinCode != null && isin.isinCode!.isNotEmpty) ||
+                            tickersList.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 2.0),
-                            child: Text(
-                              isin.isinCode!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey.shade400,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        if (tickersList.isNotEmpty)
-                          Text(
-                            tickersList,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey.shade400,
+                            padding: const EdgeInsets.only(top: 2.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (isin.shortName != null &&
+                                    isin.shortName!.isNotEmpty)
+                                  Text(
+                                    isin.shortName!,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                if (isin.isinCode != null && isin.isinCode!.isNotEmpty)
+                                  Text(
+                                    isin.isinCode!,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                if (tickersList.isNotEmpty)
+                                  Text(
+                                    tickersList,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                       ],
