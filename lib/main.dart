@@ -59,6 +59,7 @@ class PocketIsinsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Pocket ISINs',
       theme: AppTheme.darkTheme,
       home: const MainScreen(),
