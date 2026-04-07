@@ -262,8 +262,10 @@ class Markets extends _$Markets {
         }
       }
     } catch (e, stack) {
-      debugPrint(
-        'MarketsProvider Error parsing data for ${ticker.symbol}: $e\n$stack',
+      ref.read(talkerProvider).handle(
+        e,
+        stack,
+        'MarketsProvider Error parsing data for ${ticker.symbol}',
       );
       // We don't rethrow here so that a single ticker failure doesn't crash everything,
       // it just won't update its cache.
