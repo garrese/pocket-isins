@@ -105,7 +105,7 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
         Navigator.of(context).pop();
       }
     } catch (e, stack) {
-      ref.read(talkerProvider).handle(e, stack, 'Failed to purge data');
+      ref.read(appLoggerProvider).handle(e, stack, 'Failed to purge data');
       if (mounted) {
         ToastUtils.show(context, 'Failed to purge data: $e');
       }

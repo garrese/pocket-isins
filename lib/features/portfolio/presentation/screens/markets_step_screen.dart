@@ -189,7 +189,7 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
       await _fetchChartDataForResults(mergedResults);
     } catch (e, stack) {
       if (mounted) {
-        ref.read(talkerProvider).handle(e, stack, 'Error searching tickers');
+        ref.read(appLoggerProvider).handle(e, stack, 'Error searching tickers');
         ToastUtils.show(context, 'Error searching tickers: $e');
       }
     } finally {

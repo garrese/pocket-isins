@@ -2,16 +2,16 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dio_provider.dart';
-import 'package:talker_flutter/talker_flutter.dart';
+import '../../../core/services/log/app_logger.dart';
 import '../../../core/services/log/talker_provider.dart';
 
 final marketDataServiceProvider = Provider<MarketDataService>((ref) {
-  return MarketDataService(ref.watch(dioProvider), ref.watch(talkerProvider));
+  return MarketDataService(ref.watch(dioProvider), ref.watch(appLoggerProvider));
 });
 
 class MarketDataService {
   final Dio _dio;
-  final Talker _log;
+  final AppLogger _log;
 
   MarketDataService(this._dio, this._log);
 

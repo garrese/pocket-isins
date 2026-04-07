@@ -1,27 +1,27 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:dio/dio.dart';
-import 'package:talker_flutter/talker_flutter.dart';
+import 'package:pocket_isins/core/services/log/app_logger.dart';
 import 'package:pocket_isins/features/feed/data/repositories/feed_repository.dart';
 
 class MockDio extends Mock implements Dio {}
-class MockTalker extends Mock implements Talker {}
+class MockAppLogger extends Mock implements AppLogger {}
 
 void main() {
   late MockDio mockDio;
-  late MockTalker mockTalker;
+  late MockAppLogger mockAppLogger;
   late FeedRepository feedRepository;
 
   setUp(() {
     mockDio = MockDio();
-    mockTalker = MockTalker();
-    feedRepository = FeedRepository(mockDio, mockTalker);
+    mockAppLogger = MockAppLogger();
+    feedRepository = FeedRepository(mockDio, mockAppLogger);
 
-    when(() => mockTalker.verbose(any(), any(), any())).thenReturn(null);
-    when(() => mockTalker.info(any(), any(), any())).thenReturn(null);
-    when(() => mockTalker.debug(any(), any(), any())).thenReturn(null);
-    when(() => mockTalker.warning(any(), any(), any())).thenReturn(null);
-    when(() => mockTalker.handle(any(), any(), any())).thenReturn(null);
+    when(() => mockAppLogger.verbose(any())).thenReturn(null);
+    when(() => mockAppLogger.info(any())).thenReturn(null);
+    when(() => mockAppLogger.debug(any())).thenReturn(null);
+    when(() => mockAppLogger.warning(any(), any(), any())).thenReturn(null);
+    when(() => mockAppLogger.handle(any(), any(), any())).thenReturn(null);
   });
 
   group('HttpDate', () {

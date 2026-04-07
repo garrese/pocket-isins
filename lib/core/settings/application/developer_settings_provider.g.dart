@@ -6,23 +6,20 @@ part of 'developer_settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$developerSettingsHash() => r'dff5efd879aeb2b93b872001b6d55893008d835a';
+String _$developerSettingsHash() => r'44036bd2fee4763511dd91c70e54635221744478';
 
 /// See also [DeveloperSettings].
 @ProviderFor(DeveloperSettings)
-final developerSettingsProvider =
-    AutoDisposeNotifierProvider<
-      DeveloperSettings,
-      DeveloperSettingsState
-    >.internal(
-      DeveloperSettings.new,
-      name: r'developerSettingsProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$developerSettingsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final developerSettingsProvider = AutoDisposeNotifierProvider<DeveloperSettings,
+    DeveloperSettingsState>.internal(
+  DeveloperSettings.new,
+  name: r'developerSettingsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$developerSettingsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$DeveloperSettings = AutoDisposeNotifier<DeveloperSettingsState>;
 // ignore_for_file: type=lint
