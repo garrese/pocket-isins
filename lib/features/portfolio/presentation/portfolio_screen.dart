@@ -125,7 +125,9 @@ class PortfolioScreen extends ConsumerWidget {
 
               String tickersList = isin.tickers.map((t) => t.symbol).join(', ');
 
-              final appThemeExt = Theme.of(context).extension<AppThemeExtension>();
+              final appThemeExt = Theme.of(
+                context,
+              ).extension<AppThemeExtension>();
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 4.0),
@@ -157,10 +159,9 @@ class PortfolioScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 2.0),
                             child: Text(
                               isin.shortName!,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: appThemeExt?.subtitleColor ?? Colors.grey,
-                                fontStyle: FontStyle.italic,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
                               ),
                             ),
                           ),
@@ -170,8 +171,8 @@ class PortfolioScreen extends ConsumerWidget {
                             child: Text(
                               isin.isinCode!,
                               style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.blueGrey,
+                                fontSize: 14,
+                                color: Colors.grey,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
