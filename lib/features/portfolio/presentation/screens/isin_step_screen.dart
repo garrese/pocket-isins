@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/portfolio_form_data.dart';
 import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
+import '../../../../core/widgets/constrained_width.dart';
 
 class IsinStepScreen extends StatefulWidget {
   final IsinFormData formData;
@@ -232,9 +233,10 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
+                  child: ConstrainedWidth.narrow(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
                       const Text(
                         'Enter ISIN and/or Name',
                         style: TextStyle(
@@ -273,8 +275,9 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                         },
                       ),
                       const SizedBox(height: 24),
-                      _buildGuideCard(),
-                    ],
+                        _buildGuideCard(),
+                      ],
+                    ),
                   ),
                 ),
               ),
