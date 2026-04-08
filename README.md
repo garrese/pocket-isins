@@ -1,5 +1,7 @@
 # Pocket ISINs
 
+[![Latest Release](https://img.shields.io/github/v/release/garrese/pocket-isins?label=Latest%20Release)](https://github.com/garrese/pocket-isins/releases/latest)
+
 ## 1. General Description
 **Pocket ISINs** is a hybrid (Android/Windows/Mac) responsive application (mobile/tablet/PC), designed to effortlessly discover, track, and analyze financial assets and news using traditional free APIs (Yahoo Finance, Google RSS) and AI models through a BYOK (Bring Your Own Key) architecture.
 
@@ -94,3 +96,14 @@ A conversational interface that goes beyond standard chat. The bot is deeply int
 <p align="center">
   <img src="assets/screenshots/Log-PC.png" alt="Developer Logs PC" width="70%">
 </p>
+
+---
+
+## 4. Downloads & Installation
+
+You can easily download the pre-compiled application for **Windows (.zip)** and **Android (.apk)** directly from our GitHub Releases.
+
+* [📥 Download Latest Release](https://github.com/garrese/pocket-isins/releases/latest)
+* [📦 View All Releases](https://github.com/garrese/pocket-isins/releases)
+
+*Note: You will find the installation files located in the **Assets** section at the bottom of the release notes.*
