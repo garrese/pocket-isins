@@ -25,6 +25,11 @@ class Isin {
     return 'Unknown';
   }
 
+  String get shortDisplayName {
+    if (shortName != null && shortName!.trim().isNotEmpty) return shortName!;
+    return displayName;
+  }
+
   @override
   String toString() {
     return 'Isin{id: $id, isinCode: $isinCode, altName: $altName, registeredNames: $registeredNames, shortName: $shortName, tickers: ${tickers.length}}';
