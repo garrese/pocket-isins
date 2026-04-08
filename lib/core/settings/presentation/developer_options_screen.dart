@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -92,28 +93,50 @@ class DeveloperOptionsScreen extends ConsumerWidget {
             ListTile(
               title: const Text('Max Log History'),
               subtitle: const Text('Limit the number of log messages saved in memory'),
-              trailing: SizedBox(
-                width: 80,
-                child: TextFormField(
-                  initialValue: settings.maxHistoryItems.toString(),
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.right,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                  onFieldSubmitted: (value) {
-                    final parsedValue = int.tryParse(value);
-                    if (parsedValue != null && parsedValue > 0) {
-                      ref
-                          .read(developerSettingsProvider.notifier)
-                          .setMaxHistoryItems(parsedValue);
-                    } else {
-                      ToastUtils.show(context, 'Please enter a valid number greater than 0');
-                    }
-                  },
-                ),
+              trailing: Text(
+                '${settings.maxHistoryItems}',
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
+              onTap: () {
+                final controller = TextEditingController(text: settings.maxHistoryItems.toString());
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Max Log History'),
+                      content: TextFormField(
+                        controller: controller,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        decoration: const InputDecoration(
+                          labelText: 'Number of messages',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                        FilledButton(
+                          onPressed: () {
+                            final parsedValue = int.tryParse(controller.text);
+                            if (parsedValue != null && parsedValue > 0) {
+                              ref
+                                  .read(developerSettingsProvider.notifier)
+                                  .setMaxHistoryItems(parsedValue);
+                              Navigator.pop(context);
+                            } else {
+                              ToastUtils.show(context, 'Please enter a valid number greater than 0');
+                            }
+                          },
+                          child: const Text('Save'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
             const Divider(),
             ListTile(
