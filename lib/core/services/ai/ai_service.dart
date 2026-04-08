@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../network/dio_provider.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import '../../../core/services/log/talker_provider.dart';
+import '../../../core/services/log/app_logger.dart';
 import '../../../features/bot/domain/ai_settings.dart';
 import '../../../features/bot/domain/news_card_model.dart';
 import '../../../features/bot/data/ai_settings_repository.dart';
@@ -13,14 +14,14 @@ final aiServiceProvider = Provider<AiService>((ref) {
   return AiService(
     ref.watch(dioProvider),
     ref.watch(aiSettingsRepositoryProvider),
-    ref.watch(talkerProvider),
+    ref.watch(appLoggerProvider),
   );
 });
 
 class AiService {
   final Dio _dio;
   final AiSettingsRepository _settingsRepo;
-  final Talker _log;
+  final AppLogger _log;
 
   AiService(this._dio, this._settingsRepo, this._log);
 
@@ -152,7 +153,7 @@ Example format:
       _log.debug('AI rating parsed successfully for ${results.length} items');
       return results;
     } catch (e) {
-      _log.warning('AI rating failed, returning empty map', e);
+      _log.warning('AI rating failed, returning empty map', e.toString());
       // Return empty map instead of crashing if rating fails
       return {};
     }

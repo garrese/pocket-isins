@@ -5,6 +5,7 @@ import '../../../core/services/ai/ai_service.dart';
 import '../../../core/network/market_data_service.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import '../../../core/services/log/talker_provider.dart';
+import '../../../core/services/log/app_logger.dart';
 import '../../../core/database/drift/app_database.dart';
 import '../data/bot_repository.dart';
 import '../data/ai_settings_repository.dart';
@@ -34,7 +35,7 @@ class BotController extends StateNotifier<BotState> {
   final AiService _aiService;
   final MarketDataService _marketDataService;
   final AiSettingsRepository _settingsRepo;
-  final Talker _log;
+  final AppLogger _log;
 
   BotController(
     this._repository,
@@ -229,6 +230,6 @@ final botControllerProvider = StateNotifierProvider<BotController, BotState>((
     ref.watch(aiServiceProvider),
     ref.watch(marketDataServiceProvider),
     ref.watch(aiSettingsRepositoryProvider),
-    ref.watch(talkerProvider),
+    ref.watch(appLoggerProvider),
   );
 });
