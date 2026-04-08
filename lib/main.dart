@@ -16,6 +16,7 @@ import 'features/logs/presentation/log_screen.dart';
 import 'core/services/log/custom_talker_formatter.dart';
 import '../../../core/services/log/talker_provider.dart';
 import 'core/theme/app_drawer.dart';
+import 'core/utils/toast_utils.dart';
 
 
 void main() async {
@@ -45,10 +46,12 @@ void main() async {
 
   FlutterError.onError = (details) {
     talker.handle(details.exception, details.stack, 'Uncaught Flutter Error');
+    ToastUtils.show(null, 'An unexpected error occurred. Please check the logs.');
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
     talker.handle(error, stack, 'Uncaught Platform Error');
+    ToastUtils.show(null, 'An unexpected error occurred. Please check the logs.');
     return true;
   };
 
@@ -65,6 +68,7 @@ void main() async {
     );
   }, (error, stack) {
     talker.handle(error, stack, 'Uncaught App Error');
+    ToastUtils.show(null, 'An unexpected error occurred. Please check the logs.');
   });
 }
 
@@ -85,6 +89,7 @@ class RiverpodErrorObserver extends ProviderObserver {
       stackTrace,
       'Riverpod Provider Error: ${provider.name ?? provider.runtimeType}',
     );
+    ToastUtils.show(null, 'An unexpected error occurred. Please check the logs.');
   }
 }
 
@@ -100,6 +105,7 @@ class PocketIsinsApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Pocket ISINs',
       theme: AppTheme.darkTheme,
+      scaffoldMessengerKey: ToastUtils.scaffoldMessengerKey,
       home: const MainScreen(),
     );
   }
