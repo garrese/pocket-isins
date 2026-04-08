@@ -7,7 +7,6 @@ import '../../portfolio/presentation/screens/isin_step_screen.dart';
 import '../../portfolio/domain/portfolio_form_data.dart';
 import 'bot_provider.dart';
 import '../../../core/widgets/constrained_width.dart';
-import '../../../core/widgets/custom_app_bar.dart';
 
 class BotScreen extends ConsumerStatefulWidget {
   const BotScreen({super.key});
@@ -43,7 +42,7 @@ class _BotScreenState extends ConsumerState<BotScreen> {
 
     return Scaffold(
       drawer: const AppDrawer(),
-      appBar: CustomAppBar(appBar: AppBar(
+      appBar: AppBar(
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -53,7 +52,7 @@ class _BotScreenState extends ConsumerState<BotScreen> {
             },
           ),
         ],
-      )),
+      ),
       body: Column(
         children: [
           Expanded(

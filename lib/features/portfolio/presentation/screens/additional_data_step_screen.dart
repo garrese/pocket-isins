@@ -7,7 +7,6 @@ import '../../../../core/services/log/talker_provider.dart';
 import 'wizard_bottom_actions.dart';
 import 'markets_step_screen.dart';
 import '../../../../core/widgets/constrained_width.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
 import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class AdditionalDataStepScreen extends ConsumerStatefulWidget {
@@ -150,7 +149,7 @@ class _AdditionalDataStepScreenState
         ref
             .read(talkerProvider)
             .handle(e, stack, 'Error saving ISIN from Additional Data step');
-          ToastUtils.show(context, 'Error saving: $e');
+        ToastUtils.show(context, 'Error saving: $e');
       }
     }
   }
@@ -161,10 +160,10 @@ class _AdditionalDataStepScreenState
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: CustomAppBar(appBar: AppBar(
+        appBar: AppBar(
           automaticallyImplyLeading: false,
           title: const Text('Additional Data'),
-        )),
+        ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -175,14 +174,14 @@ class _AdditionalDataStepScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                    TextFormField(
-                      controller: _shortNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Short Name (Optional)',
-                        border: OutlineInputBorder(),
-                        helperText:
-                            'Used across the app instead of full name if provided.',
-                      ),
+                      TextFormField(
+                        controller: _shortNameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Short Name (Optional)',
+                          border: OutlineInputBorder(),
+                          helperText:
+                              'Used across the app instead of full name if provided.',
+                        ),
                       ),
                     ],
                   ),
