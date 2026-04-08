@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/portfolio_form_data.dart';
+import '../../data/portfolio_provider.dart';
+import 'package:pocket_isins/core/utils/toast_utils.dart';
 import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
 
-class IsinStepScreen extends StatefulWidget {
+class IsinStepScreen extends ConsumerStatefulWidget {
   final IsinFormData formData;
   final bool isEditing;
   final bool isEntryPoint;
@@ -17,10 +20,10 @@ class IsinStepScreen extends StatefulWidget {
   });
 
   @override
-  State<IsinStepScreen> createState() => _IsinStepScreenState();
+  ConsumerState<IsinStepScreen> createState() => _IsinStepScreenState();
 }
 
-class _IsinStepScreenState extends State<IsinStepScreen> {
+class _IsinStepScreenState extends ConsumerState<IsinStepScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _isinController;
   late TextEditingController _altNameController;
@@ -44,8 +47,30 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
 
   Future<void> _onContinue() async {
     if (_formKey.currentState!.validate()) {
-      widget.formData.isinCode = _isinController.text.trim();
+      final newIsinCode = _isinController.text.trim();
+
+      // Check if ISIN code already exists (only if we're not editing or if we changed the code)
+      if (newIsinCode.isNotEmpty &&
+          (!widget.isEditing || newIsinCode != _originalFormData.isinCode)) {
+
+        try {
+          final existingIsins = await ref.read(portfolioProvider.future);
+          final isinExists = existingIsins.any((isin) => isin.isinCode == newIsinCode);
+
+          if (isinExists) {
+            if (mounted) {
+              ToastUtils.show(context, 'An ISIN with code $newIsinCode already exists.');
+            }
+            return;
+          }
+        } catch (e) {
+          // If we fail to load portfolio, ignore validation and let it be handled later.
+        }
+      }
+
+      widget.formData.isinCode = newIsinCode;
       widget.formData.altName = _altNameController.text.trim();
+
       final route = MaterialPageRoute(
         builder: (context) => RegisteredNameStepScreen(
           formData: widget.formData,

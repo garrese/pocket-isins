@@ -462,7 +462,12 @@ class _MarketsStepScreenState extends ConsumerState<MarketsStepScreen> {
         ref
             .read(talkerProvider)
             .handle(e, stack, 'Error saving ISIN from Tickers step');
-        ToastUtils.show(context, 'Error saving: $e');
+        // Clean up error message if it's the duplicate ISIN exception
+        String errorMessage = e.toString();
+        if (errorMessage.contains('Exception: An ISIN with code')) {
+          errorMessage = errorMessage.replaceAll('Exception: ', '');
+        }
+        ToastUtils.show(context, 'Error saving: $errorMessage');
       }
     }
   }
