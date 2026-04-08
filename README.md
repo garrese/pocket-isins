@@ -1,28 +1,62 @@
-# Architecture and Concept Document: Pocket ISINs
+# Pocket ISINs
 
-**Application Name:** "Pocket ISINs"
+## 1. General Description
+**Pocket ISINs** is a hybrid (Android/Windows/Mac) responsive application (mobile/tablet/PC), designed to effortlessly discover, track, and analyze financial assets and news using traditional free APIs (Yahoo Finance, Google RSS) and AI models through a BYOK (Bring Your Own Key) architecture.
+
+**Key Features:**
+* **Intuitive Ticker Discovery:** A step-by-step wizard that easily finds accurate tickers for any given asset name or ISIN.
+* **Live Market Dashboard:** A centralized hub to monitor real-time quotes and the current status of all tracked tickers.
+* **Detailed Historical Charts:** Interactive graphical views to analyze asset performance across customizable timeframes.
+* **AI-Powered News Feed:** Aggregates asset-related news via Google RSS and utilizes artificial intelligence to analyze, score, and rank articles based on their relevance.
+* **Chatbot with Custom Tools:** An integrated chatbot equipped with custom tools, enabling it to directly call Yahoo Finance APIs and execute native actions within the application's interface.
+* **Advanced Inspection Console:** A log console can be enabled to visualize the specific details of API and AI model requests and responses, and to review application events and errors.
+
+### Technology Stack
+* **Framework:** `Flutter/Dart` - 100% Client-Side execution.
+* **State Management:** `Riverpod`
+* **Data Persistence:** `Drift`
+  * **Secure Storage:** `flutter_secure_storage`
+* **Financial Data Provider:** Public Yahoo Finance API
+* **Logging:** `talker_flutter`
 
 ---
 
-## 1. Functional Concept of the Application
-* **Objective:** Hybrid app (mobile/PC) for tracking an investment portfolio based on ISINs, combining market price extraction with AI agents for news analysis.
-* **Main flow:** The user inputs the ISINs of their assets and their position (invested amount). The app categorizes the assets, calculates the total value, shows the relative weight in the portfolio, and renders evolution charts. In parallel, it searches for news about those assets and uses AI to summarize their content and analyze market sentiment or impact.
+## 2. Artificial Intelligence Integration (BYOK)
+Pocket ISINs utilizes a **"Bring Your Own Key" (BYOK)** model. The app itself does not have a proprietary backend or server; all AI orchestration happens locally on the device.
 
-## 2. Software Architecture and Ecosystem
-* **Framework:** Flutter (Dart). All development is concentrated on the client.
-* **Paradigm:** 100% Local (Client-Side). There is no proprietary backend or cloud server. All orchestration logic resides in the application.
-* **State Management:** Riverpod. In charge of separating the data layer from the visual interface and handling reactivity.
-* **Data Persistence:**
-    * Local database (Isar) to store the portfolio (ISINs, relationships with Tickers, transactions, news cache, tickers cache).
-    * Secure storage layer (`flutter_secure_storage`) to encrypt the user's API Keys on the device.
+The app provides a universal HTTP connector based on standard API syntaxes (like OpenAI's `/v1/chat/completions`). Users can configure their own base URL, Model Name, and API Key to connect to providers like OpenAI, OpenRouter, or any compatible endpoint.
 
-## 3. Artificial Intelligence Integration (BYOK Approach)
-* **"Bring Your Own Key" Model:** The app is provider-agnostic. The user configures their own credentials in the local app settings.
-* **Universal Connector:** A single HTTP client will be programmed based on the OpenAI API standard (`/v1/chat/completions`). Compatible with OpenAI, OpenRouter, local models (Ollama), and Google Gemini (via OpenAI endpoint).
-* **Configuration variables:** Base URL, API Key, and Model Name.
+### How to get a free key?
+If you want to use the AI features (like news analysis and the smart bot) without paying for API usage, you can obtain a free key from **Google AI Studio**. 
 
-## 4. Financial Data Extraction (Market Data)
-* **Data Model (ISIN -> Tickers):** 1 to N relationship. A single asset (ISIN) can be tracked in multiple markets simultaneously through different Tickers (e.g., AAPL on NASDAQ/USD and APC.DE on Xetra/EUR).
-* **Provider:** Public Yahoo Finance API.
-* **Network Optimization:** Bulk HTTP requests (multiple symbols per call).
-* **Multi-market visualization:** Interface with tabs to switch between different quotes for the same asset.
+Currently, Google AI Studio offers a generous free tier with a limited number of requests per minute/month for their Gemini models. However, web search capabilities are disabled in this free tier.
+*(This information is valid as of **April, 2026**).*
+
+---
+
+## 3. Core Features & Screens
+
+### 3.1 ISINs (Asset Management)
+This is the main hub for listing, adding, and editing your tracked assets. 
+* **Smart Wizard:** Adding a new asset triggers a step-by-step wizard. You can input an ISIN or an asset name, and the wizard will search the Yahoo Finance API to find the exact matching market symbols.
+* **Details View:** Clicking on any tracked ISIN opens a detailed card with asset information and the option to re-run the wizard to update or edit its market tickers.
+
+### 3.2 Market
+A dedicated space to monitor the active tickers associated with your ISINs.
+* **Live Tracking:** Lists all discovered tickers with their current market status.
+* **Interactive Charts:** Tapping on a ticker opens a detailed chart view, allowing you to select different historical time ranges (1D, 1W, 1M, 6M, etc.) to analyze the asset's performance.
+
+### 3.3 Feed (AI-Powered News)
+An intelligent news aggregator built directly into the app.
+* **Google RSS Integration:** Automatically fetches news articles related to your saved assets based on their names.
+* **AI Sentiment & Scoring:** You can trigger the configured AI to read the fetched news items and assign them an "Economic Relevance" score from 1 to 10. 
+* **Sorting:** Easily filter and sort the news feed by relevance, ensuring you only read the headlines that actually impact the market.
+
+### 3.4 Bot (Intelligent Assistant)
+A conversational interface that goes beyond standard chat. The bot is deeply integrated with the app's internal functions using tool calling.
+* **Actionable Commands:** You can ask the bot to fetch market data for a specific timeframe.
+* **UI Interactions:** If you ask the bot to research a new ISIN, it can search the web (if supported by your BYOK provider) and generate an actionable UI button within the chat. Clicking this button directly opens the "Add ISIN" wizard with all the gathered data pre-filled.
+
+### 3.5 Settings & Logs
+* **BYOK Configuration:** Easily input and securely store your API credentials and preferred model syntax.
+* **Developer Mode (Logs):** A hidden logging section built with `talker_flutter`. It displays verbose details of HTTP calls, Yahoo Finance API responses, AI context handling, tool execution, and error tracking to help debug the application.
