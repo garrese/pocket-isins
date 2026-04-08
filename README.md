@@ -20,7 +20,7 @@
 * **Logging:** `talker_flutter`
 
 <p align="center">
-  <img src="assets/screenshots/Market-Tablet.png" alt="Market Dashboard on Tablet" width="80%">
+  <img src="assets/screenshots/Market-Tablet.png" alt="Market Dashboard on Tablet" width="100%">
 </p>
 
 ---
@@ -57,10 +57,12 @@ A dedicated space to monitor the active tickers associated with your ISINs.
 * **Interactive Charts:** Tapping on a ticker opens a detailed chart view, allowing you to select different historical time ranges (1D, 1W, 1M, 6M, etc.) to analyze the asset's performance.
 
 <p align="center">
-  <img src="assets/screenshots/Ticker-chart-6m-PC.png" alt="Ticker Chart PC" width="70%">
+  <img src="assets/screenshots/Ticker-chart-6m-PC.png" alt="Ticker Chart PC" width="100%">
 </p>
 <p align="center">
   <img src="assets/screenshots/Ticker-Chart-1d-Mobile.png" alt="Ticker Chart Mobile" width="30%">
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/screenshots/Ticker-Chart-6m-Mobile.png" alt="Ticker Chart 6M Mobile" width="30%">
 </p>
 
 ### 3.3 Feed (AI-Powered News)
@@ -79,7 +81,7 @@ A conversational interface that goes beyond standard chat. The bot is deeply int
 * **UI Interactions:** If you ask the bot to research a new ISIN, it can search the web (if supported by your BYOK provider) and generate an actionable UI button within the chat. Clicking this button directly opens the "Add ISIN" wizard with all the gathered data pre-filled.
 
 <p align="center">
-  <img src="assets/screenshots/Bot-PC.png" alt="Intelligent Assistant Bot PC" width="70%">
+  <img src="assets/screenshots/Bot-PC.png" alt="Intelligent Assistant Bot PC" width="100%">
 </p>
 
 ### 3.5 Settings & Logs
