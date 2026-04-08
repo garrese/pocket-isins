@@ -75,6 +75,54 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                     }).toList(),
               ),
             ),
+            ListTile(
+              title: const Text('Max Log History'),
+              subtitle: const Text('Limit the number of log messages saved in memory'),
+              leading: const Icon(Icons.history),
+              trailing: Text(
+                '${settings.maxHistoryItems}',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              onTap: () {
+                final controller = TextEditingController(text: settings.maxHistoryItems.toString());
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Max Log History'),
+                      content: TextFormField(
+                        controller: controller,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Number of messages',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                        FilledButton(
+                          onPressed: () {
+                            final parsedValue = int.tryParse(controller.text);
+                            if (parsedValue != null && parsedValue > 0) {
+                              ref
+                                  .read(developerSettingsProvider.notifier)
+                                  .setMaxHistoryItems(parsedValue);
+                              Navigator.pop(context);
+                            } else {
+                              ToastUtils.show(context, 'Please enter a valid number greater than 0');
+                            }
+                          },
+                          child: const Text('Save'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
             const Divider(),
             ListTile(
               title: const Text('Purge Data'),
@@ -99,26 +147,26 @@ class DeveloperOptionsScreen extends ConsumerWidget {
               ),
               leading: const Icon(Icons.bug_report),
               onTap: () {
-                final talker = ref.read(talkerProvider);
+                final logger = ref.read(appLoggerProvider);
 
-                talker.critical(
+                logger.critical(
                   'Test Critical log\nSystem failure or critical event.',
                 );
-                talker.error(
+                logger.error(
                   'Test Error log\nAn error occurred while processing.',
                 );
-                talker.warning(
+                logger.warning(
                   'Test Warning log\nSomething unexpected happened.',
                 );
-                talker.info('Test Info log\nSummary of action...');
-                talker.debug(
+                logger.info('Test Info log\nSummary of action...');
+                logger.debug(
                   'Test Debug log\nDetails of the action with some data:\n{"key": "value", "status": "ok"}',
                 );
-                talker.verbose(
+                logger.verbose(
                   'Test Verbose log\nFull context and very detailed trace for a specific event.',
                 );
 
-                talker.handle(
+                logger.handle(
                   Exception('Test Exception'),
                   StackTrace.current,
                   'Test Exception occurred',
@@ -134,7 +182,7 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                     (_) => chars.codeUnitAt(random.nextInt(chars.length)),
                   ),
                 );
-                talker.verbose('Test Long Log (>5000 chars)\n$longString');
+                logger.verbose('Test Long Log (>5000 chars)\n$longString');
 
                 ToastUtils.show(context, 'Test logs generated!');
               },

@@ -87,7 +87,7 @@ class TickerDetail extends _$TickerDetail {
         state = state.copyWith(isLoading: false, data: rawData);
       } else {
         const errorMsg = 'Failed to fetch data or invalid response.';
-        ref.read(talkerProvider).handle(Exception(errorMsg), null, errorMsg);
+        ref.read(appLoggerProvider).handle(Exception(errorMsg), null, errorMsg);
         state = state.copyWith(isLoading: false, error: errorMsg);
       }
     } catch (e, stack) {

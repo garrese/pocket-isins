@@ -6,16 +6,15 @@ part of 'markets_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$marketsHash() => r'b21b955f3b246f3c3571cf23a2e29915d0c86b5c';
+String _$marketsHash() => r'95a409dab8aab3b008a36bd2c9f50d1c093381da';
 
 /// See also [Markets].
 @ProviderFor(Markets)
 final marketsProvider = AsyncNotifierProvider<Markets, List<Isin>>.internal(
   Markets.new,
   name: r'marketsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$marketsHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$marketsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
