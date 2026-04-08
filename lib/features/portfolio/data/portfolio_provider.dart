@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/database/drift_service.dart';
@@ -201,10 +202,11 @@ class Portfolio extends _$Portfolio {
       'ISIN details - ID: $id, Code: $isinCode, AltName: $altName, RegisteredNames: $registeredNames, ShortName: $shortName, Tickers: ${tickersData.length}',
     );
 
-    await db.transaction(() async {
-      int currentIsinId;
+    try {
+      await db.transaction(() async {
+        int currentIsinId;
 
-      if (id != null) {
+        if (id != null) {
         currentIsinId = id;
         await (db.update(db.isins)..where((t) => t.id.equals(id))).write(
           drift.IsinsCompanion(
@@ -282,26 +284,32 @@ class Portfolio extends _$Portfolio {
                   isinId: currentIsinId,
                 ),
               );
-        } else {
-          int currentTickerId = tickerRow.id;
-          await (db.update(
-            db.tickers,
-          )..where((t) => t.id.equals(currentTickerId))).write(
-            drift.TickersCompanion(
-              exchange: Value(tData.exchange),
-              currency: Value(tData.currency),
-              quoteType: Value(tData.quoteType),
-              regularMarketStart: Value(tData.regularMarketStart),
-              regularMarketEnd: Value(tData.regularMarketEnd),
-              preMarketStart: Value(tData.preMarketStart),
-              preMarketEnd: Value(tData.preMarketEnd),
-              postMarketStart: Value(tData.postMarketStart),
-              postMarketEnd: Value(tData.postMarketEnd),
-            ),
-          );
+          } else {
+            int currentTickerId = tickerRow.id;
+            await (db.update(
+              db.tickers,
+            )..where((t) => t.id.equals(currentTickerId))).write(
+              drift.TickersCompanion(
+                exchange: Value(tData.exchange),
+                currency: Value(tData.currency),
+                quoteType: Value(tData.quoteType),
+                regularMarketStart: Value(tData.regularMarketStart),
+                regularMarketEnd: Value(tData.regularMarketEnd),
+                preMarketStart: Value(tData.preMarketStart),
+                preMarketEnd: Value(tData.preMarketEnd),
+                postMarketStart: Value(tData.postMarketStart),
+                postMarketEnd: Value(tData.postMarketEnd),
+              ),
+            );
+          }
         }
+      });
+    } on SqliteException catch (e) {
+      if (e.extendedResultCode == 2067) {
+        throw Exception('An ISIN with code $isinCode already exists.');
       }
-    });
+      rethrow;
+    }
 
     state = const AsyncValue.loading();
     state = AsyncValue.data(await _fetchIsins());
