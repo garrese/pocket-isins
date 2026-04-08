@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/drift_service.dart';
 import '../application/developer_settings_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/widgets/custom_app_bar.dart';
 import 'package:pocket_isins/core/utils/toast_utils.dart';
 import '../../../features/portfolio/data/portfolio_provider.dart';
 import '../../../features/markets/data/markets_provider.dart';
@@ -116,7 +115,7 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(appBar: AppBar(title: const Text('Purge Data'))),
+      appBar: AppBar(title: const Text('Purge Data')),
       body: ListView(
         children: [
           CheckboxListTile(

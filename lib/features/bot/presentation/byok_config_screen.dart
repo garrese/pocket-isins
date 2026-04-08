@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/constrained_width.dart';
 import '../data/ai_settings_repository.dart';
 import '../domain/ai_settings.dart';
-import '../../../core/widgets/custom_app_bar.dart';
 import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 final aiSettingsProvider = FutureProvider.autoDispose<AiSettings>((ref) async {
@@ -69,7 +68,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
       }
     } catch (e) {
       if (mounted) {
-          ToastUtils.show(context, 'Error saving settings: \$e');
+        ToastUtils.show(context, 'Error saving settings: \$e');
       }
     } finally {
       if (mounted) {
@@ -85,7 +84,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
     final settingsAsyncValue = ref.watch(aiSettingsProvider);
 
     return Scaffold(
-      appBar: CustomAppBar(appBar: AppBar(title: const Text('BYOK AI Configuration'))),
+      appBar: AppBar(title: const Text('BYOK AI Configuration')),
       body: settingsAsyncValue.when(
         data: (settings) {
           // Initialize controllers with current values
@@ -102,107 +101,107 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Configure your "Bring Your Own Key" (BYOK) AI provider.\n'
-                    'Select the API Syntax below. If your provider uses standard OpenAI format (like Ollama, Groq, or basic OpenRouter), select "OpenAI Compatible". Only select a different syntax if it requires a proprietary format.',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 24),
-                  DropdownButtonFormField<String>(
-                    initialValue: _selectedProvider,
-                    decoration: const InputDecoration(
-                      labelText: 'API Syntax',
-                      border: OutlineInputBorder(),
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Configure your "Bring Your Own Key" (BYOK) AI provider.\n'
+                      'Select the API Syntax below. If your provider uses standard OpenAI format (like Ollama, Groq, or basic OpenRouter), select "OpenAI Compatible". Only select a different syntax if it requires a proprietary format.',
+                      style: TextStyle(fontSize: 16),
                     ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'openai',
-                        child: Text(
-                          'OpenAI Compatible (OpenAI, OpenRouter, Ollama)',
-                        ),
+                    const SizedBox(height: 24),
+                    DropdownButtonFormField<String>(
+                      initialValue: _selectedProvider,
+                      decoration: const InputDecoration(
+                        labelText: 'API Syntax',
+                        border: OutlineInputBorder(),
                       ),
-                      DropdownMenuItem(
-                        value: 'openrouter_web',
-                        child: Text('OpenRouter with Web Search'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'google_ai_studio',
-                        child: Text('Google AI Studio (Gemini)'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _selectedProvider = value;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _baseUrlController,
-                    decoration: const InputDecoration(
-                      labelText: 'Base URL',
-                      hintText: 'e.g., https://api.openai.com/v1',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a Base URL';
-                      }
-                      if (!Uri.parse(value).isAbsolute) {
-                        return 'Please enter a valid URL';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _modelNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Model Name',
-                      hintText: 'e.g., gpt-4o',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a Model Name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _apiKeyController,
-                    decoration: const InputDecoration(
-                      labelText: 'API Key',
-                      hintText: 'Enter your API Key',
-                      border: OutlineInputBorder(),
-                    ),
-                    obscureText: true,
-                    // API Key might be optional for some local setups like Ollama
-                    // so we don't strictly validate it as mandatory, or we can just let the user leave it blank.
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: _isSaving ? null : _saveSettings,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: _isSaving
-                        ? const CircularProgressIndicator()
-                        : const Text(
-                            'Save Configuration',
-                            style: TextStyle(fontSize: 16),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'openai',
+                          child: Text(
+                            'OpenAI Compatible (OpenAI, OpenRouter, Ollama)',
                           ),
-                  ),
-                ],
+                        ),
+                        DropdownMenuItem(
+                          value: 'openrouter_web',
+                          child: Text('OpenRouter with Web Search'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'google_ai_studio',
+                          child: Text('Google AI Studio (Gemini)'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedProvider = value;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _baseUrlController,
+                      decoration: const InputDecoration(
+                        labelText: 'Base URL',
+                        hintText: 'e.g., https://api.openai.com/v1',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a Base URL';
+                        }
+                        if (!Uri.parse(value).isAbsolute) {
+                          return 'Please enter a valid URL';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _modelNameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Model Name',
+                        hintText: 'e.g., gpt-4o',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a Model Name';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _apiKeyController,
+                      decoration: const InputDecoration(
+                        labelText: 'API Key',
+                        hintText: 'Enter your API Key',
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
+                      // API Key might be optional for some local setups like Ollama
+                      // so we don't strictly validate it as mandatory, or we can just let the user leave it blank.
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: _isSaving ? null : _saveSettings,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: _isSaving
+                          ? const CircularProgressIndicator()
+                          : const Text(
+                              'Save Configuration',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                    ),
+                  ],
+                ),
               ),
-            ),
             ),
           );
         },
