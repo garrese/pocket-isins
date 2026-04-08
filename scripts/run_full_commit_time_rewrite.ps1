@@ -52,5 +52,4 @@ if ($response -match "^[sS]") {
 
 Write-Host ""
 Write-Host "==== PROCESO COMPLETADO ====" -ForegroundColor Green
-Write-Host "Si todo ha ido bien, puedes borrar la carpeta oculta de backups de filter-branch ejecutando:"
-Write-Host "git update-ref -d refs/original/refs/heads/master"
+Write-Host "Tus copias de seguridad de los commits originales se mantienen a salvo en la carpeta oculta de Git (.git/refs/original/)."
