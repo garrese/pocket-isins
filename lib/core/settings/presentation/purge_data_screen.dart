@@ -9,6 +9,7 @@ import '../../../features/portfolio/data/portfolio_provider.dart';
 import '../../../features/markets/data/markets_provider.dart';
 import '../../../features/bot/presentation/bot_provider.dart';
 import '../../../core/services/log/talker_provider.dart';
+import '../../widgets/constrained_width.dart';
 
 class PurgeDataScreen extends ConsumerStatefulWidget {
   const PurgeDataScreen({super.key});
@@ -116,10 +117,11 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Purge Data')),
-      body: ListView(
-        children: [
-          CheckboxListTile(
-            title: const Text('ISINs'),
+      body: ConstrainedWidth.narrow(
+        child: ListView(
+          children: [
+            CheckboxListTile(
+              title: const Text('ISINs'),
             subtitle: const Text(
               'Deletes all ISINs, including their associated Tickers, Positions, Market Data, and News.',
             ),
@@ -174,14 +176,15 @@ class _PurgeDataScreenState extends ConsumerState<PurgeDataScreen> {
             subtitle: const Text(
               'Resets all application settings to their default values.',
             ),
-            value: _purgeConfiguration,
-            onChanged: (value) {
-              setState(() {
-                _purgeConfiguration = value ?? false;
-              });
-            },
-          ),
-        ],
+              value: _purgeConfiguration,
+              onChanged: (value) {
+                setState(() {
+                  _purgeConfiguration = value ?? false;
+                });
+              },
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
