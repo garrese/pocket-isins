@@ -168,7 +168,7 @@ class MarketsScreen extends ConsumerWidget {
                                         builder: (_) => TickerDetailScreen(
                                           symbol: tickerVm.ticker.symbol,
                                           displayName:
-                                              tickerVm.isin.displayName,
+                                              tickerVm.isin.shortDisplayName,
                                         ),
                                       ),
                                     );
@@ -190,7 +190,7 @@ class MarketsScreen extends ConsumerWidget {
                                             Expanded(
                                               child: _buildMarqueeText(
                                                 context,
-                                                tickerVm.isin.displayName,
+                                                tickerVm.isin.shortDisplayName,
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
