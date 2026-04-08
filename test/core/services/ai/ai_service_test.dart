@@ -1,36 +1,36 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:dio/dio.dart';
-import 'package:talker_flutter/talker_flutter.dart';
+import 'package:pocket_isins/core/services/log/app_logger.dart';
 import 'package:pocket_isins/core/services/ai/ai_service.dart';
 import 'package:pocket_isins/features/bot/data/ai_settings_repository.dart';
 import 'package:pocket_isins/features/bot/domain/ai_settings.dart';
 
 class MockDio extends Mock implements Dio {}
 class MockAiSettingsRepository extends Mock implements AiSettingsRepository {}
-class MockTalker extends Mock implements Talker {}
+class MockAppLogger extends Mock implements AppLogger {}
 
 void main() {
   late MockDio mockDio;
   late MockAiSettingsRepository mockSettingsRepo;
-  late MockTalker mockTalker;
+  late MockAppLogger mockLogger;
   late AiService aiService;
 
   setUp(() {
     mockDio = MockDio();
     mockSettingsRepo = MockAiSettingsRepository();
-    mockTalker = MockTalker();
-    aiService = AiService(mockDio, mockSettingsRepo, mockTalker);
+    mockLogger = MockAppLogger();
+    aiService = AiService(mockDio, mockSettingsRepo, mockLogger);
 
     when(() => mockSettingsRepo.getSettings()).thenAnswer(
         (_) async => const AiSettings(apiKey: 'dummy_key', baseUrl: 'https://api.openai.com/v1'));
 
-    // We need to mock Talker's methods since they are called when exceptions happen or for logging
-    when(() => mockTalker.verbose(any(), any(), any())).thenReturn(null);
-    when(() => mockTalker.info(any(), any(), any())).thenReturn(null);
-    when(() => mockTalker.debug(any(), any(), any())).thenReturn(null);
-    when(() => mockTalker.warning(any(), any(), any())).thenReturn(null);
-    when(() => mockTalker.handle(any(), any(), any())).thenReturn(null);
+    // We need to mock Logger's methods since they are called when exceptions happen or for logging
+    when(() => mockLogger.verbose(any())).thenReturn(null);
+    when(() => mockLogger.info(any())).thenReturn(null);
+    when(() => mockLogger.debug(any())).thenReturn(null);
+    when(() => mockLogger.warning(any(), any(), any())).thenReturn(null);
+    when(() => mockLogger.handle(any(), any(), any())).thenReturn(null);
   });
 
   group('AiService - rateNewsRelevanceBatch', () {

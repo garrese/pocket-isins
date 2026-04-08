@@ -1,4 +1,5 @@
 import 'package:talker_flutter/talker_flutter.dart';
+import '../../utils/toast_utils.dart';
 
 class AppLogger {
   final Talker _talker;
@@ -31,6 +32,7 @@ class AppLogger {
 
   void handle(Object exception, [StackTrace? stackTrace, String? msg]) {
     _talker.handle(exception, stackTrace, msg != null ? _truncateMessage(msg) : null);
+    ToastUtils.show(null, 'An unexpected error occurred. Please check the logs.');
   }
 
   // Allow access to underlying Talker if strictly necessary (e.g., TalkerScreen)
