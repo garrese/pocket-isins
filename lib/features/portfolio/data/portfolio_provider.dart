@@ -193,7 +193,7 @@ class Portfolio extends _$Portfolio {
     required List<TickerFormData> tickersData,
   }) async {
     final db = ref.read(driftServiceProvider).db;
-    final log = ref.read(talkerProvider);
+    final log = ref.read(appLoggerProvider);
 
     final actionType = id != null ? 'Updating' : 'Creating';
     log.info('$actionType ISIN: ${isinCode ?? altName}');
@@ -309,7 +309,7 @@ class Portfolio extends _$Portfolio {
 
   Future<void> removeIsin(int id) async {
     final db = ref.read(driftServiceProvider).db;
-    final log = ref.read(talkerProvider);
+    final log = ref.read(appLoggerProvider);
 
     log.info('Deleting ISIN with ID: $id');
     log.debug(

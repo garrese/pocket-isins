@@ -26,6 +26,14 @@ class AppLogger {
     _talker.verbose(_truncateMessage(message));
   }
 
+  void error(String message, [Object? exception, StackTrace? stackTrace]) {
+    _talker.error(_truncateMessage(message), exception, stackTrace);
+  }
+
+  void critical(String message, [Object? exception, StackTrace? stackTrace]) {
+    _talker.critical(_truncateMessage(message), exception, stackTrace);
+  }
+
   void warning(String message, [String? exception, StackTrace? stackTrace]) {
     _talker.warning(_truncateMessage(message), exception, stackTrace);
   }

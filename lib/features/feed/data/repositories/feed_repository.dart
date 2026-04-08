@@ -7,12 +7,14 @@ import '../../../../core/network/dio_provider.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import '../../../../core/services/log/talker_provider.dart';
 import '../../domain/models/feed_news_model.dart';
+import '../../../../core/services/log/app_logger.dart';
 
 part 'feed_repository.g.dart';
 
+
 class FeedRepository {
   final Dio _dio;
-  final Talker _log;
+  final AppLogger _log;
 
   FeedRepository(this._dio, this._log);
 
@@ -193,6 +195,6 @@ class HttpDate {
 @riverpod
 FeedRepository feedRepository(FeedRepositoryRef ref) {
   final dio = ref.watch(dioProvider);
-  final log = ref.watch(talkerProvider);
+  final log = ref.watch(appLoggerProvider);
   return FeedRepository(dio, log);
 }
