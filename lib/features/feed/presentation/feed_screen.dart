@@ -263,7 +263,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             child: FloatingActionButton(
               onPressed: isLoading ? null : _startSearch,
               tooltip: 'Search news',
-              child: const Icon(Icons.refresh),
+              child: const Icon(Icons.add),
             ),
           ),
         ),

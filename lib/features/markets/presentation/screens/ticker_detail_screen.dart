@@ -312,7 +312,7 @@ class TickerDetailScreen extends ConsumerWidget {
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 34,
+                  reservedSize: 46,
                   getTitlesWidget: (value, meta) {
                     // Hide exactly the min and max auto-generated labels,
                     // preserving all the intermediate grid-aligned ones.
