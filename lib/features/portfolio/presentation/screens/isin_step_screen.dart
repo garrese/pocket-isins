@@ -3,7 +3,6 @@ import '../../domain/portfolio_form_data.dart';
 import 'registered_name_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
 
 class IsinStepScreen extends StatefulWidget {
   final IsinFormData formData;
@@ -130,8 +129,8 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                 Text(
                   'How it works',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 _buildStep(
@@ -175,10 +174,9 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .secondary
-                      .withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -225,7 +223,7 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: CustomAppBar(appBar: AppBar(title: const Text('Add ISIN / Name'))),
+        appBar: AppBar(title: const Text('Add ISIN / Name')),
         body: Form(
           key: _formKey,
           child: Column(
@@ -238,44 +236,44 @@ class _IsinStepScreenState extends State<IsinStepScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                      const Text(
-                        'Enter ISIN and/or Name',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                        const Text(
+                          'Enter ISIN and/or Name',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _isinController,
-                        decoration: const InputDecoration(
-                          labelText: 'ISIN Code',
-                          border: OutlineInputBorder(),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _isinController,
+                          decoration: const InputDecoration(
+                            labelText: 'ISIN Code',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if ((value == null || value.trim().isEmpty) &&
+                                _altNameController.text.trim().isEmpty) {
+                              return 'Please enter either an ISIN or a Name';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if ((value == null || value.trim().isEmpty) &&
-                              _altNameController.text.trim().isEmpty) {
-                            return 'Please enter either an ISIN or a Name';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _altNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Name',
-                          border: OutlineInputBorder(),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _altNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Name',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if ((value == null || value.trim().isEmpty) &&
+                                _isinController.text.trim().isEmpty) {
+                              return 'Please enter either an ISIN or a Name';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if ((value == null || value.trim().isEmpty) &&
-                              _isinController.text.trim().isEmpty) {
-                            return 'Please enter either an ISIN or a Name';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         _buildGuideCard(),
                       ],
                     ),

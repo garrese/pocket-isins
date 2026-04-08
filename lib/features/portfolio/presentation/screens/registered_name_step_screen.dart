@@ -8,7 +8,6 @@ import 'isin_step_screen.dart';
 import 'markets_step_screen.dart';
 import 'wizard_bottom_actions.dart';
 import '../../../../core/widgets/constrained_width.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
 import 'package:pocket_isins/core/utils/toast_utils.dart';
 
 class RegisteredNameStepScreen extends ConsumerStatefulWidget {
@@ -153,9 +152,10 @@ class _RegisteredNameStepScreenState
         });
 
         if (_uniqueNames.isEmpty) {
-          ToastUtils.show(context,
-                'No registered names found. You can enter them manually.',
-              );
+          ToastUtils.show(
+            context,
+            'No registered names found. You can enter them manually.',
+          );
         }
       }
     } catch (e, stack) {
@@ -163,7 +163,7 @@ class _RegisteredNameStepScreenState
         ref
             .read(talkerProvider)
             .handle(e, stack, 'Error searching registered names');
-          ToastUtils.show(context, 'Error searching: $e');
+        ToastUtils.show(context, 'Error searching: $e');
       }
     } finally {
       if (mounted) {
@@ -257,10 +257,10 @@ class _RegisteredNameStepScreenState
       canPop: false,
       onPopInvokedWithResult: (didPop, result) => _handleBackNavigation(didPop),
       child: Scaffold(
-        appBar: CustomAppBar(appBar: AppBar(
+        appBar: AppBar(
           automaticallyImplyLeading: false,
           title: const Text('Registered Names'),
-        )),
+        ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -271,87 +271,87 @@ class _RegisteredNameStepScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        const Text(
-                          'Select Registered Names:',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            'Select Registered Names:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: _addManualName,
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add Manually'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      if (_isLoading)
+                        const Expanded(
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      else if (_uniqueNames.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          child: Text(
+                            'No results found.',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        )
+                      else
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: _uniqueNames.length,
+                            itemBuilder: (context, index) {
+                              final name = _uniqueNames[index];
+                              final isSelected = _selectedNames.contains(name);
+
+                              return CheckboxListTile(
+                                title: Text(name),
+                                value: isSelected,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      _selectedNames.add(name);
+                                    } else {
+                                      _selectedNames.remove(name);
+                                    }
+                                  });
+                                },
+                              );
+                            },
                           ),
                         ),
-                        TextButton.icon(
-                          onPressed: _addManualName,
-                          icon: const Icon(Icons.add),
-                          label: const Text('Add Manually'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (_isLoading)
-                      const Expanded(
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (_uniqueNames.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
-                        child: Text(
-                          'No results found.',
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      )
-                    else
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: _uniqueNames.length,
-                          itemBuilder: (context, index) {
-                            final name = _uniqueNames[index];
-                            final isSelected = _selectedNames.contains(name);
-
-                            return CheckboxListTile(
-                              title: Text(name),
-                              value: isSelected,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  if (value == true) {
-                                    _selectedNames.add(name);
-                                  } else {
-                                    _selectedNames.remove(name);
-                                  }
-                                });
-                              },
-                            );
+                      const SizedBox(height: 16),
+                      Form(
+                        key: _formKey,
+                        child: FormField<bool>(
+                          validator: (_) {
+                            if (_selectedNames.isEmpty) {
+                              return 'Please select at least one registered name, or skip if you really want to.';
+                            }
+                            return null;
+                          },
+                          builder: (state) {
+                            if (state.hasError) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  state.errorText!,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
                           },
                         ),
-                      ),
-                    const SizedBox(height: 16),
-                    Form(
-                      key: _formKey,
-                      child: FormField<bool>(
-                        validator: (_) {
-                          if (_selectedNames.isEmpty) {
-                            return 'Please select at least one registered name, or skip if you really want to.';
-                          }
-                          return null;
-                        },
-                        builder: (state) {
-                          if (state.hasError) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                state.errorText!,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.error,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                          ),
                       ),
                     ],
                   ),

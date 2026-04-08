@@ -6,7 +6,6 @@ import '../application/feed_service.dart';
 import 'widgets/feed_news_card.dart';
 import '../../../core/theme/app_drawer.dart';
 import '../../../core/widgets/constrained_width.dart';
-import '../../../core/widgets/custom_app_bar.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
@@ -120,7 +119,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
     return Scaffold(
       drawer: const AppDrawer(),
-      appBar: CustomAppBar(appBar: AppBar(
+      appBar: AppBar(
         actions: [
           if (_showScrollToTop)
             IconButton(
@@ -192,7 +191,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             onPressed: isLoading ? null : _confirmAndClearFeed,
           ),
         ],
-      )),
+      ),
       body: Column(
         children: [
           if (isLoading) const LinearProgressIndicator(),
@@ -221,27 +220,27 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                   child: CustomScrollView(
                     controller: _scrollController,
                     // In flutter 3.x, if we want to anchor to bottom when inserting top, we'd use a special package or key.
-                  // For now, we keep it simple. If we want it to not move when reading, one trick is reverse list but we want newest on top.
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.only(top: 8.0, bottom: 80.0),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            return FeedNewsCard(
-                              key: ValueKey(newsList[index].id),
-                              news: newsList[index],
-                            );
-                          },
-                          childCount: newsList.length,
-                          // This keeps the scroll from jumping if elements are added above the viewport in some setups
-                          findChildIndexCallback: (Key key) {
-                            final int? id = (key as ValueKey<int?>).value;
-                            final index = newsList.indexWhere(
-                              (n) => n.id == id,
-                            );
-                            return index == -1 ? null : index;
+                    // For now, we keep it simple. If we want it to not move when reading, one trick is reverse list but we want newest on top.
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 80.0),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return FeedNewsCard(
+                                key: ValueKey(newsList[index].id),
+                                news: newsList[index],
+                              );
+                            },
+                            childCount: newsList.length,
+                            // This keeps the scroll from jumping if elements are added above the viewport in some setups
+                            findChildIndexCallback: (Key key) {
+                              final int? id = (key as ValueKey<int?>).value;
+                              final index = newsList.indexWhere(
+                                (n) => n.id == id,
+                              );
+                              return index == -1 ? null : index;
                             },
                           ),
                         ),
