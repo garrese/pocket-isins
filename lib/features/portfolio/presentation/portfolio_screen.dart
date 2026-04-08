@@ -15,17 +15,39 @@ import '../../../core/theme/app_theme_extension.dart';
 import '../../../core/widgets/constrained_width.dart';
 import 'package:pocket_isins/core/utils/toast_utils.dart';
 
+final sortByNameStateProvider = StateProvider<bool>((ref) => true);
+
 class PortfolioScreen extends ConsumerWidget {
   const PortfolioScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final portfolioAsync = ref.watch(portfolioProvider);
+    final sortByNameState = ref.watch(sortByNameStateProvider);
 
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
         actions: [
+          PopupMenuButton<bool>(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Sort options',
+            onSelected: (bool value) {
+              ref.read(sortByNameStateProvider.notifier).state = value;
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<bool>>[
+              CheckedPopupMenuItem<bool>(
+                value: true,
+                checked: sortByNameState,
+                child: const Text('Sort by Name'),
+              ),
+              CheckedPopupMenuItem<bool>(
+                value: false,
+                checked: !sortByNameState,
+                child: const Text('Natural Sort'),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.file_download),
             tooltip: 'Import Portfolio',
@@ -110,15 +132,25 @@ class PortfolioScreen extends ConsumerWidget {
               child: Text('You have no ISINs yet. Add some!'),
             );
           }
+
+          final sortedIsins = List.of(isins);
+          sortedIsins.sort((a, b) {
+            if (sortByNameState) {
+              return a.displayName.toLowerCase().compareTo(b.displayName.toLowerCase());
+            } else {
+              return a.id.compareTo(b.id);
+            }
+          });
+
           return ConstrainedWidth.narrow(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(
                 horizontal: 8.0,
                 vertical: 8.0,
               ),
-              itemCount: isins.length,
+              itemCount: sortedIsins.length,
               itemBuilder: (context, index) {
-                final isin = isins[index];
+                final isin = sortedIsins[index];
 
                 String tickersList = isin.tickers
                     .map((t) => t.symbol)
