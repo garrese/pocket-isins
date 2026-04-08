@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 
 class ToastUtils {
-  static void show(BuildContext context, String message) {
-    final messenger = ScaffoldMessenger.of(context);
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
+  static void show(BuildContext? context, String message) {
+    final messenger = context != null
+        ? ScaffoldMessenger.of(context)
+        : scaffoldMessengerKey.currentState;
+
+    if (messenger == null) return;
+
     // Hide any currently showing snackbar first
     messenger.hideCurrentSnackBar();
 
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = context != null
+        ? MediaQuery.of(context).size.height
+        : 800.0; // Fallback height if no context
     final bottomMargin = screenHeight * 0.33;
 
     messenger.showSnackBar(
@@ -29,7 +39,9 @@ class ToastUtils {
                       color: const Color(0xFF2C2C3E),
                       borderRadius: BorderRadius.circular(24.0),
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.primary.withAlpha((255 * 0.2).round()),
+                        color: context != null
+                              ? Theme.of(context).colorScheme.primary.withAlpha((255 * 0.2).round())
+                              : const Color(0xFF00E5FF).withAlpha((255 * 0.2).round()),
                         width: 1,
                       ),
                       boxShadow: const [
@@ -43,8 +55,8 @@ class ToastUtils {
                     child: Text(
                       message,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.white,
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontSize: 14.0,
                       ),
                     ),

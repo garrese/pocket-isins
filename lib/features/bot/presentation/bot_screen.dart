@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_drawer.dart';
 import '../../portfolio/presentation/screens/isin_step_screen.dart';
@@ -180,17 +181,24 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                         children: [
                           if (displayContent.isNotEmpty)
                             isUser
-                                ? SelectableText(
-                                    displayContent,
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onPrimaryContainer,
+                                ? SelectionArea(
+                                    child: Text(
+                                      displayContent,
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimaryContainer,
+                                      ),
                                     ),
                                   )
                                 : MarkdownBody(
                                     selectable: true,
                                     data: displayContent,
+                                    onTapLink: (text, href, title) {
+                                      if (href != null) {
+                                        launchUrl(Uri.parse(href), mode: LaunchMode.externalApplication);
+                                      }
+                                    },
                                     styleSheet: MarkdownStyleSheet(
                                       p: TextStyle(
                                         color: Theme.of(
@@ -217,16 +225,6 @@ class _BotScreenState extends ConsumerState<BotScreen> {
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
-            ),
-          if (botState.error != null)
-            ConstrainedWidth.medium(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  botState.error!,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
             ),
