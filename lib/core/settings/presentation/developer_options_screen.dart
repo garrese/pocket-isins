@@ -1,3 +1,4 @@
+import '../../database/data_import_service.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -92,13 +93,17 @@ class DeveloperOptionsScreen extends ConsumerWidget {
             ),
             ListTile(
               title: const Text('Max Log History'),
-              subtitle: const Text('Limit the number of log messages saved in memory'),
+              subtitle: const Text(
+                'Limit the number of log messages saved in memory',
+              ),
               trailing: Text(
                 '${settings.maxHistoryItems}',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               onTap: () {
-                final controller = TextEditingController(text: settings.maxHistoryItems.toString());
+                final controller = TextEditingController(
+                  text: settings.maxHistoryItems.toString(),
+                );
                 showDialog(
                   context: context,
                   builder: (context) {
@@ -107,7 +112,9 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                       content: TextFormField(
                         controller: controller,
                         keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         decoration: const InputDecoration(
                           labelText: 'Number of messages',
                           border: OutlineInputBorder(),
@@ -127,7 +134,10 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                                   .setMaxHistoryItems(parsedValue);
                               Navigator.pop(context);
                             } else {
-                              ToastUtils.show(context, 'Please enter a valid number greater than 0');
+                              ToastUtils.show(
+                                context,
+                                'Please enter a valid number greater than 0',
+                              );
                             }
                           },
                           child: const Text('Save'),
@@ -190,82 +200,14 @@ class DeveloperOptionsScreen extends ConsumerWidget {
 
                   if (confirmed == true && context.mounted) {
                     try {
-                      final importData = jsonDecode(jsonString) as Map<String, dynamic>;
                       final db = ref.read(driftServiceProvider).db;
+                      final aiRepository = ref.read(aiSettingsRepositoryProvider);
 
-                      await db.transaction(() async {
-                        if (importData.containsKey('isins')) {
-                          for (var isinData in importData['isins']) {
-                            final data = isinData as Map<String, dynamic>;
-                            if (data['registeredNames'] != null) {
-                              data['registeredNames'] = (data['registeredNames'] as List).map((e) => e.toString()).toList();
-                            }
-                            await db.into(db.isins).insertOnConflictUpdate(IsinData.fromJson(data));
-                          }
-                        }
-
-                        if (importData.containsKey('tickers')) {
-                          for (var tickerData in importData['tickers']) {
-                            await db.into(db.tickers).insertOnConflictUpdate(TickerData.fromJson(tickerData as Map<String, dynamic>));
-                          }
-                        }
-
-                        if (importData.containsKey('feedNews')) {
-                          for (var newsData in importData['feedNews']) {
-                            await db.into(db.feedNews).insertOnConflictUpdate(FeedNewsData.fromJson(newsData as Map<String, dynamic>));
-                          }
-                        }
-
-                        if (importData.containsKey('marketData')) {
-                          for (var mdData in importData['marketData']) {
-                            final data = mdData as Map<String, dynamic>;
-                            if (data['intradayPrices'] != null) {
-                              data['intradayPrices'] = (data['intradayPrices'] as List).map((e) => (e as num).toDouble()).toList();
-                            }
-                            if (data['intradayTimestamps'] != null) {
-                              data['intradayTimestamps'] = (data['intradayTimestamps'] as List).map((e) => (e as num).toInt()).toList();
-                            }
-                            await db.into(db.marketDataCaches).insertOnConflictUpdate(MarketDataCacheData.fromJson(data));
-                          }
-                        }
-
-                        if (importData.containsKey('chatMessages')) {
-                          for (var msgData in importData['chatMessages']) {
-                            await db.into(db.chatMessages).insertOnConflictUpdate(ChatMessageData.fromJson(msgData as Map<String, dynamic>));
-                          }
-                        }
-                      });
-
-                      if (importData.containsKey('configuration')) {
-                        final configData = importData['configuration'] as Map<String, dynamic>;
-                        final prefs = await SharedPreferences.getInstance();
-                        for (final entry in configData.entries) {
-                          final value = entry.value;
-                          if (value is bool) {
-                            await prefs.setBool(entry.key, value);
-                          } else if (value is int) {
-                            await prefs.setInt(entry.key, value);
-                          } else if (value is double) {
-                            await prefs.setDouble(entry.key, value);
-                          } else if (value is String) {
-                            await prefs.setString(entry.key, value);
-                          } else if (value is List) {
-                            await prefs.setStringList(entry.key, value.map((e) => e.toString()).toList());
-                          }
-                        }
-                      }
-
-                      if (importData.containsKey('aiSettings')) {
-                        final aiSettingsData = importData['aiSettings'] as Map<String, dynamic>;
-                        final aiRepo = ref.read(aiSettingsRepositoryProvider);
-                        final currentSettings = await aiRepo.getSettings();
-                        await aiRepo.saveSettings(currentSettings.copyWith(
-                          apiProvider: aiSettingsData['apiProvider'] as String?,
-                          baseUrl: aiSettingsData['baseUrl'] as String?,
-                          modelName: aiSettingsData['modelName'] as String?,
-                          webSearchCapability: aiSettingsData['webSearchCapability'] as bool?,
-                        ));
-                      }
+                      await DataImportService.importFromJsonString(
+                        jsonString: jsonString,
+                        db: db,
+                        aiRepository: aiRepository,
+                      );
 
                       ref.invalidate(portfolioProvider);
                       ref.invalidate(marketsProvider);
@@ -276,7 +218,9 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                         ToastUtils.show(context, 'Data imported successfully!');
                       }
                     } catch (e, stack) {
-                      ref.read(appLoggerProvider).handle(e, stack, 'Failed to import data');
+                      ref
+                          .read(appLoggerProvider)
+                          .handle(e, stack, 'Failed to import data');
                       if (context.mounted) {
                         ToastUtils.show(context, 'Failed to import data: $e');
                       }
