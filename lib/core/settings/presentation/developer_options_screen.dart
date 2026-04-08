@@ -196,7 +196,11 @@ class DeveloperOptionsScreen extends ConsumerWidget {
                       await db.transaction(() async {
                         if (importData.containsKey('isins')) {
                           for (var isinData in importData['isins']) {
-                            await db.into(db.isins).insertOnConflictUpdate(IsinData.fromJson(isinData as Map<String, dynamic>));
+                            final data = isinData as Map<String, dynamic>;
+                            if (data['registeredNames'] != null) {
+                              data['registeredNames'] = (data['registeredNames'] as List).map((e) => e.toString()).toList();
+                            }
+                            await db.into(db.isins).insertOnConflictUpdate(IsinData.fromJson(data));
                           }
                         }
 
@@ -214,7 +218,14 @@ class DeveloperOptionsScreen extends ConsumerWidget {
 
                         if (importData.containsKey('marketData')) {
                           for (var mdData in importData['marketData']) {
-                            await db.into(db.marketDataCaches).insertOnConflictUpdate(MarketDataCacheData.fromJson(mdData as Map<String, dynamic>));
+                            final data = mdData as Map<String, dynamic>;
+                            if (data['intradayPrices'] != null) {
+                              data['intradayPrices'] = (data['intradayPrices'] as List).map((e) => (e as num).toDouble()).toList();
+                            }
+                            if (data['intradayTimestamps'] != null) {
+                              data['intradayTimestamps'] = (data['intradayTimestamps'] as List).map((e) => (e as num).toInt()).toList();
+                            }
+                            await db.into(db.marketDataCaches).insertOnConflictUpdate(MarketDataCacheData.fromJson(data));
                           }
                         }
 
