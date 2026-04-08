@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -82,16 +84,36 @@ class _ExportDataScreenState extends ConsumerState<ExportDataScreen> {
 
       final jsonString = jsonEncode(exportData);
 
-      final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/app_data_export.json');
-      await file.writeAsString(jsonString);
+      if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+        // Desktop platforms
+        final String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Please select where to save the export file:',
+          fileName: 'app_data_export.json',
+          type: FileType.custom,
+          allowedExtensions: ['json'],
+        );
 
-      final xFile = XFile(file.path, mimeType: 'application/json', name: 'app_data_export.json');
+        if (outputFile != null) {
+          final file = File(outputFile);
+          await file.writeAsString(jsonString);
+          if (mounted) {
+            ToastUtils.show(context, 'Data exported successfully');
+            Navigator.of(context).pop();
+          }
+        }
+      } else {
+        // Mobile / Web
+        final directory = await getTemporaryDirectory();
+        final file = File('${directory.path}/app_data_export.json');
+        await file.writeAsString(jsonString);
 
-      if (mounted) {
-        ToastUtils.show(context, 'Data exported successfully');
-        Navigator.of(context).pop();
-        await Share.shareXFiles([xFile], text: 'My App Data Export');
+        final xFile = XFile(file.path, mimeType: 'application/json', name: 'app_data_export.json');
+
+        if (mounted) {
+          ToastUtils.show(context, 'Data exported successfully');
+          Navigator.of(context).pop();
+          await Share.shareXFiles([xFile], text: 'My App Data Export');
+        }
       }
     } catch (e, stack) {
       ref.read(appLoggerProvider).handle(e, stack, 'Failed to export data');
