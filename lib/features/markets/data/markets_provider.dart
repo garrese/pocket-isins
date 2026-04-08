@@ -116,23 +116,7 @@ class Markets extends _$Markets {
 
     try {
       // Fetch from Yahoo (5m intraday)
-      var rawData = await marketService.fetchIntradayData(ticker.symbol);
-
-      if (rawData != null) {
-        final indicators = rawData['indicators']?['quote']?[0];
-        final closeArray = indicators?['close'] as List<dynamic>? ?? [];
-
-        if (closeArray.isEmpty) {
-          final fallbackData = await marketService.fetchHistoricalData(
-            ticker.symbol,
-            '1d',
-            '1mo',
-          );
-          if (fallbackData != null) {
-            rawData = fallbackData;
-          }
-        }
-      }
+      var rawData = await marketService.fetchIntradayData(ticker.symbol, isBackgroundRefresh: true);
 
       if (rawData != null) {
         final meta = rawData['meta'];
