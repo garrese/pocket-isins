@@ -7,6 +7,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 import '../../../core/services/log/talker_provider.dart';
 import '../../../core/database/drift/app_database.dart';
 import '../data/bot_repository.dart';
+import '../data/ai_settings_repository.dart';
 
 class BotState {
   final List<ChatMessageData> messages;
@@ -32,12 +33,14 @@ class BotController extends StateNotifier<BotState> {
   final BotRepository _repository;
   final AiService _aiService;
   final MarketDataService _marketDataService;
+  final AiSettingsRepository _settingsRepo;
   final Talker _log;
 
   BotController(
     this._repository,
     this._aiService,
     this._marketDataService,
+    this._settingsRepo,
     this._log,
   ) : super(BotState(messages: [])) {
     loadHistory();
@@ -107,10 +110,12 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
           .map((m) => {'role': m.role, 'content': m.content})
           .toList();
 
+      final settings = await _settingsRepo.getSettings();
+
       final response = await _aiService.getGenericCompletion(
         systemPrompt: systemPrompt,
         messages: historyMaps,
-        webSearch: true,
+        webSearch: settings.webSearchCapability,
       );
 
       await _handleAiResponse(response, systemPrompt);
@@ -166,10 +171,12 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
               .map((m) => {'role': m.role, 'content': m.content})
               .toList();
 
+          final settings = await _settingsRepo.getSettings();
+
           final newResponse = await _aiService.getGenericCompletion(
             systemPrompt: systemPrompt,
             messages: historyMaps,
-            webSearch: true,
+            webSearch: settings.webSearchCapability,
           );
 
           await _handleAiResponse(newResponse, systemPrompt);
@@ -186,10 +193,12 @@ Example: [\$ACTION:CREATE_ISIN isinCode="US0378331005" name="Apple Inc."]
               .map((m) => {'role': m.role, 'content': m.content})
               .toList();
 
+          final settings = await _settingsRepo.getSettings();
+
           final newResponse = await _aiService.getGenericCompletion(
             systemPrompt: systemPrompt,
             messages: historyMaps,
-            webSearch: true,
+            webSearch: settings.webSearchCapability,
           );
 
           await _handleAiResponse(newResponse, systemPrompt);
@@ -219,6 +228,7 @@ final botControllerProvider = StateNotifierProvider<BotController, BotState>((
     ref.watch(botRepositoryProvider),
     ref.watch(aiServiceProvider),
     ref.watch(marketDataServiceProvider),
+    ref.watch(aiSettingsRepositoryProvider),
     ref.watch(talkerProvider),
   );
 });

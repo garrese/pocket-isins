@@ -23,6 +23,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
   late TextEditingController _apiKeyController;
   late TextEditingController _modelNameController;
   String _selectedProvider = 'openai';
+  bool _webSearchCapability = false;
   bool _isSaving = false;
 
   @override
@@ -53,6 +54,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
       baseUrl: _baseUrlController.text.trim(),
       apiKey: _apiKeyController.text.trim(),
       modelName: _modelNameController.text.trim(),
+      webSearchCapability: _webSearchCapability,
     );
 
     try {
@@ -95,6 +97,7 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
             _baseUrlController.text = settings.baseUrl;
             _apiKeyController.text = settings.apiKey;
             _modelNameController.text = settings.modelName;
+            _webSearchCapability = settings.webSearchCapability;
           }
 
           return ConstrainedWidth.narrow(
@@ -120,13 +123,11 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                       items: const [
                         DropdownMenuItem(
                           value: 'openai',
-                          child: Text(
-                            'OpenAI Compatible (OpenAI, OpenRouter, Ollama)',
-                          ),
+                          child: Text('OpenAI Compatible'),
                         ),
                         DropdownMenuItem(
                           value: 'openrouter_web',
-                          child: Text('OpenRouter with Web Search'),
+                          child: Text('OpenRouter'),
                         ),
                         DropdownMenuItem(
                           value: 'google_ai_studio',
@@ -137,6 +138,21 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                         if (value != null) {
                           setState(() {
                             _selectedProvider = value;
+                            if (value == 'openai') {
+                              _baseUrlController.text =
+                                  'https://api.openai.com/v1';
+                              _modelNameController.text =
+                                  'gpt-5.4-nano-2026-03-17';
+                            } else if (value == 'openrouter_web') {
+                              _baseUrlController.text =
+                                  'https://openrouter.ai/api/v1';
+                              _modelNameController.text = 'x-ai/grok-4.1-fast';
+                            } else if (value == 'google_ai_studio') {
+                              _baseUrlController.text =
+                                  'https://generativelanguage.googleapis.com/v1beta';
+                              _modelNameController.text =
+                                  'gemini-3.1-flash-lite-preview';
+                            }
                           });
                         }
                       },
@@ -173,6 +189,21 @@ class _ByokConfigScreenState extends ConsumerState<ByokConfigScreen> {
                         }
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 16),
+                    CheckboxListTile(
+                      title: const Text('Web Search Capability'),
+                      subtitle: const Text(
+                        'Enable web search during bot conversations (if supported by model)',
+                      ),
+                      value: _webSearchCapability,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _webSearchCapability = value ?? false;
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
