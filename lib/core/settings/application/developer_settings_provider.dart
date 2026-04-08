@@ -13,6 +13,7 @@ class DeveloperSettings extends _$DeveloperSettings {
   static const _showLogConsoleKey = 'show_log_console';
   static const _enableLongLogDetailsKey = 'enable_long_log_details';
   static const _logLevelKey = 'log_level';
+  static const _maxHistoryItemsKey = 'max_history_items';
 
   @override
   DeveloperSettingsState build() {
@@ -21,6 +22,7 @@ class DeveloperSettings extends _$DeveloperSettings {
       showLogConsole: false,
       enableLongLogDetails: false,
       logLevel: LogLevel.info,
+      maxHistoryItems: 30,
     );
   }
 
@@ -37,6 +39,8 @@ class DeveloperSettings extends _$DeveloperSettings {
     final enableLongLogDetails =
         prefs.getBool(_enableLongLogDetailsKey) ?? false;
 
+    final maxHistoryItems = prefs.getInt(_maxHistoryItemsKey) ?? 30;
+
     // Apply log level to talker instance immediately if possible
     try {
       ref
@@ -44,7 +48,7 @@ class DeveloperSettings extends _$DeveloperSettings {
           .configure(
             settings: TalkerSettings(
               useHistory: true,
-              maxHistoryItems: 1000,
+              maxHistoryItems: maxHistoryItems,
               useConsoleLogs: true,
             ),
             logger: TalkerLogger(
@@ -63,6 +67,7 @@ class DeveloperSettings extends _$DeveloperSettings {
       showLogConsole: prefs.getBool(_showLogConsoleKey) ?? false,
       enableLongLogDetails: enableLongLogDetails,
       logLevel: logLevel,
+      maxHistoryItems: maxHistoryItems,
     );
   }
 
@@ -83,7 +88,7 @@ class DeveloperSettings extends _$DeveloperSettings {
           .configure(
             settings: TalkerSettings(
               useHistory: true,
-              maxHistoryItems: 1000,
+              maxHistoryItems: state.maxHistoryItems,
               useConsoleLogs: true,
             ),
             logger: TalkerLogger(
@@ -107,7 +112,7 @@ class DeveloperSettings extends _$DeveloperSettings {
           .configure(
             settings: TalkerSettings(
               useHistory: true,
-              maxHistoryItems: 1000,
+              maxHistoryItems: state.maxHistoryItems,
               useConsoleLogs: true,
             ),
             logger: TalkerLogger(
@@ -123,5 +128,33 @@ class DeveloperSettings extends _$DeveloperSettings {
     } catch (_) {}
 
     state = state.copyWith(logLevel: level);
+  }
+
+  Future<void> setMaxHistoryItems(int items) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_maxHistoryItemsKey, items);
+
+    try {
+      ref
+          .read(talkerProvider)
+          .configure(
+            settings: TalkerSettings(
+              useHistory: true,
+              maxHistoryItems: items,
+              useConsoleLogs: true,
+            ),
+            logger: TalkerLogger(
+              settings: TalkerLoggerSettings(
+                level: state.logLevel,
+                colors: {LogLevel.debug: AnsiPen()..green()},
+              ),
+              formatter: CustomTalkerFormatter(
+                () => state.enableLongLogDetails,
+              ),
+            ),
+          );
+    } catch (_) {}
+
+    state = state.copyWith(maxHistoryItems: items);
   }
 }

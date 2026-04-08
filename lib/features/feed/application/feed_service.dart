@@ -5,7 +5,7 @@ import 'package:drift/drift.dart' as drift;
 import '../../../../core/database/drift_service.dart';
 import '../../../../core/database/drift/app_database.dart';
 import '../../../../core/services/ai/ai_service.dart';
-import 'package:talker_flutter/talker_flutter.dart';
+import '../../../../core/services/log/app_logger.dart';
 import '../../../core/services/log/talker_provider.dart';
 import '../data/repositories/feed_repository.dart';
 
@@ -15,7 +15,7 @@ class FeedService {
   final FeedRepository _repository;
   final DriftService _driftService;
   final AiService _aiService;
-  final Talker _log;
+  final AppLogger _log;
 
   FeedService(this._repository, this._driftService, this._aiService, this._log);
 
@@ -195,6 +195,6 @@ FeedService feedService(FeedServiceRef ref) {
   final repository = ref.watch(feedRepositoryProvider);
   final driftServiceInstance = ref.watch(driftServiceProvider);
   final aiService = ref.watch(aiServiceProvider);
-  final log = ref.watch(talkerProvider);
+  final log = ref.watch(appLoggerProvider);
   return FeedService(repository, driftServiceInstance, aiService, log);
 }

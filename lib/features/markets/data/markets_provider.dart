@@ -264,7 +264,7 @@ class Markets extends _$Markets {
         }
       }
     } catch (e, stack) {
-      ref.read(talkerProvider).handle(
+      ref.read(appLoggerProvider).handle(
         e,
         stack,
         'MarketsProvider Error parsing data for ${ticker.symbol}',

@@ -12,14 +12,14 @@ String _$feedNewsStreamHash() => r'99966212debb4cde3f552efd3ec81219756085a8';
 @ProviderFor(feedNewsStream)
 final feedNewsStreamProvider =
     AutoDisposeStreamProvider<List<FeedNewsModel>>.internal(
-      feedNewsStream,
-      name: r'feedNewsStreamProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$feedNewsStreamHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  feedNewsStream,
+  name: r'feedNewsStreamProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$feedNewsStreamHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
@@ -31,14 +31,14 @@ String _$feedSortOrderStateHash() =>
 @ProviderFor(FeedSortOrderState)
 final feedSortOrderStateProvider =
     AutoDisposeNotifierProvider<FeedSortOrderState, FeedSortOrder>.internal(
-      FeedSortOrderState.new,
-      name: r'feedSortOrderStateProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$feedSortOrderStateHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  FeedSortOrderState.new,
+  name: r'feedSortOrderStateProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$feedSortOrderStateHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$FeedSortOrderState = AutoDisposeNotifier<FeedSortOrder>;
 String _$feedLoadingStateHash() => r'e9a0c02e6ca59511c501369fa90fd92d138bb0cc';
@@ -47,14 +47,14 @@ String _$feedLoadingStateHash() => r'e9a0c02e6ca59511c501369fa90fd92d138bb0cc';
 @ProviderFor(FeedLoadingState)
 final feedLoadingStateProvider =
     AutoDisposeNotifierProvider<FeedLoadingState, bool>.internal(
-      FeedLoadingState.new,
-      name: r'feedLoadingStateProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$feedLoadingStateHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  FeedLoadingState.new,
+  name: r'feedLoadingStateProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$feedLoadingStateHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
 typedef _$FeedLoadingState = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
