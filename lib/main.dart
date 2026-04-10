@@ -14,17 +14,14 @@ import 'features/feed/presentation/feed_screen.dart';
 import 'features/bot/presentation/bot_screen.dart';
 import 'features/logs/presentation/log_screen.dart';
 import 'core/services/log/custom_talker_formatter.dart';
-import '../../../core/services/log/talker_provider.dart';
+import 'core/services/log/talker_provider.dart';
+import 'core/services/log/app_logger.dart';
 import 'core/theme/app_drawer.dart';
 import 'core/utils/toast_utils.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Drift
-  final driftServiceInstance = DriftService();
-  await driftServiceInstance.init();
 
   final talker = TalkerFlutter.init(
     settings: TalkerSettings(
@@ -44,6 +41,15 @@ void main() async {
     ),
   );
 
+  final appLogger = AppLogger(
+    talker,
+    () => false, // Initial default, will be overridden by the provider's logic once Riverpod starts
+  );
+
+  // Initialize Drift
+  final driftServiceInstance = DriftService();
+  await driftServiceInstance.init(appLogger);
+
   FlutterError.onError = (details) {
     talker.handle(details.exception, details.stack, 'Uncaught Flutter Error');
     ToastUtils.show(null, 'An unexpected error occurred. Please check the logs.');
@@ -61,6 +67,14 @@ void main() async {
       overrides: [
         driftServiceProvider.overrideWithValue(driftServiceInstance),
         talkerProvider.overrideWithValue(talker),
+        // We override appLoggerProvider to use the same talker and initial logic,
+        // but the developerSettingsProvider will still manage its live configuration.
+        appLoggerProvider.overrideWith((ref) {
+          return AppLogger(
+            talker,
+            () => ref.watch(developerSettingsProvider).enableLongLogDetails,
+          );
+        }),
       ],
       child: const PocketIsinsApp(),
     ),
