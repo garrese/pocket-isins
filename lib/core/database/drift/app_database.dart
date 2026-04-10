@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'app_tables.dart';
 import 'connection/connection.dart' as impl;
+import '../../services/log/app_logger.dart';
 
 part 'app_database.g.dart';
 
@@ -9,7 +10,9 @@ part 'app_database.g.dart';
   tables: [Isins, Tickers, MarketDataCaches, FeedNews, ChatMessages],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(impl.connect());
+  final AppLogger? logger;
+
+  AppDatabase([this.logger]) : super(impl.connect(logger));
 
   @override
   int get schemaVersion => 6;
@@ -52,7 +55,7 @@ class AppDatabase extends _$AppDatabase {
             );
           } catch (e, stackTrace) {
             // Can be ignored if it exists, but log for visibility
-            print('Error adding regularMarketStart: $e');
+            logger?.warning('Error adding regularMarketStart', e.toString(), stackTrace);
           }
           try {
             await m.addColumn(
@@ -60,7 +63,7 @@ class AppDatabase extends _$AppDatabase {
               marketDataCaches.regularMarketEnd,
             );
           } catch (e, stackTrace) {
-            print('Error adding regularMarketEnd: $e');
+            logger?.warning('Error adding regularMarketEnd', e.toString(), stackTrace);
           }
           try {
             await m.addColumn(
@@ -68,12 +71,12 @@ class AppDatabase extends _$AppDatabase {
               marketDataCaches.preMarketStart,
             );
           } catch (e, stackTrace) {
-            print('Error adding preMarketStart: $e');
+            logger?.warning('Error adding preMarketStart', e.toString(), stackTrace);
           }
           try {
             await m.addColumn(marketDataCaches, marketDataCaches.preMarketEnd);
           } catch (e, stackTrace) {
-            print('Error adding preMarketEnd: $e');
+            logger?.warning('Error adding preMarketEnd', e.toString(), stackTrace);
           }
           try {
             await m.addColumn(
@@ -81,12 +84,12 @@ class AppDatabase extends _$AppDatabase {
               marketDataCaches.postMarketStart,
             );
           } catch (e, stackTrace) {
-            print('Error adding postMarketStart: $e');
+            logger?.warning('Error adding postMarketStart', e.toString(), stackTrace);
           }
           try {
             await m.addColumn(marketDataCaches, marketDataCaches.postMarketEnd);
           } catch (e, stackTrace) {
-            print('Error adding postMarketEnd: $e');
+            logger?.warning('Error adding postMarketEnd', e.toString(), stackTrace);
           }
         }
       },

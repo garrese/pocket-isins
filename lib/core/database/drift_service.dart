@@ -5,28 +5,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data_import_service.dart';
 import 'drift/app_database.dart';
+import '../services/log/app_logger.dart';
 
 part 'drift_service.g.dart';
 
 class DriftService {
   late final AppDatabase db;
 
-  Future<void> init() async {
+  Future<void> init(AppLogger logger) async {
     try {
-      db = AppDatabase();
+      db = AppDatabase(logger);
       // Verify connection by doing a simple query
       await db.customSelect('SELECT 1').get();
 
       // Seed default app data on first launch
-      await _seedInitialData();
+      await _seedInitialData(logger);
     } catch (e, stackTrace) {
-      print('Failed to initialize Drift database: $e\n$stackTrace');
+      logger.error('Failed to initialize Drift database', e, stackTrace);
       // Rethrow to allow the app to fail fast if DB is inaccessible
       rethrow;
     }
   }
 
-  Future<void> _seedInitialData() async {
+  Future<void> _seedInitialData(AppLogger logger) async {
     final prefs = await SharedPreferences.getInstance();
     final hasRunSeed = prefs.getBool('has_run_initial_seed') ?? false;
 
@@ -40,9 +41,9 @@ class DriftService {
           aiRepository: null, // Initial seed doesn't necessarily need the full Ref scope
         );
         await prefs.setBool('has_run_initial_seed', true);
-        print('Initial dummy app data successfully seeded.');
+        logger.info('Initial dummy app data successfully seeded.');
       } catch (e, stack) {
-        print('Failed to seed initial dummy app data: $e\n$stack');
+        logger.error('Failed to seed initial dummy app data', e, stack);
       }
     }
   }
